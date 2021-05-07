@@ -1,0 +1,14 @@
+{
+  "modid": "ojb_ojbui",
+  "name": "ojbui",
+  "author_list": [
+    "ojb"
+  ],
+  "description": "Slay the Spire UI library (WIP)",
+  "version": "0.0.1",
+  "sts_version": "12-22-2020",
+  "mts_version": "3.18.2",
+  "dependencies": [
+    "basemod"
+  ]
+}
