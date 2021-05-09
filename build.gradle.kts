@@ -20,7 +20,6 @@ dependencies {
     compileOnly(fileTree(compileOnlyLibs))
 }
 
-
 tasks.register<Jar>("buildJAR") {
     group = "Slay the Spire"
     description = "Builds a fat (includes runtime dependencies) JAR in the build/libs folder"
