@@ -1,7 +1,6 @@
 package ojbui.ui.layouts;
 
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
-import com.megacrit.cardcrawl.core.Settings;
 import ojbui.ui.AbstractWidget;
 import ojbui.ui.AnchorPosition;
 import ojbui.ui.InterpolationSpeed;
@@ -51,23 +50,14 @@ public final class GridLayout extends AbstractWidget<GridLayout> {
     private float totalWidth;
     private float totalHeight;
 
-    private int numWidgetsHorizontal;
-    private int numWidgetsVertical;
-
     private ArrayList<Float> rowHeights = new ArrayList<>();
     private ArrayList<Float> colWidths = new ArrayList<>();
 
     private AnchorPosition defaultChildAnchor = AnchorPosition.LEFT_TOP;
 
-    private float preferredWidth = 0.0f;
-    private float preferredHeight = 0.0f;
 
     public GridLayout() { }
 
-    public GridLayout(float preferredWidth, float preferredHeight) {
-        this.preferredWidth = preferredWidth;
-        this.preferredHeight = preferredHeight;
-    }
 
     // --------------------------------------------------------------------------------
 
@@ -82,81 +72,6 @@ public final class GridLayout extends AbstractWidget<GridLayout> {
 
     // --------------------------------------------------------------------------------
 
-    private ArrayList<Float> buildExactSizeArray(float pref, float... values) {
-        ArrayList<Float> sizes = new ArrayList<>();
-
-        float sum = 0.0f;
-        int numNegative = 0;
-
-        for (float v : values) {
-            if (v < 0.0f)
-                ++numNegative;
-            else
-                sum += v;
-        }
-
-        float remainder = pref - sum;
-        float sizePerDynamicElement = (numNegative > 0) ? remainder / (float)numNegative : 0.0f;
-
-        for (float v : values) {
-            if (v < 0.0f)
-                sizes.add(sizePerDynamicElement);
-            else
-                sizes.add(v);
-        }
-
-        return sizes;
-    }
-
-    private ArrayList<Float> buildRelativeSizeArray(float pref, float... values) {
-        ArrayList<Float> sizes = new ArrayList<>();
-
-        if (values.length == 0)
-            return sizes;
-
-        float sumPositive = 0.0f;
-        float sumNegative = 0.0f;
-
-        int numPositive = 0;
-        int numNegative = 0;
-
-        for (float v : values) {
-            if (v < 0.0f) {
-                numNegative++;
-                sumNegative -= v;
-            }
-            else {
-                numPositive++;
-                sumPositive += v;
-            }
-        }
-
-        float totalSum = sumPositive + sumNegative;
-
-        // Sanity check
-        if (totalSum == 0.0f)
-            return sizes;
-
-        if (numNegative > 0) {
-            float positivePercent = sumPositive / totalSum;
-            float negativePercent = sumNegative / totalSum;
-
-            for (float v : values) {
-                if (v < 0.0f)
-                    sizes.add(negativePercent * pref * (-v / sumNegative));
-                else
-                    sizes.add(positivePercent * pref * (v / sumPositive));
-            }
-        }
-        else {
-            for (float v : values) {
-                sizes.add((v / sumPositive) * pref);
-            }
-        }
-
-        return sizes;
-    }
-
     private void updateTotalHeight() {
         this.totalHeight = rowHeights.stream().reduce(Float::sum).orElse(0.0f);
     }
@@ -165,26 +80,155 @@ public final class GridLayout extends AbstractWidget<GridLayout> {
         this.totalWidth = colWidths.stream().reduce(Float::sum).orElse(0.0f);
     }
 
+    // --------------------------------------------------------------------------------
+
+    private ArrayList<Float> buildExactSizeArray(float... values) {
+        ArrayList<Float> sizes = new ArrayList<>();
+
+        for (float v : values)
+            sizes.add(v);
+
+        return sizes;
+    }
+
+    private ArrayList<Float> buildExactSizeArrayOverflow(float overflow, float... values) {
+        ArrayList<Float> sizes = new ArrayList<>();
+
+        int numNegative = 0;
+
+        for (float v : values) {
+            if (v < 0.0f)
+                ++numNegative;
+        }
+
+        float sizePerOverflowElement = (numNegative > 0) ? overflow / (float)numNegative : 0.0f;
+
+        for (float v : values) {
+            if (v < 0.0f)
+                sizes.add(sizePerOverflowElement);
+            else
+                sizes.add(v);
+        }
+
+        return sizes;
+    }
+
+    private ArrayList<Float> buildRelativeSizeArray(float total, float... values) {
+        ArrayList<Float> sizes = new ArrayList<>();
+
+        if (values.length == 0)
+            return sizes;
+
+        float sum = 0.0f;
+        for (float v : values)
+            sum += v;
+
+        if (sum == 0.0f)
+            return sizes;
+
+        for (float v : values)
+            sizes.add((v / sum) * total);
+
+        return sizes;
+    }
+
+    private ArrayList<Float> buildNSizeArray(float pref, int count) {
+        ArrayList<Float> sizes = new ArrayList<>();
+
+        for (int i = 0; i < count; ++i)
+            sizes.add(pref / count);
+
+        return sizes;
+    }
+
+    // --------------------------------------------------------------------------------
+
+    /**
+     * Sets the heights of each row to an exact pixel value. Each argument to this function produces a row in the grid with the given height.
+     * The following example makes the grid have three rows, where the top-most row is given a height of 100px, the middle row 200px, and the bottom row 300px:
+     * <pre>
+     * {@code
+     * grid.withExactRows(100.0f, 200.0f, 300.0f);
+     * }
+     * </pre>
+     * NOTE: using negative values for a row height lets the layout overlap multiple rows (usually undesired behavior).
+     * @see #withExactCols(float...)
+     * @see #withExactRowsOverflow(float, float...)
+     * @param heights a list of heights for row 0, row 1, row 2, etc., where row 0 is the top-most row. Heights are assumed to be in 1080p space.
+     * @return this
+     */
     public GridLayout withExactRows(float... heights) {
-        this.rowHeights = buildExactSizeArray(preferredHeight, heights);
+        this.rowHeights = buildExactSizeArray(heights);
         updateTotalHeight();
         return this;
     }
 
+    /**
+     * Sets the widths of each column to an exact pixel value. Each argument to this function produces a column in the grid with the given width.
+     * The following example makes the grid have three columns, where the left-most column is given a width of 100px, the middle column 200px, and the right-most row 300px:
+     * <pre>
+     * {@code
+     * grid.withExactCols(100.0f, 200.0f, 300.0f);
+     * }
+     * </pre>
+     * NOTE: using negative values for a column width lets the layout overlap multiple columns (usually undesired behavior).
+     * @see #withExactRows(float...)
+     * @see #withExactColsOverflow(float, float...)
+     * @param widths a list of widths for column 0, column 1, column 2, etc., where column 0 is the left-most row. Widths are assumed to be in 1080p space.
+     * @return this
+     */
     public GridLayout withExactCols(float... widths) {
-        this.colWidths = buildExactSizeArray(preferredWidth, widths);
+        this.colWidths = buildExactSizeArray(widths);
         updateTotalWidth();
         return this;
     }
 
-    public GridLayout withRelativeRows(float... heights) {
-        this.rowHeights = buildRelativeSizeArray(preferredHeight, heights);
+    /**
+     * Sets the heights of each row to an exact pixel value allowing for "overflow" rows . Each argument to this function produces a row in the grid with the given height.
+     * The following example makes the grid have three rows, where the top-most row is given a height of 100px, the middle row 200px, and the bottom row 300px:
+     * <pre>
+     * {@code
+     * grid.withExactRows(100.0f, 200.0f, 300.0f);
+     * }
+     * </pre>
+     * NOTE: using negative values for a row height lets the layout overlap multiple rows (usually undesired behavior).
+     * @see #withExactRows(float...)
+     * @param overflowHeight how much space should be allotted for ALL overflow rows combined; with N overflow rows, each row will be provided <code>overflowHeight / N</code> pixels of height.
+     * @param heights a list of heights for row 0, row 1, row 2, etc., where row 0 is the top-most row. Heights are assumed to be in 1080p space.
+     * @return this
+     */
+    public GridLayout withExactRowsOverflow(float overflowHeight, float... heights) {
+        this.rowHeights = buildExactSizeArrayOverflow(overflowHeight, heights);
         updateTotalHeight();
         return this;
     }
 
-    public GridLayout withRelativeCols(float... widths) {
-        this.colWidths = buildRelativeSizeArray(preferredWidth, widths);
+    public GridLayout withExactColsOverflow(float overflowWidth, float... widths) {
+        this.colWidths = buildExactSizeArrayOverflow(overflowWidth, widths);
+        updateTotalWidth();
+        return this;
+    }
+
+    public GridLayout withRelativeRows(float totalHeight, float... heights) {
+        this.rowHeights = buildRelativeSizeArray(totalHeight, heights);
+        updateTotalHeight();
+        return this;
+    }
+
+    public GridLayout withRelativeCols(float totalWidth, float... widths) {
+        this.colWidths = buildRelativeSizeArray(totalWidth, widths);
+        updateTotalWidth();
+        return this;
+    }
+
+    public GridLayout withNEvenlyDistributedRows(float totalHeight, int numRows) {
+        this.rowHeights = buildNSizeArray(totalHeight, numRows);
+        updateTotalHeight();
+        return this;
+    }
+
+    public GridLayout withNEvenlyDistributedCols(float totalWidth, int numCols) {
+        this.colWidths = buildNSizeArray(totalWidth, numCols);
         updateTotalWidth();
         return this;
     }
