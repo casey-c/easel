@@ -1,9 +1,13 @@
 package ojbui.ui.layouts;
 
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.megacrit.cardcrawl.core.Settings;
+import com.megacrit.cardcrawl.helpers.ImageMaster;
+import ojbui.ojbui;
 import ojbui.ui.AbstractWidget;
 import ojbui.ui.AnchorPosition;
 import ojbui.ui.InterpolationSpeed;
+import ojbui.ui.debug.DebugWidget;
 
 import java.util.*;
 import java.util.stream.Stream;
@@ -91,28 +95,6 @@ public final class GridLayout extends AbstractWidget<GridLayout> {
         return sizes;
     }
 
-    private ArrayList<Float> buildExactSizeArrayOverflow(float overflow, float... values) {
-        ArrayList<Float> sizes = new ArrayList<>();
-
-        int numNegative = 0;
-
-        for (float v : values) {
-            if (v < 0.0f)
-                ++numNegative;
-        }
-
-        float sizePerOverflowElement = (numNegative > 0) ? overflow / (float)numNegative : 0.0f;
-
-        for (float v : values) {
-            if (v < 0.0f)
-                sizes.add(sizePerOverflowElement);
-            else
-                sizes.add(v);
-        }
-
-        return sizes;
-    }
-
     private ArrayList<Float> buildRelativeSizeArray(float total, float... values) {
         ArrayList<Float> sizes = new ArrayList<>();
 
@@ -132,11 +114,11 @@ public final class GridLayout extends AbstractWidget<GridLayout> {
         return sizes;
     }
 
-    private ArrayList<Float> buildNSizeArray(float pref, int count) {
+    private ArrayList<Float> buildNSizeArray(float total, int count) {
         ArrayList<Float> sizes = new ArrayList<>();
 
         for (int i = 0; i < count; ++i)
-            sizes.add(pref / count);
+            sizes.add(total / count);
 
         return sizes;
     }
@@ -153,7 +135,8 @@ public final class GridLayout extends AbstractWidget<GridLayout> {
      * </pre>
      * NOTE: using negative values for a row height lets the layout overlap multiple rows (usually undesired behavior).
      * @see #withExactCols(float...)
-     * @see #withExactRowsOverflow(float, float...)
+     * @see #withRelativeRows(float, float...)
+     * @see #withNEvenlySizedRows(float, int)
      * @param heights a list of heights for row 0, row 1, row 2, etc., where row 0 is the top-most row. Heights are assumed to be in 1080p space.
      * @return this
      */
@@ -173,7 +156,8 @@ public final class GridLayout extends AbstractWidget<GridLayout> {
      * </pre>
      * NOTE: using negative values for a column width lets the layout overlap multiple columns (usually undesired behavior).
      * @see #withExactRows(float...)
-     * @see #withExactColsOverflow(float, float...)
+     * @see #withRelativeCols(float, float...)
+     * @see #withNEvenlySizedCols(float, int)
      * @param widths a list of widths for column 0, column 1, column 2, etc., where column 0 is the left-most row. Widths are assumed to be in 1080p space.
      * @return this
      */
@@ -184,50 +168,92 @@ public final class GridLayout extends AbstractWidget<GridLayout> {
     }
 
     /**
-     * Sets the heights of each row to an exact pixel value allowing for "overflow" rows . Each argument to this function produces a row in the grid with the given height.
-     * The following example makes the grid have three rows, where the top-most row is given a height of 100px, the middle row 200px, and the bottom row 300px:
+     * Sets the row heights relative to each other as a fraction of some given <code>totalHeight</code>. Each argument in the <code>heightRatios</code> variadic list produces a row in the final grid.
+     * The following example makes the grid have three rows, where the top-most row is considered the "baseline" height with the middle row being twice as tall and the bottom row being half as tall. With a <code>totalHeight</code> of 350px, this results in row heights being 100px, 200px, and 50px respectively.
      * <pre>
      * {@code
-     * grid.withExactRows(100.0f, 200.0f, 300.0f);
+     * grid.withRelativeRows(350.0f, 1f, 2f, 0.5f);
      * }
      * </pre>
-     * NOTE: using negative values for a row height lets the layout overlap multiple rows (usually undesired behavior).
+     * The portion of the total height allotted to each row is entirely relative, so these will both produce 100px tall rows:
+     * <pre>
+     * {@code
+     * grid.withRelativeRows(300.0f, 0.2f, 0.2f, 0.2f);
+     * grid.withRelativeRows(300.0f, 1f, 1f, 1f);
+     * }
+     * </pre>
+     * Given ratios (x, y, z), the space allotted for row x is simply <code>totalHeight * (x / (x + y + z))</code>
+     * @implNote undefined behavior if supplied negative or zero ratios
+     * @param totalHeight the total space allotted for all rows combined
+     * @param heightRatios a list of ratios used to divide up the totalHeight in a relative manner
+     * @see #withRelativeCols(float, float...)
      * @see #withExactRows(float...)
-     * @param overflowHeight how much space should be allotted for ALL overflow rows combined; with N overflow rows, each row will be provided <code>overflowHeight / N</code> pixels of height.
-     * @param heights a list of heights for row 0, row 1, row 2, etc., where row 0 is the top-most row. Heights are assumed to be in 1080p space.
-     * @return this
+     * @see #withNEvenlySizedRows(float, int)
+     * @return
      */
-    public GridLayout withExactRowsOverflow(float overflowHeight, float... heights) {
-        this.rowHeights = buildExactSizeArrayOverflow(overflowHeight, heights);
+    public GridLayout withRelativeRows(float totalHeight, float... heightRatios) {
+        this.rowHeights = buildRelativeSizeArray(totalHeight, heightRatios);
         updateTotalHeight();
         return this;
     }
 
-    public GridLayout withExactColsOverflow(float overflowWidth, float... widths) {
-        this.colWidths = buildExactSizeArrayOverflow(overflowWidth, widths);
+    /**
+     * Sets the column widths relative to each other as a fraction of some given <code>totalWidth</code>. Each argument in the <code>widthRatios</code> variadic list produces a column in the final grid.
+     * The following example makes the grid have three columns, where the left-most column is considered the "baseline" width with the middle column being twice as wide and the bottom column being half as wide. With a <code>totalWidth</code> of 350px, this results in column widths being 100px, 200px, and 50px respectively.
+     * <pre>
+     * {@code
+     * grid.withRelativeCols(350.0f, 1f, 2f, 0.5f);
+     * }
+     * </pre>
+     * The portion of the total width allotted to each row is entirely relative, so these will both produce 100px wide columns:
+     * <pre>
+     * {@code
+     * grid.withRelativeCols(300.0f, 0.2f, 0.2f, 0.2f);
+     * grid.withRelativeCols(300.0f, 1f, 1f, 1f);
+     * }
+     * </pre>
+     * Given ratios (x, y, z), the space allotted for column x is simply <code>totalWidth * (x / (x + y + z))</code>
+     * @implNote undefined behavior if supplied negative or zero ratios
+     * @param totalWidth the total space allotted for all columns combined
+     * @param widthRatios a list of ratios used to divide up the totalWidth in a relative manner
+     * @see #withRelativeRows(float, float...)
+     * @see #withExactCols(float...)
+     * @see #withNEvenlySizedCols(float, int)
+     * @return
+     */
+    public GridLayout withRelativeCols(float totalWidth, float... widthRatios) {
+        this.colWidths = buildRelativeSizeArray(totalWidth, widthRatios);
         updateTotalWidth();
         return this;
     }
 
-    public GridLayout withRelativeRows(float totalHeight, float... heights) {
-        this.rowHeights = buildRelativeSizeArray(totalHeight, heights);
-        updateTotalHeight();
-        return this;
-    }
-
-    public GridLayout withRelativeCols(float totalWidth, float... widths) {
-        this.colWidths = buildRelativeSizeArray(totalWidth, widths);
-        updateTotalWidth();
-        return this;
-    }
-
-    public GridLayout withNEvenlyDistributedRows(float totalHeight, int numRows) {
+    /**
+     * Makes <code>numRows</code> evenly sized rows. Each row will be given a height of <code>totalHeight / numRows</code> pixels.
+     * @implNote undefined behavior if numRows is not > 0 or if totalHeight is < 0
+     * @param totalHeight the combined height of all rows
+     * @param numRows the number of rows to construct
+     * @return this
+     * @see #withNEvenlySizedCols(float, int)
+     * @see #withExactRows(float...)
+     * @see #withRelativeRows(float, float...)
+     */
+    public GridLayout withNEvenlySizedRows(float totalHeight, int numRows) {
         this.rowHeights = buildNSizeArray(totalHeight, numRows);
         updateTotalHeight();
         return this;
     }
 
-    public GridLayout withNEvenlyDistributedCols(float totalWidth, int numCols) {
+    /**
+     * Makes <code>numCols</code> evenly sized columns. Each column will be given a width of <code>totalWidth / numCols</code> pixels.
+     * @implNote undefined behavior if numCols is not > 0 or if totalWidth is < 0
+     * @param totalWidth the combined width of all columns
+     * @param numCols the number of columns to construct
+     * @return this
+     * @see #withNEvenlySizedRows(float, int)
+     * @see #withExactCols(float...)
+     * @see #withRelativeCols(float, float...)
+     */
+    public GridLayout withNEvenlySizedCols(float totalWidth, int numCols) {
         this.colWidths = buildNSizeArray(totalWidth, numCols);
         updateTotalWidth();
         return this;
@@ -277,21 +303,56 @@ public final class GridLayout extends AbstractWidget<GridLayout> {
     // Add child
     // --------------------------------------------------------------------------------
 
-    public void addChild(AbstractWidget widget, int row, int col, AnchorPosition anchorPosition) {
+    /**
+     * Let this grid manage the given widget. The widget will be placed at the specified anchor position at the desired (row, col) position in the grid next time {@link #anchoredAt(float, float, AnchorPosition)} is called. This widget will replace any existing widget at the same (row, col) position if it already exists.
+     * @implNote assumes that (row,col) will be a valid position in the grid, but no bounds checking is provided. The grid will add this widget to its tracked HashMap regardless.
+     * @param row the row the widget will be placed in (0 is the top-most row)
+     * @param col the col the widget will be placed in (0 is the left-most column)
+     * @param widget the widget to track
+     * @param anchorPosition how the child will be situated inside the (row, col) grid cell [which may be wider and taller than the widget's own width/height]
+     * @see #addChild(int, int, AbstractWidget, AnchorPosition)
+     * @see #withChild(int, int, AbstractWidget)
+     * @see #withDefaultChildAnchorPosition(AnchorPosition)
+     */
+    public void addChild(int row, int col, AbstractWidget widget, AnchorPosition anchorPosition) {
         children.put(new GridLocation(row, col), new GridItem(widget, anchorPosition));
     }
 
-    public void addChild(AbstractWidget widget, int row, int col) {
-        addChild(widget, row, col, defaultChildAnchor);
+    /**
+     * Convenience function for {@link #addChild(int, int, AbstractWidget, AnchorPosition)}. Uses the <code>defaultChildAnchor</code> anchor set by the {@link #withDefaultChildAnchorPosition(AnchorPosition)} method (if that method isn't used when building, the <code>defaultChildAnchor</code> defaults to LEFT_TOP).
+     * @param row the row the widget will be placed in (0 is the top-most row)
+     * @param col the col the widget will be placed in (0 is the left-most column)
+     * @param widget the widget to track
+     * @see #addChild(int, int, AbstractWidget, AnchorPosition)
+     */
+    public void addChild(int row, int col, AbstractWidget widget) {
+        addChild(row, col, widget, defaultChildAnchor);
     }
 
-    public GridLayout withChild(AbstractWidget widget, int row, int col) {
-        addChild(widget, row, col, defaultChildAnchor);
+    /**
+     * Convenience function.
+     * @param row the row the widget will be placed in (0 is the top-most row)
+     * @param col the col the widget will be placed in (0 is the left-most column)
+     * @param widget the widget to track
+     * @see #addChild(int, int, AbstractWidget)
+     * @return this
+     */
+    public GridLayout withChild(int row, int col, AbstractWidget widget) {
+        addChild(row, col, widget, defaultChildAnchor);
         return this;
     }
 
-    public GridLayout withChild(AbstractWidget widget, int row, int col, AnchorPosition anchorPosition) {
-        addChild(widget, row, col, anchorPosition);
+    /**
+     * Convenience function.
+     * @param row the row the widget will be placed in (0 is the top-most row)
+     * @param col the col the widget will be placed in (0 is the left-most column)
+     * @param widget the widget to track
+     * @param anchorPosition how the child will be situated inside the (row, col) grid cell [which may be wider and taller than the widget's own width/height]
+     * @see #addChild(int, int, AbstractWidget, AnchorPosition)
+     * @return
+     */
+    public GridLayout withChild(int row, int col, AbstractWidget widget, AnchorPosition anchorPosition) {
+        addChild(row, col, widget, anchorPosition);
         return this;
     }
 
@@ -324,6 +385,11 @@ public final class GridLayout extends AbstractWidget<GridLayout> {
     // --------------------------------------------------------------------------------
 
     private void anchorChild(AbstractWidget child, int row, int col, AnchorPosition target, InterpolationSpeed withDelay) {
+        // Ensure the child position is indeed tracked by this grid
+        if (row >= rowHeights.size() || col >= colWidths.size()) {
+            ojbui.logger.warn("Warning: attempt to anchor child " + child + " to GridLayout " + this + " failed: (row, col) index out of bounds.");
+        }
+
         float colLeft = getColLeft(col);
         float rowTop = getRowTop(row);
 
@@ -384,6 +450,14 @@ public final class GridLayout extends AbstractWidget<GridLayout> {
 
     @Override
     protected void renderWidget(SpriteBatch sb) {
+        // TODO: make debug only
+        sb.setColor(DebugWidget.DEBUG_COLOR_1);
+        sb.draw(ImageMaster.WHITE_SQUARE_IMG,
+                getContentLeft() * Settings.xScale,
+                getContentBottom() * Settings.yScale,
+                getContentWidth() * Settings.xScale,
+                getContentHeight() * Settings.yScale);
+
         children.values()
                 .stream()
                 .map(a -> a.widget)
