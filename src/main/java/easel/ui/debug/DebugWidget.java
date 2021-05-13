@@ -1,10 +1,10 @@
-package ojbui.ui.debug;
+package easel.ui.debug;
 
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.megacrit.cardcrawl.core.Settings;
 import com.megacrit.cardcrawl.helpers.ImageMaster;
-import ojbui.ui.AbstractWidget;
+import easel.ui.AbstractWidget;
 
 public class DebugWidget extends AbstractWidget<DebugWidget> {
     public static final Color DEBUG_COLOR_0 = new Color(0.384f, 0.690f, 0.388f, 0.500f);

@@ -1,4 +1,4 @@
-package ojbui.ui;
+package easel.ui;
 
 import com.megacrit.cardcrawl.helpers.MathHelper;
 

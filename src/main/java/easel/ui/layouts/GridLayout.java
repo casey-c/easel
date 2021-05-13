@@ -1,13 +1,13 @@
-package ojbui.ui.layouts;
+package easel.ui.layouts;
 
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.megacrit.cardcrawl.core.Settings;
 import com.megacrit.cardcrawl.helpers.ImageMaster;
-import ojbui.ojbui;
-import ojbui.ui.AbstractWidget;
-import ojbui.ui.AnchorPosition;
-import ojbui.ui.InterpolationSpeed;
-import ojbui.ui.debug.DebugWidget;
+import easel.Easel;
+import easel.ui.AbstractWidget;
+import easel.ui.AnchorPosition;
+import easel.ui.InterpolationSpeed;
+import easel.ui.debug.DebugWidget;
 
 import java.util.*;
 import java.util.stream.Stream;
@@ -183,13 +183,13 @@ public final class GridLayout extends AbstractWidget<GridLayout> {
      * }
      * </pre>
      * Given ratios (x, y, z), the space allotted for row x is simply <code>totalHeight * (x / (x + y + z))</code>
-     * @implNote undefined behavior if supplied negative or zero ratios
+     * Note: undefined behavior if supplied negative or zero ratios
      * @param totalHeight the total space allotted for all rows combined
      * @param heightRatios a list of ratios used to divide up the totalHeight in a relative manner
      * @see #withRelativeCols(float, float...)
      * @see #withExactRows(float...)
      * @see #withNEvenlySizedRows(float, int)
-     * @return
+     * @return this
      */
     public GridLayout withRelativeRows(float totalHeight, float... heightRatios) {
         this.rowHeights = buildRelativeSizeArray(totalHeight, heightRatios);
@@ -213,13 +213,13 @@ public final class GridLayout extends AbstractWidget<GridLayout> {
      * }
      * </pre>
      * Given ratios (x, y, z), the space allotted for column x is simply <code>totalWidth * (x / (x + y + z))</code>
-     * @implNote undefined behavior if supplied negative or zero ratios
+     * NOTE: undefined behavior if supplied negative or zero ratios
      * @param totalWidth the total space allotted for all columns combined
      * @param widthRatios a list of ratios used to divide up the totalWidth in a relative manner
      * @see #withRelativeRows(float, float...)
      * @see #withExactCols(float...)
      * @see #withNEvenlySizedCols(float, int)
-     * @return
+     * @return this
      */
     public GridLayout withRelativeCols(float totalWidth, float... widthRatios) {
         this.colWidths = buildRelativeSizeArray(totalWidth, widthRatios);
@@ -229,7 +229,7 @@ public final class GridLayout extends AbstractWidget<GridLayout> {
 
     /**
      * Makes <code>numRows</code> evenly sized rows. Each row will be given a height of <code>totalHeight / numRows</code> pixels.
-     * @implNote undefined behavior if numRows is not > 0 or if totalHeight is < 0
+     * NOTE: undefined behavior if numRows is less than or equal to 0 or if totalHeight is less than 0
      * @param totalHeight the combined height of all rows
      * @param numRows the number of rows to construct
      * @return this
@@ -245,7 +245,7 @@ public final class GridLayout extends AbstractWidget<GridLayout> {
 
     /**
      * Makes <code>numCols</code> evenly sized columns. Each column will be given a width of <code>totalWidth / numCols</code> pixels.
-     * @implNote undefined behavior if numCols is not > 0 or if totalWidth is < 0
+     * NOTE: undefined behavior if numCols is less than or equal to 0 or if totalWidth is less than 0
      * @param totalWidth the combined width of all columns
      * @param numCols the number of columns to construct
      * @return this
@@ -305,7 +305,7 @@ public final class GridLayout extends AbstractWidget<GridLayout> {
 
     /**
      * Let this grid manage the given widget. The widget will be placed at the specified anchor position at the desired (row, col) position in the grid next time {@link #anchoredAt(float, float, AnchorPosition)} is called. This widget will replace any existing widget at the same (row, col) position if it already exists.
-     * @implNote assumes that (row,col) will be a valid position in the grid, but no bounds checking is provided. The grid will add this widget to its tracked HashMap regardless.
+     * NOTE: assumes that (row,col) will be a valid position in the grid, but no bounds checking is provided. The grid will add this widget to its tracked HashMap regardless.
      * @param row the row the widget will be placed in (0 is the top-most row)
      * @param col the col the widget will be placed in (0 is the left-most column)
      * @param widget the widget to track
@@ -349,7 +349,7 @@ public final class GridLayout extends AbstractWidget<GridLayout> {
      * @param widget the widget to track
      * @param anchorPosition how the child will be situated inside the (row, col) grid cell [which may be wider and taller than the widget's own width/height]
      * @see #addChild(int, int, AbstractWidget, AnchorPosition)
-     * @return
+     * @return this
      */
     public GridLayout withChild(int row, int col, AbstractWidget widget, AnchorPosition anchorPosition) {
         addChild(row, col, widget, anchorPosition);
@@ -387,7 +387,7 @@ public final class GridLayout extends AbstractWidget<GridLayout> {
     private void anchorChild(AbstractWidget child, int row, int col, AnchorPosition target, InterpolationSpeed withDelay) {
         // Ensure the child position is indeed tracked by this grid
         if (row >= rowHeights.size() || col >= colWidths.size()) {
-            ojbui.logger.warn("Warning: attempt to anchor child " + child + " to GridLayout " + this + " failed: (row, col) index out of bounds.");
+            Easel.logger.warn("Warning: attempt to anchor child " + child + " to GridLayout " + this + " failed: (row, col) index out of bounds.");
         }
 
         float colLeft = getColLeft(col);

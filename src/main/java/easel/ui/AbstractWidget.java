@@ -1,4 +1,4 @@
-package ojbui.ui;
+package easel.ui;
 
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.megacrit.cardcrawl.core.Settings;
@@ -73,17 +73,22 @@ public abstract class AbstractWidget<T extends AbstractWidget<T>> {
         float screenCenterX = (Settings.WIDTH / 2.0f) / Settings.xScale;
         float screenCenterY = (Settings.HEIGHT / 2.0f) / Settings.yScale;
 
-        this.targetX = screenCenterX - (0.5f * getWidth());
-        this.targetY = screenCenterY - (0.5f * getHeight());
+        return anchoredAt(screenCenterX, screenCenterY, AnchorPosition.CENTER, withDelay);
 
-        this.interpolationSpeed = withDelay;
+//        float screenCenterX = (Settings.WIDTH / 2.0f) / Settings.xScale;
+//        float screenCenterY = (Settings.HEIGHT / 2.0f) / Settings.yScale;
+//
+//        this.targetX = screenCenterX - (0.5f * getWidth());
+//        this.targetY = screenCenterY - (0.5f * getHeight());
+//
+//        this.interpolationSpeed = withDelay;
+//
+//        if (withDelay == InterpolationSpeed.INSTANT) {
+//            this.x = targetX;
+//            this.y = targetY;
+//        }
 
-        if (withDelay == InterpolationSpeed.INSTANT) {
-            this.x = targetX;
-            this.y = targetY;
-        }
-
-        return (T)this;
+        //return (T)this;
     }
 
     /*

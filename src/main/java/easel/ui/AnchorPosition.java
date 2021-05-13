@@ -1,4 +1,4 @@
-package ojbui.ui;
+package easel.ui;
 
 public enum AnchorPosition {
     LEFT_TOP, CENTER_TOP, RIGHT_TOP,

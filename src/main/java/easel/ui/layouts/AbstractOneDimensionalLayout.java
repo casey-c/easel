@@ -1,4 +1,4 @@
-package ojbui.ui.layouts;
+package easel.ui.layouts;
 //
 //import ojbui.ui.AbstractWidget;
 //
