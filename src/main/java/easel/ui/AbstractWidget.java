@@ -65,11 +65,11 @@ public abstract class AbstractWidget<T extends AbstractWidget<T>> {
         return (T)this;
     }
 
-    public T anchorCenteredOnScreen() {
-        return anchorCenteredOnScreen(InterpolationSpeed.INSTANT);
+    public T anchoredCenteredOnScreen() {
+        return anchoredCenteredOnScreen(InterpolationSpeed.INSTANT);
     }
 
-    public T anchorCenteredOnScreen(InterpolationSpeed withDelay) {
+    public T anchoredCenteredOnScreen(InterpolationSpeed withDelay) {
         float screenCenterX = (Settings.WIDTH / 2.0f) / Settings.xScale;
         float screenCenterY = (Settings.HEIGHT / 2.0f) / Settings.yScale;
 
