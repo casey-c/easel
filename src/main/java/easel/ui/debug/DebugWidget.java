@@ -19,6 +19,10 @@ public class DebugWidget extends AbstractWidget<DebugWidget> {
         this(100, 100, DEBUG_COLOR_0);
     }
 
+    public DebugWidget(Color color) {
+        this(100, 100, color);
+    }
+
     public DebugWidget(float width, float height) {
         this(width, height, DEBUG_COLOR_0);
     }

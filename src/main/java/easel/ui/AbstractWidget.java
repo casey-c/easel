@@ -105,7 +105,7 @@ public abstract class AbstractWidget<T extends AbstractWidget<T>> {
      *               rendering further to the left of the screen and get cut off.
      * @return this widget
      */
-    public T instantClampIntoScreen(int border) {
+    public T clampedOntoScreen(int border) {
         // TODO this function needs to account for xScale, yScale, as x and y are both in 1080p space, and
         //   Settings.WIDTH etc. may not be in the same coordinate system. (Need to verify / do testing here!)
 
@@ -121,12 +121,16 @@ public abstract class AbstractWidget<T extends AbstractWidget<T>> {
         if (targetY + getHeight() > (Settings.HEIGHT - border))
             this.targetY = Settings.HEIGHT - border - getHeight();
 
-        this.x = targetX;
-        this.y = targetY;
+        // TODO: might want to not instantly move to target; but instead use this function to just make sure the target
+        //   is clamped. Need to do some testing to see what makes more sense...
+        return anchoredAt(targetX, targetY, AnchorPosition.LEFT_BOTTOM, InterpolationSpeed.INSTANT);
 
-        this.interpolationSpeed = InterpolationSpeed.INSTANT;
+//        this.x = targetX;
+//        this.y = targetY;
+//
+//        this.interpolationSpeed = InterpolationSpeed.INSTANT;
 
-        return (T)this;
+        //return (T)this;
     }
 
     // --------------------------------------------------------------------------------

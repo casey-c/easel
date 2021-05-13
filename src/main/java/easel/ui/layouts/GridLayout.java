@@ -39,18 +39,9 @@ public final class GridLayout extends AbstractWidget<GridLayout> {
         }
     }
 
-    private static final class GridItem {
-        AbstractWidget widget;
-        AnchorPosition anchor;
-
-        public GridItem(AbstractWidget widget, AnchorPosition anchor) {
-            this.widget = widget;
-            this.anchor = anchor;
-        }
-    }
 
     // --------------------------------------------------------------------------------
-    private HashMap<GridLocation, GridItem> children = new HashMap<>();
+    private HashMap<GridLocation, LayoutItem> children = new HashMap<>();
     private float totalWidth;
     private float totalHeight;
 
@@ -268,14 +259,14 @@ public final class GridLayout extends AbstractWidget<GridLayout> {
 
     // --------------------------------------------------------------------------------
 
-    protected Stream<GridItem> iteratorByRow(int row) {
+    protected Stream<LayoutItem> iteratorByRow(int row) {
         return children.entrySet()
                 .stream()
                 .filter(a -> a.getKey().row == row)
                 .map(Map.Entry::getValue);
     }
 
-    protected Stream<GridItem> iteratorByCol(int col) {
+    protected Stream<LayoutItem> iteratorByCol(int col) {
         return children.entrySet()
                 .stream()
                 .filter(a -> a.getKey().col == col)
@@ -315,7 +306,7 @@ public final class GridLayout extends AbstractWidget<GridLayout> {
      * @see #withDefaultChildAnchorPosition(AnchorPosition)
      */
     public void addChild(int row, int col, AbstractWidget widget, AnchorPosition anchorPosition) {
-        children.put(new GridLocation(row, col), new GridItem(widget, anchorPosition));
+        children.put(new GridLocation(row, col), new LayoutItem(widget, anchorPosition));
     }
 
     /**
@@ -412,9 +403,9 @@ public final class GridLayout extends AbstractWidget<GridLayout> {
     }
 
     private void anchorAllChildren(InterpolationSpeed withDelay) {
-        for (Map.Entry<GridLocation, GridItem> gridEntry : children.entrySet()) {
+        for (Map.Entry<GridLocation, LayoutItem> gridEntry : children.entrySet()) {
             GridLocation location = gridEntry.getKey();
-            GridItem item = gridEntry.getValue();
+            LayoutItem item = gridEntry.getValue();
 
             anchorChild(item.widget, location.row, location.col, item.anchor, withDelay);
         }
@@ -429,23 +420,23 @@ public final class GridLayout extends AbstractWidget<GridLayout> {
         return this;
     }
 
-    @Override
-    public GridLayout anchoredAt(float x, float y, AnchorPosition anchorPosition) {
-        return anchoredAt(x, y, anchorPosition, InterpolationSpeed.INSTANT);
-    }
-
-    @Override
-    public GridLayout anchorCenteredOnScreen(InterpolationSpeed withDelay) {
-        super.anchorCenteredOnScreen(withDelay);
-        anchorAllChildren(withDelay);
-        return this;
-    }
-
-    @Override
-    public GridLayout anchorCenteredOnScreen() {
-        return anchorCenteredOnScreen(InterpolationSpeed.INSTANT);
-    }
-
+//    @Override
+//    public GridLayout anchoredAt(float x, float y, AnchorPosition anchorPosition) {
+//        return anchoredAt(x, y, anchorPosition, InterpolationSpeed.INSTANT);
+//    }
+//
+//    @Override
+//    public GridLayout anchorCenteredOnScreen(InterpolationSpeed withDelay) {
+//        super.anchorCenteredOnScreen(withDelay);
+//        anchorAllChildren(withDelay);
+//        return this;
+//    }
+//
+//    @Override
+//    public GridLayout anchorCenteredOnScreen() {
+//        return anchorCenteredOnScreen(InterpolationSpeed.INSTANT);
+//    }
+//
     // --------------------------------------------------------------------------------
 
     @Override

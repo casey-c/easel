@@ -13,6 +13,7 @@ import easel.ui.AbstractWidget;
 import easel.ui.AnchorPosition;
 import easel.ui.debug.DebugWidget;
 import easel.ui.layouts.GridLayout;
+import easel.ui.layouts.VerticalLayout;
 import easel.ui.misc.WidgetSwapper;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -65,6 +66,22 @@ public class Easel implements PostInitializeSubscriber, RenderSubscriber, PostUp
                 .anchorCenteredOnScreen();
 
         widgets.add(widget);
+
+        widgets.add(
+                new VerticalLayout(400, 40)
+                        .withChild(new DebugWidget(40, 40))
+                        .withChild(new DebugWidget(40, 40, DebugWidget.DEBUG_COLOR_1), AnchorPosition.LEFT_CENTER)
+                        .withChild(new DebugWidget(40, 40), AnchorPosition.LEFT_BOTTOM)
+                        .withChild(new DebugWidget(40, 40), AnchorPosition.CENTER_BOTTOM)
+                        .withChild(new DebugWidget(40, 40, DebugWidget.DEBUG_COLOR_2), AnchorPosition.CENTER)
+                        .withChild(new DebugWidget(40, 40), AnchorPosition.CENTER_TOP)
+                        .withChild(new DebugWidget(40, 40), AnchorPosition.RIGHT_BOTTOM)
+                        .withChild(new DebugWidget(40, 40), AnchorPosition.RIGHT_CENTER)
+                        .withChild(new DebugWidget(40, 40), AnchorPosition.RIGHT_BOTTOM)
+                        .withChild(new DebugWidget(400, 40))
+                        .withChild(new DebugWidget(400, 40))
+                        .anchoredAt(Settings.WIDTH - 20, Settings.HEIGHT - 20, AnchorPosition.RIGHT_TOP)
+        );
     }
 
     @Override
