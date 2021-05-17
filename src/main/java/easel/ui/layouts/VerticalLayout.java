@@ -1,59 +1,45 @@
 package easel.ui.layouts;
 
-import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import easel.ui.AbstractWidget;
 import easel.ui.AnchorPosition;
 import easel.ui.InterpolationSpeed;
 
-import java.util.ArrayList;
-
-public class VerticalLayout extends AbstractWidget<VerticalLayout> {
-    private ArrayList<LayoutItem> children = new ArrayList<>();
-    private AnchorPosition defaultChildAnchor = AnchorPosition.LEFT_TOP;
-
-    private float desiredWidth;
-    private float totalHeight;
-
-    private float spacing = 0.0f;
-
+/**
+ * Layout widgets vertically from top to bottom. Use the {@link #withChild(AbstractWidget)} family of methods to manage new widgets. The following example code constructs a new layout with a desired width of 100px and three widgets spaced 20px apart vertically. From top to bottom: widget1, 20px spacing, widget2, 20px spacing, and widget3. The default child anchor is set to center, so all children added after this line will be centered horizontally inside the 100px width, except for widget3 which specifies that it overrides this anchor and will be aligned to the right most side.
+ * <pre>
+ * {@code
+ * VerticalLayout vlayout = new VerticalLayout(100.0f, 20.0f)
+ *     .withDefaultChildAnchor(AnchorPosition.CENTER)
+ *     .withChild(widget1)
+ *     .withChild(widget2)
+ *     .withChild(widget3, AnchorPosition.RIGHT_CENTER)
+ *     .anchoredAt(x, y, AnchorPosition.LEFT_TOP);
+ * }
+ * </pre>
+ * NOTE: child widgets are only given enough room as their preferred heights allow but can move around horizontally within the preferred width; because of this, the child anchor positions only consider the horizontal position of the anchor and the vertical information is ignored.
+ * @see HorizontalLayout
+ */
+public class VerticalLayout extends AbstractOneDimensionalLayout<VerticalLayout> {
+    /**
+     * Constructs a new vertical layout with a total desired width and the vertical spacing between each widget.
+     * @param desiredWidth how much space the
+     * @param spacing vertical space in between widgets (in pixels)
+     */
     public VerticalLayout(float desiredWidth, float spacing) {
-        this.desiredWidth = desiredWidth;
-        this.spacing = spacing;
+        super(spacing);
+        this.totalWidth = desiredWidth;
     }
 
-    // --------------------------------------------------------------------------------
+    @Override public float getContentWidth() { return totalWidth; }
+    @Override public float getContentHeight() { return totalHeight - spacing; }
 
-    public VerticalLayout withDefaultChildAnchorPosition(AnchorPosition anchorPosition) {
-        this.defaultChildAnchor = anchorPosition;
-        return this;
+    @Override
+    protected void updateSize(AbstractWidget newChild) {
+        this.totalHeight += (spacing + newChild.getHeight());
     }
 
-    public void clear() {
-        children.clear();
-    }
-
-    public void addChild(AbstractWidget widget, AnchorPosition anchor) {
-        children.add(new LayoutItem(widget, anchor));
-        this.totalHeight += (spacing + widget.getHeight());
-    }
-
-    public VerticalLayout withChild(AbstractWidget widget, AnchorPosition anchor) {
-        addChild(widget, anchor);
-        return this;
-    }
-
-    public void addChild(AbstractWidget widget) {
-        addChild(widget, defaultChildAnchor);
-    }
-
-    public VerticalLayout withChild(AbstractWidget widget) {
-        addChild(widget, defaultChildAnchor);
-        return this;
-    }
-
-    // --------------------------------------------------------------------------------
-
-    private void anchorChildren(InterpolationSpeed withDelay) {
+    @Override
+    protected void anchorChildren(InterpolationSpeed withDelay) {
         float left = getContentLeft();
         float currY = getContentTop();
 
@@ -63,7 +49,7 @@ public class VerticalLayout extends AbstractWidget<VerticalLayout> {
 
             float widgetHeight = widget.getHeight();
 
-            float x = anchor.getXFromLeft(left, desiredWidth);
+            float x = anchor.getXFromLeft(left, totalWidth);
             float y = anchor.getYFromTop(currY, widgetHeight);
 
             widget.anchoredAt(x, y, anchor, withDelay);
@@ -72,20 +58,16 @@ public class VerticalLayout extends AbstractWidget<VerticalLayout> {
         }
     }
 
-    @Override
-    public VerticalLayout anchoredAt(float x, float y, AnchorPosition anchorPosition, InterpolationSpeed withDelay) {
-        super.anchoredAt(x, y, anchorPosition, withDelay);
-        anchorChildren(withDelay);
+    /**
+     * Replaces the <code>desiredWidth</code> set in the constructor ({@link #VerticalLayout(float, float)}) with the width of the widest child. Useful for dynamically scaling the width of this widget to fit the widths of its children. NOTE: should call this function AFTER adding all children and before anchoring.
+     * @return this widget
+     */
+    public VerticalLayout resizeWidthToWidestChild() {
+        this.totalWidth = children.stream()
+                .map(item -> item.widget.getWidth())
+                .max(Float::compareTo)
+                .orElse(0.0f);
+
         return this;
     }
-
-
-    // --------------------------------------------------------------------------------
-
-    @Override public float getContentWidth() { return desiredWidth; }
-    @Override public float getContentHeight() { return totalHeight - spacing; }
-
-    @Override protected void renderWidget(SpriteBatch sb) { children.forEach(w -> w.widget.render(sb)); }
-    @Override public void hide() { children.forEach(w -> w.widget.hide()); }
-    @Override public void show() { children.forEach(w -> w.widget.show()); }
 }

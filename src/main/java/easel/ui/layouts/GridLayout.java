@@ -149,7 +149,7 @@ public final class GridLayout extends AbstractWidget<GridLayout> {
      * @see #withExactRows(float...)
      * @see #withRelativeCols(float, float...)
      * @see #withNEvenlySizedCols(float, int)
-     * @param widths a list of widths for column 0, column 1, column 2, etc., where column 0 is the left-most row. Widths are assumed to be in 1080p space.
+     * @param widths a list of widths for column 0, column 1, column 2, etc., where column 0 is the left-most column. Widths are assumed to be in 1080p space.
      * @return this
      */
     public GridLayout withExactCols(float... widths) {

@@ -10,6 +10,7 @@ public class DebugWidget extends AbstractWidget<DebugWidget> {
     public static final Color DEBUG_COLOR_0 = new Color(0.384f, 0.690f, 0.388f, 0.500f);
     public static final Color DEBUG_COLOR_1 = new Color(0.384f, 0.388f, 0.690f, 0.500f);
     public static final Color DEBUG_COLOR_2 = new Color(0.690f, 0.384f, 0.388f, 0.500f);
+    public static final Color DEBUG_COLOR_3 = new Color(0.690f, 0.684f, 0.688f, 0.500f);
 
     private float width, height;
     private Color color;
@@ -38,11 +39,18 @@ public class DebugWidget extends AbstractWidget<DebugWidget> {
 
     @Override
     protected void renderWidget(SpriteBatch sb) {
+        sb.setColor(DEBUG_COLOR_3);
+        sb.draw(ImageMaster.WHITE_SQUARE_IMG,
+                getLeft() * Settings.xScale,
+                getBottom() * Settings.yScale,
+                getWidth() * Settings.xScale,
+                getHeight() * Settings.yScale);
+
         sb.setColor(color);
         sb.draw(ImageMaster.WHITE_SQUARE_IMG,
                 getContentLeft() * Settings.xScale,
                 getContentBottom() * Settings.yScale,
-                width * Settings.xScale,
-                height * Settings.yScale);
+                getContentWidth() * Settings.xScale,
+                getContentHeight() * Settings.yScale);
     }
 }

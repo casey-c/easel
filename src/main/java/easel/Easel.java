@@ -14,6 +14,7 @@ import easel.ui.AbstractWidget;
 import easel.ui.AnchorPosition;
 import easel.ui.debug.DebugWidget;
 import easel.ui.layouts.GridLayout;
+import easel.ui.layouts.HorizontalLayout;
 import easel.ui.layouts.VerticalLayout;
 import easel.ui.misc.WidgetSwapper;
 import org.apache.logging.log4j.LogManager;
@@ -101,6 +102,23 @@ public class Easel implements PostInitializeSubscriber, RenderSubscriber, PostUp
                 .anchoredCenteredOnScreen();
 
         widgets.add(grid);
+
+        HorizontalLayout horizontalLayout = new HorizontalLayout(400.0f, 20.0f)
+                .withMargins(40.0f)
+                .withDefaultChildAnchorPosition(AnchorPosition.CENTER_TOP)
+                .withChild(new DebugWidget(50, 50))
+                .withChild(new DebugWidget(50, 50).withMargins(10))
+                .withChild(new DebugWidget(50, 50).withMargins(20))
+                .withChild(new DebugWidget(50, 50).withMargins(30))
+                .resizeHeightToTallestChild()
+                .anchoredAt(0,0,AnchorPosition.LEFT_BOTTOM);
+
+        widgets.add(horizontalLayout);
+
+        widgets.add(new DebugWidget(50, 50)
+                .withMargins(20)
+                .anchoredAt(800, 300, AnchorPosition.LEFT_BOTTOM)
+        );
     }
 
     @Override
@@ -108,8 +126,7 @@ public class Easel implements PostInitializeSubscriber, RenderSubscriber, PostUp
         sb.setColor(Color.BLACK);
         sb.draw(ImageMaster.WHITE_SQUARE_IMG, 0, 0, Settings.WIDTH, Settings.HEIGHT);
 
-        grid.anchoredAt(InputHelper.mX, InputHelper.mY, AnchorPosition.CENTER)
-                .clampedOntoScreen(20);
+        grid.anchoredAt(InputHelper.mX, InputHelper.mY, AnchorPosition.CENTER, 20);
 
         widgets.forEach(w -> w.render(sb));
     }
