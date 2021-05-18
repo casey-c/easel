@@ -4,6 +4,7 @@ import com.megacrit.cardcrawl.core.Settings;
 import com.megacrit.cardcrawl.helpers.Hitbox;
 import com.megacrit.cardcrawl.helpers.controller.CInputActionSet;
 import com.megacrit.cardcrawl.helpers.input.InputHelper;
+import easel.Easel;
 
 import java.util.function.Consumer;
 
@@ -68,10 +69,18 @@ public abstract class HitboxWidget<T extends HitboxWidget<T>> extends AbstractWi
         // Hover transitions
         if (hb.hovered && !isHovered) {
             onHoverEnter.accept((T)this);
+
+            Easel.logger.info("Hover started");
+            Easel.logger.info(this);
+
             isHovered = true;
         }
-        else if (isHovered){
+        else if (!hb.hovered && isHovered){
             onHoverLeave.accept((T)this);
+
+            Easel.logger.info("Hover finished");
+            Easel.logger.info(this);
+
             isHovered = false;
         }
 
@@ -82,12 +91,18 @@ public abstract class HitboxWidget<T extends HitboxWidget<T>> extends AbstractWi
         else if (hb.hovered && CInputActionSet.select.isJustPressed()) {
             CInputActionSet.select.unpress();
             onLeftClick.accept((T)this);
+
+            Easel.logger.info("Clicked (using CInputActionSet)");
+            Easel.logger.info(this);
         }
 
         // Left click ended
         if (leftClickStarted && InputHelper.justReleasedClickLeft) {
             if (isHovered) {
                 onLeftClick.accept((T)this);
+
+                Easel.logger.info("Clicked (regular)");
+                Easel.logger.info(this);
             }
 
             leftClickStarted = false;

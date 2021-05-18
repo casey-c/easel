@@ -13,13 +13,11 @@ public class InteractiveDebugWidget extends HitboxWidget<InteractiveDebugWidget>
     public InteractiveDebugWidget() {
         this.dw = new DebugWidget(50, 50);
 
-        this.onLeftClick(w -> SoundHelper.cawCaw());
-
         this.onHoverEnter(w -> setColor(DebugWidget.DEBUG_COLOR_1));
         this.onHoverLeave(w -> setColor(DebugWidget.DEBUG_COLOR_0));
     }
 
-    protected void setColor(Color color) {
+    public void setColor(Color color) {
         dw.setColor(color);
     }
 
