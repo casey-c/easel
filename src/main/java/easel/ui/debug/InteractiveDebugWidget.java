@@ -3,11 +3,11 @@ package easel.ui.debug;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import easel.ui.AnchorPosition;
-import easel.ui.HitboxWidget;
+import easel.ui.interactive.HitboxWidget;
 import easel.ui.InterpolationSpeed;
-import easel.utils.SoundHelper;
+import easel.ui.interactive.MovableWidget;
 
-public class InteractiveDebugWidget extends HitboxWidget<InteractiveDebugWidget> {
+public class InteractiveDebugWidget extends MovableWidget<InteractiveDebugWidget> {
     private DebugWidget dw;
 
     public InteractiveDebugWidget() {

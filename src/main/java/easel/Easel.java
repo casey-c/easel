@@ -52,6 +52,7 @@ public class Easel implements PostInitializeSubscriber, RenderSubscriber, PostUp
         widgets.add(
                 new InteractiveDebugWidget()
                         .onLeftClick(w -> SoundHelper.cawCaw())
+                        .onRightClick(w -> w.setColor(Color.GOLD))
                         .anchoredAt(500, 500, AnchorPosition.LEFT_BOTTOM)
         );
     }

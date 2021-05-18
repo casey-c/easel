@@ -1,26 +1,29 @@
-package easel.ui;
+package easel.ui.interactive;
 
 import com.megacrit.cardcrawl.core.Settings;
 import com.megacrit.cardcrawl.helpers.Hitbox;
 import com.megacrit.cardcrawl.helpers.controller.CInputActionSet;
 import com.megacrit.cardcrawl.helpers.input.InputHelper;
 import easel.Easel;
+import easel.ui.AbstractWidget;
+import easel.ui.AnchorPosition;
+import easel.ui.InterpolationSpeed;
 
 import java.util.function.Consumer;
 
 public abstract class HitboxWidget<T extends HitboxWidget<T>> extends AbstractWidget<T> {
     protected Hitbox hb;
 
-    private Consumer<T> onLeftClick = x -> {};
-    private Consumer<T> onRightClick;
+    protected Consumer<T> onLeftClick = x -> {};
+    protected Consumer<T> onRightClick;
 
-    private Consumer<T> onHoverEnter = x -> {};
-    private Consumer<T> onHoverLeave = x -> {};
+    protected Consumer<T> onHoverEnter = x -> {};
+    protected Consumer<T> onHoverLeave = x -> {};
 
-    private boolean isHovered = false;
+    protected boolean isHovered = false;
 
-    private boolean rightClickStarted = false;
-    private boolean leftClickStarted = false;
+    protected boolean rightClickStarted = false;
+    protected boolean leftClickStarted = false;
 
     private void resizeHitboxToContent() {
         float scaledContentWidth = getContentWidth() * Settings.xScale;
@@ -107,12 +110,42 @@ public abstract class HitboxWidget<T extends HitboxWidget<T>> extends AbstractWi
 
             leftClickStarted = false;
         }
+
+        // Right click started
+        if (isHovered && InputHelper.justClickedRight) {
+            rightClickStarted = true;
+        }
+        // Should look into how to use input action set for right clicks - e.g. what is the key used when previewing card upgrades in shops?
+//        else if (hb.hovered && CInputActionSet.???.isJustPressed()) {
+//            CInputActionSet.select.unpress();
+//            onLeftClick.accept((T)this);
+//
+//            Easel.logger.info("Clicked (using CInputActionSet)");
+//            Easel.logger.info(this);
+//        }
+
+        // Right click ended
+        if (rightClickStarted && InputHelper.justReleasedClickRight) {
+            if (isHovered) {
+                onRightClick.accept((T)this);
+
+                Easel.logger.info("Right Clicked (regular)");
+                Easel.logger.info(this);
+            }
+
+            rightClickStarted = false;
+        }
     }
 
     // --------------------------------------------------------------------------------
 
     public T onLeftClick(Consumer<T> onLeftClick) {
         this.onLeftClick = onLeftClick;
+        return (T)this;
+    }
+
+    public T onRightClick(Consumer<T> onRightClick) {
+        this.onRightClick = onRightClick;
         return (T)this;
     }
 
