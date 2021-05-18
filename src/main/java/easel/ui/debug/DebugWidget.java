@@ -34,6 +34,10 @@ public class DebugWidget extends AbstractWidget<DebugWidget> {
         this.color = color;
     }
 
+    public void setColor(Color color) {
+        this.color = color;
+    }
+
     @Override public float getContentWidth() { return width; }
     @Override public float getContentHeight() { return height; }
 

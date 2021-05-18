@@ -17,6 +17,7 @@ import easel.ui.layouts.GridLayout;
 import easel.ui.layouts.HorizontalLayout;
 import easel.ui.layouts.VerticalLayout;
 import easel.ui.misc.WidgetSwapper;
+import easel.ui.text.Label;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -88,17 +89,17 @@ public class Easel implements PostInitializeSubscriber, RenderSubscriber, PostUp
         );
 
         grid = new GridLayout()
-                .withNEvenlySizedCols(300.0f, 3)
-                .withNEvenlySizedRows(300.0f, 3)
-                .withChild(0, 0, new DebugWidget(40, 40), AnchorPosition.LEFT_TOP)
-                .withChild(0, 1, new DebugWidget(40, 40), AnchorPosition.CENTER_TOP)
-                .withChild(0, 2, new DebugWidget(40, 40), AnchorPosition.RIGHT_TOP)
-                .withChild(1, 0, new DebugWidget(40, 40), AnchorPosition.LEFT_CENTER)
-                .withChild(1, 1, new DebugWidget(40, 40), AnchorPosition.CENTER)
-                .withChild(1, 2, new DebugWidget(40, 40), AnchorPosition.RIGHT_CENTER)
-                .withChild(2, 0, new DebugWidget(40, 40), AnchorPosition.LEFT_BOTTOM)
-                .withChild(2, 1, new DebugWidget(40, 40), AnchorPosition.CENTER_BOTTOM)
-                .withChild(2, 2, new DebugWidget(40, 40), AnchorPosition.RIGHT_BOTTOM)
+                .withNEvenlySizedCols(500.0f, 3)
+                .withNEvenlySizedRows(500.0f, 3)
+                .withChild(0, 0, new Label("LEFT_TOP"), AnchorPosition.LEFT_TOP)
+                .withChild(0, 1, new Label("CENTER_TOP"), AnchorPosition.CENTER_TOP)
+                .withChild(0, 2, new Label("RIGHT_TOP"), AnchorPosition.RIGHT_TOP)
+                .withChild(1, 0, new Label("LEFT_CENTER"), AnchorPosition.LEFT_CENTER)
+                .withChild(1, 1, new Label("CENTER"), AnchorPosition.CENTER)
+                .withChild(1, 2, new Label("RIGHT_CENTER"), AnchorPosition.RIGHT_CENTER)
+                .withChild(2, 0, new Label("LEFT_BOTTOM"), AnchorPosition.LEFT_BOTTOM)
+                .withChild(2, 1, new Label("CENTER_BOTTOM"), AnchorPosition.CENTER_BOTTOM)
+                .withChild(2, 2, new Label("RIGHT_BOTTOM"), AnchorPosition.RIGHT_BOTTOM)
                 .anchoredCenteredOnScreen();
 
         widgets.add(grid);

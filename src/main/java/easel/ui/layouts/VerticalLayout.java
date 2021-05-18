@@ -8,7 +8,7 @@ import easel.ui.InterpolationSpeed;
  * Layout widgets vertically from top to bottom. Use the {@link #withChild(AbstractWidget)} family of methods to manage new widgets. The following example code constructs a new layout with a desired width of 100px and three widgets spaced 20px apart vertically. From top to bottom: widget1, 20px spacing, widget2, 20px spacing, and widget3. The default child anchor is set to center, so all children added after this line will be centered horizontally inside the 100px width, except for widget3 which specifies that it overrides this anchor and will be aligned to the right most side.
  * <pre>
  * {@code
- * VerticalLayout vlayout = new VerticalLayout(100.0f, 20.0f)
+ * VerticalLayout layout = new VerticalLayout(100.0f, 20.0f)
  *     .withDefaultChildAnchor(AnchorPosition.CENTER)
  *     .withChild(widget1)
  *     .withChild(widget2)

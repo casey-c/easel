@@ -11,7 +11,7 @@ import easel.ui.debug.DebugWidget;
  * Layout widgets horizontally from left to right. Use the {@link #withChild(AbstractWidget)} family of methods to manage new widgets. The following example code constructs a new layout with a desired height of 100px and three widgets spaced 20px apart horizontally. From left to right: widget1, 20px spacing, widget2, 20px spacing, and widget3. The default child anchor is set to center, so all children added after this line will be centered vertically inside the 100px height, except for widget3 which specifies that it overrides this anchor and will be aligned to the top.
  * <pre>
  * {@code
- * HorizontalLayout hlayout = new HorizontalLayout(100.0f, 20.0f)
+ * HorizontalLayout layout = new HorizontalLayout(100.0f, 20.0f)
  *     .withDefaultChildAnchor(AnchorPosition.CENTER)
  *     .withChild(widget1)
  *     .withChild(widget2)
