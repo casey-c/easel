@@ -15,7 +15,7 @@ public abstract class HitboxWidget<T extends HitboxWidget<T>> extends AbstractWi
     protected Hitbox hb;
 
     protected Consumer<T> onLeftClick = x -> {};
-    protected Consumer<T> onRightClick;
+    protected Consumer<T> onRightClick = x -> {};
 
     protected Consumer<T> onHoverEnter = x -> {};
     protected Consumer<T> onHoverLeave = x -> {};
@@ -60,16 +60,7 @@ public abstract class HitboxWidget<T extends HitboxWidget<T>> extends AbstractWi
         return (T)this;
     }
 
-    @Override
-    public void update() {
-        hb.update();
-
-        // NOTE: (poorly) rewriting code that already exists in the hitbox
-        // (e.g. clickStarted/clicked/hoverStarted/justHovered etc. all exist in Hitbox already - I just
-        //   want full control)
-        // Really should have just found a way to work around the Hitbox code; but I'm a control freak...
-
-        // Hover transitions
+    protected void updateHoverTransitions() {
         if (hb.hovered && !isHovered) {
             onHoverEnter.accept((T)this);
 
@@ -86,7 +77,9 @@ public abstract class HitboxWidget<T extends HitboxWidget<T>> extends AbstractWi
 
             isHovered = false;
         }
+    }
 
+    protected void updateLeftClicks() {
         // Left click started
         if (isHovered && InputHelper.justClickedLeft) {
             leftClickStarted = true;
@@ -110,7 +103,9 @@ public abstract class HitboxWidget<T extends HitboxWidget<T>> extends AbstractWi
 
             leftClickStarted = false;
         }
+    }
 
+    protected void updateRightClicks() {
         // Right click started
         if (isHovered && InputHelper.justClickedRight) {
             rightClickStarted = true;
@@ -135,6 +130,19 @@ public abstract class HitboxWidget<T extends HitboxWidget<T>> extends AbstractWi
 
             rightClickStarted = false;
         }
+    }
+
+
+    @Override
+    public void update() {
+        hb.update();
+
+        // Hover (mouse enter / leave)
+        updateHoverTransitions();
+
+        // Mouse button down / up
+        updateLeftClicks();
+        updateRightClicks();
     }
 
     // --------------------------------------------------------------------------------

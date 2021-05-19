@@ -442,12 +442,12 @@ public final class GridLayout extends AbstractWidget<GridLayout> {
     @Override
     protected void renderWidget(SpriteBatch sb) {
         // TODO: make debug only
-        sb.setColor(DebugWidget.DEBUG_COLOR_1);
-        sb.draw(ImageMaster.WHITE_SQUARE_IMG,
-                getContentLeft() * Settings.xScale,
-                getContentBottom() * Settings.yScale,
-                getContentWidth() * Settings.xScale,
-                getContentHeight() * Settings.yScale);
+//        sb.setColor(DebugWidget.DEBUG_COLOR_1);
+//        sb.draw(ImageMaster.WHITE_SQUARE_IMG,
+//                getContentLeft() * Settings.xScale,
+//                getContentBottom() * Settings.yScale,
+//                getContentWidth() * Settings.xScale,
+//                getContentHeight() * Settings.yScale);
 
         children.values()
                 .stream()

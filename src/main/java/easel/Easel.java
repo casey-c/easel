@@ -14,6 +14,7 @@ import easel.ui.AbstractWidget;
 import easel.ui.AnchorPosition;
 import easel.ui.debug.DebugWidget;
 import easel.ui.debug.InteractiveDebugWidget;
+import easel.ui.debug.PartiallyMoveableWidget;
 import easel.ui.layouts.GridLayout;
 import easel.ui.layouts.HorizontalLayout;
 import easel.ui.layouts.VerticalLayout;
@@ -50,10 +51,12 @@ public class Easel implements PostInitializeSubscriber, RenderSubscriber, PostUp
         logger.info("Hello, world");
 
         widgets.add(
-                new InteractiveDebugWidget()
-                        .onLeftClick(w -> SoundHelper.cawCaw())
-                        .onRightClick(w -> w.setColor(Color.GOLD))
-                        .anchoredAt(500, 500, AnchorPosition.LEFT_BOTTOM)
+//                new InteractiveDebugWidget()
+//                        .onLeftClick(w -> SoundHelper.cawCaw())
+//                        .onRightClick(w -> w.setColor(Color.GOLD))
+//                        .anchoredAt(500, 500, AnchorPosition.LEFT_BOTTOM)
+                new PartiallyMoveableWidget(200, 140)
+                        .anchoredCenteredOnScreen()
         );
     }
 
