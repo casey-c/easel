@@ -9,18 +9,8 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.evacipated.cardcrawl.modthespire.lib.SpireInitializer;
 import com.megacrit.cardcrawl.core.Settings;
 import com.megacrit.cardcrawl.helpers.ImageMaster;
-import com.megacrit.cardcrawl.helpers.input.InputHelper;
 import easel.ui.AbstractWidget;
-import easel.ui.AnchorPosition;
-import easel.ui.debug.DebugWidget;
-import easel.ui.debug.InteractiveDebugWidget;
 import easel.ui.debug.PartiallyMoveableWidget;
-import easel.ui.layouts.GridLayout;
-import easel.ui.layouts.HorizontalLayout;
-import easel.ui.layouts.VerticalLayout;
-import easel.ui.misc.WidgetSwapper;
-import easel.ui.text.Label;
-import easel.utils.SoundHelper;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 

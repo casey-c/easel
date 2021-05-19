@@ -9,7 +9,7 @@ import easel.ui.AnchorPosition;
 
 public class MoveableWidget extends HitboxWidget<MoveableWidget> {
     private boolean moving = false;
-    private AbstractWidget parent;
+    private AbstractWidget widgetToMove;
 
     private float startingWidgetLeft;
     private float startingWidgetBottom;
@@ -17,8 +17,8 @@ public class MoveableWidget extends HitboxWidget<MoveableWidget> {
     private int startingMouseX;
     private int startingMouseY;
 
-    public MoveableWidget(AbstractWidget parent, float hitboxWidth, float hitboxHeight) {
-        this.parent = parent;
+    public MoveableWidget(AbstractWidget widgetToMove, float hitboxWidth, float hitboxHeight) {
+        this.widgetToMove = widgetToMove;
         this.hb = new Hitbox(hitboxWidth * Settings.xScale, hitboxHeight * Settings.yScale);
     }
 
@@ -36,7 +36,7 @@ public class MoveableWidget extends HitboxWidget<MoveableWidget> {
         float newWidgetLeft = startingWidgetLeft - deltaX;
         float newWidgetBottom = startingWidgetBottom - deltaY;
 
-        parent.anchoredAt(newWidgetLeft, newWidgetBottom, AnchorPosition.LEFT_BOTTOM, 20);
+        widgetToMove.anchoredAt(newWidgetLeft, newWidgetBottom, AnchorPosition.LEFT_BOTTOM, 20);
 
         // Handle releasing the mouse down
         if (InputHelper.justReleasedClickLeft) {
@@ -45,7 +45,7 @@ public class MoveableWidget extends HitboxWidget<MoveableWidget> {
     }
 
     @Override
-    public void update() {
+    public void updateWidget() {
         hb.update();
 
         if (moving) {
@@ -57,28 +57,14 @@ public class MoveableWidget extends HitboxWidget<MoveableWidget> {
 
             // Left click started
             if (isHovered && InputHelper.justClickedLeft) {
-                leftClickStarted = true;
-
                 // START MOVING
                 moving = true;
 
                 this.startingMouseX = InputHelper.mX;
                 this.startingMouseY = InputHelper.mY;
-                this.startingWidgetLeft = parent.getLeft();
-                this.startingWidgetBottom = parent.getBottom();
+                this.startingWidgetLeft = widgetToMove.getLeft();
+                this.startingWidgetBottom = widgetToMove.getBottom();
             }
-
-            // Left click ended (ignored?)
-//            if (leftClickStarted && InputHelper.justReleasedClickLeft) {
-//                if (isHovered) {
-//                    onLeftClick.accept(this);
-//
-//                    Easel.logger.info("Clicked (regular)");
-//                    Easel.logger.info(this);
-//                }
-//
-//                leftClickStarted = false;
-//            }
 
             updateRightClicks();
         }

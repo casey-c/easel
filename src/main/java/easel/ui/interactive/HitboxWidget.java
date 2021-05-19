@@ -134,7 +134,7 @@ public abstract class HitboxWidget<T extends HitboxWidget<T>> extends AbstractWi
 
 
     @Override
-    public void update() {
+    public void updateWidget() {
         hb.update();
 
         // Hover (mouse enter / leave)

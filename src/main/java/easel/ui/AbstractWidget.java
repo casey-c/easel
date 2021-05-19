@@ -512,7 +512,18 @@ public abstract class AbstractWidget<T extends AbstractWidget<T>> {
      *
      * As this is called once per frame - for more complicated interactive widgets, you should try and avoid recomputing expensive things here unless absolutely needed. For many scenarios, it is better for custom widgets to compute information at one designated time and cache the results to be displayed later, instead of re-computing it again and again.
      */
-    public void update() {}
+    public final void update() {
+        updateInteractivity();
+        updateWidget();
+    }
+
+    private void updateInteractivity() {
+        // Update interactive pieces of this widget
+    }
+
+    protected void updateWidget() {
+
+    }
 
     // --------------------------------------------------------------------------------
     // Usually for hitboxes, but can be used to enable/disable computations required each frame - these should recurse

@@ -1,46 +1,15 @@
 package easel.ui.layouts;
 
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
-import com.megacrit.cardcrawl.core.Settings;
-import com.megacrit.cardcrawl.helpers.ImageMaster;
 import easel.Easel;
 import easel.ui.AbstractWidget;
 import easel.ui.AnchorPosition;
 import easel.ui.InterpolationSpeed;
-import easel.ui.debug.DebugWidget;
 
 import java.util.*;
 import java.util.stream.Stream;
 
 public final class GridLayout extends AbstractWidget<GridLayout> {
-    // --------------------------------------------------------------------------------
-    // Simple struct for making widget location access convenient
-    // --------------------------------------------------------------------------------
-    private static final class GridLocation {
-        int row;
-        int col;
-
-        public GridLocation(int row, int col) {
-            this.row = row;
-            this.col = col;
-        }
-
-        @Override
-        public boolean equals(Object o) {
-            if (this == o) return true;
-            if (o == null || getClass() != o.getClass()) return false;
-            GridLocation that = (GridLocation) o;
-            return row == that.row && col == that.col;
-        }
-
-        @Override
-        public int hashCode() {
-            return Objects.hash(row, col);
-        }
-    }
-
-
-    // --------------------------------------------------------------------------------
     private HashMap<GridLocation, LayoutItem> children = new HashMap<>();
     private float totalWidth;
     private float totalHeight;
@@ -50,9 +19,7 @@ public final class GridLayout extends AbstractWidget<GridLayout> {
 
     private AnchorPosition defaultChildAnchor = AnchorPosition.LEFT_TOP;
 
-
     public GridLayout() { }
-
 
     // --------------------------------------------------------------------------------
 
@@ -456,7 +423,7 @@ public final class GridLayout extends AbstractWidget<GridLayout> {
     }
 
     @Override
-    public void update() {
+    public void updateWidget() {
         children.values()
                 .stream()
                 .map(a -> a.widget)

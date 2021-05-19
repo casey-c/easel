@@ -1,14 +1,11 @@
 package easel.ui.debug;
 
-import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import easel.ui.AbstractWidget;
 import easel.ui.AnchorPosition;
 import easel.ui.InterpolationSpeed;
-import easel.ui.interactive.MovableWidget;
 import easel.ui.interactive.MoveableWidget;
 import easel.ui.layouts.GridLayout;
-import easel.utils.GraphicsHelper;
 
 public class PartiallyMoveableWidget extends AbstractWidget<PartiallyMoveableWidget> {
     private GridLayout grid;
@@ -16,17 +13,6 @@ public class PartiallyMoveableWidget extends AbstractWidget<PartiallyMoveableWid
     private static final float MOVE_HEIGHT = 40;
 
     public PartiallyMoveableWidget(float totalWidth, float totalHeight) {
-//        MovableWidget moveArea = new MovableWidget() {
-//            @Override public float getContentWidth() { return totalWidth; }
-//            @Override public float getContentHeight() { return MOVE_HEIGHT; }
-//
-//            @Override
-//            protected void renderWidget(SpriteBatch sb) {
-//                GraphicsHelper.drawRect(sb, getContentLeft(), getContentBottom(), getContentWidth(), getContentHeight(), DebugWidget.DEBUG_COLOR_0);
-//            }
-//        };
-
-
         this.grid = new GridLayout();
         MoveableWidget moveArea = new MoveableWidget(grid, totalWidth, MOVE_HEIGHT);
 
@@ -46,6 +32,6 @@ public class PartiallyMoveableWidget extends AbstractWidget<PartiallyMoveableWid
     @Override public float getContentWidth() { return grid.getContentWidth(); }
     @Override public float getContentHeight() { return grid.getContentHeight(); }
 
-    @Override public void update() { grid.update(); }
+    @Override public void updateWidget() { grid.update(); }
     @Override protected void renderWidget(SpriteBatch sb) { grid.render(sb); }
 }

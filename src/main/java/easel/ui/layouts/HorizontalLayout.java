@@ -1,11 +1,8 @@
 package easel.ui.layouts;
 
-import com.badlogic.gdx.graphics.g2d.SpriteBatch;
-import com.megacrit.cardcrawl.helpers.ImageMaster;
 import easel.ui.AbstractWidget;
 import easel.ui.AnchorPosition;
 import easel.ui.InterpolationSpeed;
-import easel.ui.debug.DebugWidget;
 
 /**
  * Layout widgets horizontally from left to right. Use the {@link #withChild(AbstractWidget)} family of methods to manage new widgets. The following example code constructs a new layout with a desired height of 100px and three widgets spaced 20px apart horizontally. From left to right: widget1, 20px spacing, widget2, 20px spacing, and widget3. The default child anchor is set to center, so all children added after this line will be centered vertically inside the 100px height, except for widget3 which specifies that it overrides this anchor and will be aligned to the top.
@@ -68,16 +65,5 @@ public class HorizontalLayout extends AbstractOneDimensionalLayout<HorizontalLay
                 .orElse(0.0f);
 
         return this;
-    }
-
-    @Override
-    protected void renderWidget(SpriteBatch sb) {
-        sb.setColor(DebugWidget.DEBUG_COLOR_2);
-        sb.draw(ImageMaster.WHITE_SQUARE_IMG, getLeft(), getBottom(), getWidth(), getHeight());
-
-        sb.setColor(DebugWidget.DEBUG_COLOR_1);
-        sb.draw(ImageMaster.WHITE_SQUARE_IMG, getContentLeft(), getContentBottom(), getContentWidth(), getContentHeight());
-
-        super.renderWidget(sb);
     }
 }
