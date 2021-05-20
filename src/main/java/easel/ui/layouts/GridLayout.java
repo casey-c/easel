@@ -410,6 +410,7 @@ public final class GridLayout extends AbstractWidget<GridLayout> {
                 .orElse(0.0f);
 
         rowHeights.set(row, maxHeightInRow);
+        updateTotalHeight();
 
         return this;
     }
@@ -417,6 +418,29 @@ public final class GridLayout extends AbstractWidget<GridLayout> {
     public GridLayout resizeRowsToFitTallestChildren() {
         for (int row = 0; row < rowHeights.size(); ++row)
             resizeRowToFitTallestChild(row);
+
+        return this;
+    }
+
+    public GridLayout resizeColToFitWidestChild(int col) {
+        if (col > colWidths.size())
+            return this;
+
+        float maxWidthInCol = children.entrySet().stream()
+                .filter(entry -> entry.getKey().col == col)
+                .map(entry -> entry.getValue().widget.getWidth())
+                .max(Float::compareTo)
+                .orElse(0.0f);
+
+        colWidths.set(col, maxWidthInCol);
+        updateTotalWidth();
+
+        return this;
+    }
+
+    public GridLayout resizeColsToFitWidestChildren() {
+        for (int col = 0; col < colWidths.size(); ++col)
+            resizeColToFitWidestChild(col);
 
         return this;
     }

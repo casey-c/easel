@@ -12,9 +12,13 @@ import com.megacrit.cardcrawl.helpers.ImageMaster;
 import easel.ui.AbstractWidget;
 import easel.ui.AnchorPosition;
 import easel.ui.debug.DebugWidget;
+import easel.ui.debug.NinePatchTest;
+import easel.ui.graphics.NinePatchWidget;
 import easel.ui.interactive.MoveableWidget;
 import easel.ui.layouts.GridLayout;
 import easel.utils.SoundHelper;
+import easel.utils.textures.TextureDatabase;
+import easel.utils.textures.TextureManager;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -42,55 +46,76 @@ public class Easel implements PostInitializeSubscriber, RenderSubscriber, PostUp
     @Override
     public void receivePostInitialize() {
         logger.info("Hello, world");
+        TextureManager.loadTextures();
 
-        GridLayout grid = new GridLayout();
         widgets.add(
-                grid.withRowsCols(500, 500, 2, 2)
-                        .withDefaultChildAnchorPosition(AnchorPosition.CENTER)
-                        .withChildrenInRow(0,
-                                new DebugWidget()
-                                        .onMouseEnter(w -> w.setColor(DebugWidget.DEBUG_COLOR_1))
-                                        .onMouseLeave(w -> w.setColor(DebugWidget.DEBUG_COLOR_0))
-                                        .onLeftClick(w -> SoundHelper.cawCaw()),
-                                new DebugWidget()
-                                        .onMouseEnter(w -> w.setColor(DebugWidget.DEBUG_COLOR_1))
-                                        .onMouseLeave(w -> w.setColor(DebugWidget.DEBUG_COLOR_0))
-                                        .onLeftClick(w -> SoundHelper.cawCaw())
-                        )
-                        .withChildrenInRow(1,
-                                new DebugWidget()
-                                        .onMouseEnter(w -> w.setColor(DebugWidget.DEBUG_COLOR_1))
-                                        .onMouseLeave(w -> w.setColor(DebugWidget.DEBUG_COLOR_0))
-                                        .onRightClick(w -> SoundHelper.cawCaw()),
-                                new MoveableWidget(100, 100, grid)
-                        )
-                        //.resizeRowsToFitTallestChildren()
-                        .onLeftClick(onClick -> SoundHelper.screenCloseSound())
+                new NinePatchTest()
+                        .makeMoveable()
+//                        .onMouseEnter(w -> SoundHelper.uiHoverSound())
+//                        .onLeftClick(w -> SoundHelper.uiClick1())
+//                        .onRightClick(w -> SoundHelper.uiClick2())
                         .anchoredCenteredOnScreen()
         );
 
-        widgets.add(
-                new DebugWidget(100, 100, DebugWidget.DEBUG_COLOR_1)
-                        .onRightClick(w -> {
-                            w.setColor(Color.GOLD);
-                            SoundHelper.cawCaw();
-                        })
-                        .onMouseEnter(w -> w.setColor(DebugWidget.DEBUG_COLOR_0))
-                        .onMouseLeave(w -> w.setColor(DebugWidget.DEBUG_COLOR_1))
-                        .makeMoveable()
-                        .anchoredAt(500, 500, AnchorPosition.LEFT_BOTTOM)
-//                new InteractiveDebugWidget()
-//                        .onLeftClick(w -> SoundHelper.cawCaw())
-//                        .onRightClick(w -> w.setColor(Color.GOLD))
-//                        .anchoredAt(500, 500, AnchorPosition.LEFT_BOTTOM)
-//                new PartiallyMoveableWidget(200, 140)
-//                        .anchoredCenteredOnScreen()
-        );
 
-        widgets.add(
-                new DebugWidget(50, 50)
-                        .anchoredAt(100, 100, AnchorPosition.LEFT_BOTTOM)
-        );
+//        GridLayout grid = new GridLayout()
+//                .withRowsCols(500, 500, 3, 3)
+//                .withChildrenInRow(0, new DebugWidget(), new DebugWidget(), new DebugWidget())
+//                .withChildrenInRow(1, new DebugWidget(), new DebugWidget(), new DebugWidget())
+//                .withChildrenInRow(2, new DebugWidget(), new DebugWidget(), new DebugWidget())
+//                .withChild(1, 1, background, AnchorPosition.CENTER)
+//                //.withBackgroundWidget(background.scaleToFullWidget(grid))
+//                .anchoredCenteredOnScreen();
+
+
+//        GridLayout grid = new GridLayout();
+//        widgets.add(
+//                grid.withRowsCols(500, 500, 2, 2)
+//                        .withDefaultChildAnchorPosition(AnchorPosition.CENTER)
+//                        .withChildrenInRow(0,
+//                                new DebugWidget()
+//                                        .onMouseEnter(w -> w.setColor(DebugWidget.DEBUG_COLOR_1))
+//                                        .onMouseLeave(w -> w.setColor(DebugWidget.DEBUG_COLOR_0))
+//                                        .onLeftClick(w -> SoundHelper.cawCaw()),
+//                                new DebugWidget()
+//                                        .onMouseEnter(w -> w.setColor(DebugWidget.DEBUG_COLOR_1))
+//                                        .onMouseLeave(w -> w.setColor(DebugWidget.DEBUG_COLOR_0))
+//                                        .onLeftClick(w -> SoundHelper.cawCaw())
+//                        )
+//                        .withChildrenInRow(1,
+//                                new DebugWidget()
+//                                        .onMouseEnter(w -> w.setColor(DebugWidget.DEBUG_COLOR_1))
+//                                        .onMouseLeave(w -> w.setColor(DebugWidget.DEBUG_COLOR_0))
+//                                        .onRightClick(w -> SoundHelper.cawCaw()),
+//                                new MoveableWidget(100, 100, grid)
+//                        )
+//                        //.resizeRowsToFitTallestChildren()
+//                        .onLeftClick(onClick -> SoundHelper.screenCloseSound())
+//                        .anchoredCenteredOnScreen()
+//        );
+//
+//        widgets.add(
+//                new DebugWidget(100, 100, DebugWidget.DEBUG_COLOR_1)
+//                        .onRightClick(w -> {
+//                            w.setColor(Color.GOLD);
+//                            SoundHelper.cawCaw();
+//                        })
+//                        .onMouseEnter(w -> w.setColor(DebugWidget.DEBUG_COLOR_0))
+//                        .onMouseLeave(w -> w.setColor(DebugWidget.DEBUG_COLOR_1))
+//                        .makeMoveable()
+//                        .anchoredAt(500, 500, AnchorPosition.LEFT_BOTTOM)
+////                new InteractiveDebugWidget()
+////                        .onLeftClick(w -> SoundHelper.cawCaw())
+////                        .onRightClick(w -> w.setColor(Color.GOLD))
+////                        .anchoredAt(500, 500, AnchorPosition.LEFT_BOTTOM)
+////                new PartiallyMoveableWidget(200, 140)
+////                        .anchoredCenteredOnScreen()
+//        );
+//
+//        widgets.add(
+//                new DebugWidget(50, 50)
+//                        .anchoredAt(100, 100, AnchorPosition.LEFT_BOTTOM)
+//        );
     }
 
 

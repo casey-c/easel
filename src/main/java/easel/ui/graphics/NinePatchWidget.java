@@ -27,41 +27,41 @@ public class NinePatchWidget extends AbstractWidget<NinePatchWidget> {
 
     /**
      * Constructs a new NinePatch widget using a texture region. This convenience constructor assumes the corners to be 32px by 32px.
-     * @param texRegion the texture region containing the entire nine patch
      * @param width the desired width of the final widget (what we render)
      * @param height the desired height of the final widget (what we render)
-     * @see #NinePatchWidget(Texture, float, float)
-     * @see #NinePatchWidget(TextureRegion, float, float, int, int, int, int)
+     * @param texRegion the texture region containing the entire nine patch
+     * @see #NinePatchWidget(float, float, Texture)
+     * @see #NinePatchWidget(float, float, int, int, int, int, TextureRegion)
      */
-    public NinePatchWidget(TextureRegion texRegion, float width, float height) {
-        this(texRegion, width, height, 32, 32, 32, 32);
+    public NinePatchWidget( float width, float height, TextureRegion texRegion) {
+        this(width, height, 32, 32, 32, 32, texRegion);
     }
 
     /**
      * Constructs a new NinePatch widget using a full texture. This convenience constructor assumes the corners to be 32px by 32px.
-     * @param texture the texture containing the entire nine patch
      * @param width the desired width of the final widget (what we render)
      * @param height the desired height of the final widget (what we render)
-     * @see #NinePatchWidget(TextureRegion, float, float)
-     * @see #NinePatchWidget(Texture, float, float, int, int, int, int)
+     * @param texture the texture containing the entire nine patch
+     * @see #NinePatchWidget(float, float, TextureRegion)
+     * @see #NinePatchWidget(float, float, int, int, int, int, Texture)
      */
-    public NinePatchWidget(Texture texture, float width, float height) {
-        this(texture, width, height, 32, 32, 32, 32);
+    public NinePatchWidget( float width, float height, Texture texture) {
+        this(width, height, 32, 32, 32, 32, texture);
     }
 
     /**
      * Constructs a new NinePatch widget using a texture region and specifying all corner sizes for the patch. See {@link NinePatch} from the libgdx library for more details about what NinePatches are or what the corner values mean.
-     * @param texRegion the texture region containing the entire nine patch
      * @param width the desired width of the final widget (what we render)
      * @param height the desired height of the final widget (what we render)
      * @param patchLeft the number of pixels from the left which define the left patch edge
      * @param patchRight the number of pixels from the right which define the right patch edge
      * @param patchTop the number of pixels from the top which define the top patch edge
      * @param patchBottom the number of pixels from the bottom which define the bottom patch edge
-     * @see #NinePatchWidget(Texture, float, float, int, int, int, int)
-     * @see #NinePatchWidget(TextureRegion, float, float)
+     * @param texRegion the texture region containing the entire nine patch
+     * @see #NinePatchWidget(float, float, int, int, int, int, Texture)
+     * @see #NinePatchWidget(float, float, TextureRegion)
      */
-    public NinePatchWidget(TextureRegion texRegion, float width, float height, int patchLeft, int patchRight, int patchTop, int patchBottom) {
+    public NinePatchWidget(float width, float height, int patchLeft, int patchRight, int patchTop, int patchBottom, TextureRegion texRegion) {
         this.np = new NinePatch(texRegion, patchLeft, patchRight, patchTop, patchBottom);
 
         this.prefWidth = width;
@@ -70,17 +70,17 @@ public class NinePatchWidget extends AbstractWidget<NinePatchWidget> {
 
     /**
      * Constructs a new NinePatch widget using a texture and specifying all corner sizes for the patch. See {@link NinePatch} from the libgdx library for more details about what NinePatches are or what the corner values mean.
-     * @param texture the texture containing the entire nine patch
      * @param width the desired width of the final widget (what we render)
      * @param height the desired height of the final widget (what we render)
      * @param patchLeft the number of pixels from the left which define the left patch edge
      * @param patchRight the number of pixels from the right which define the right patch edge
      * @param patchTop the number of pixels from the top which define the top patch edge
      * @param patchBottom the number of pixels from the bottom which define the bottom patch edge
-     * @see #NinePatchWidget(TextureRegion, float, float, int, int, int, int)
-     * @see #NinePatchWidget(Texture, float, float)
+     * @param texture the texture containing the entire nine patch
+     * @see #NinePatchWidget(float, float, int, int, int, int, TextureRegion)
+     * @see #NinePatchWidget(float, float, Texture)
      */
-    public NinePatchWidget(Texture texture, float width, float height, int patchLeft, int patchRight, int patchTop, int patchBottom) {
+    public NinePatchWidget(float width, float height, int patchLeft, int patchRight, int patchTop, int patchBottom, Texture texture) {
         this.np = new NinePatch(texture, patchLeft, patchRight, patchTop, patchBottom);
 
         this.prefWidth = width;
