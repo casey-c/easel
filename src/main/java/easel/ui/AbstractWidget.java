@@ -2,6 +2,13 @@ package easel.ui;
 
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.megacrit.cardcrawl.core.Settings;
+import com.megacrit.cardcrawl.helpers.Hitbox;
+import com.megacrit.cardcrawl.helpers.controller.CInputActionSet;
+import com.megacrit.cardcrawl.helpers.input.InputHelper;
+import easel.Easel;
+import easel.ui.interactive.MoveableWidget2;
+
+import java.util.function.Consumer;
 
 /**
  * <p>
@@ -98,6 +105,27 @@ public abstract class AbstractWidget<T extends AbstractWidget<T>> {
     private float x, y;
     private float targetX, targetY;
     private InterpolationSpeed interpolationSpeed = InterpolationSpeed.INSTANT;
+
+    // --------------------------------------------------------------------------------
+
+    protected boolean hasInteractivity;
+
+    protected Hitbox hb;
+    protected boolean leftClickStarted;
+    protected boolean rightClickStarted;
+    protected boolean isHovered;
+
+    private final Consumer<T> NOOP = x -> {};
+
+    protected Consumer<T> onLeftClick = NOOP;
+    protected Consumer<T> onRightClick = NOOP;
+    protected Consumer<T> onMouseEnter = NOOP;
+    protected Consumer<T> onMouseLeave = NOOP;
+
+    private boolean hasMoveable;
+    private MoveableWidget2 moveable;
+
+    // --------------------------------------------------------------------------------
 
     /**
      * The internal content width of the widget (excludes margins). Safe to use before anchoring (values should be accurate after constructor).
@@ -211,6 +239,8 @@ public abstract class AbstractWidget<T extends AbstractWidget<T>> {
             this.x = targetX;
             this.y = targetY;
         }
+
+        moveHitboxToTarget(targetX, targetY);
 
         return (T)this;
     }
@@ -349,45 +379,9 @@ public abstract class AbstractWidget<T extends AbstractWidget<T>> {
         return anchoredAt(screenCenterX, screenCenterY, AnchorPosition.CENTER, withDelay);
     }
 
-    /*
-      Prevent the left, right, top, bottom edges from going outside the screen, e.g.
-       +--------+          +--------+
-       |       xxx    ->   |     xxx|
-       +--------+          +--------+
-    */
-//    /**
-//     * Instantly snap the edges back into the viewing area. Note: the top right snapping takes priority if the widget is larger than the screen, although that is undefined behavior (widgets should fit inside the view area). This function will update the targetX, targetY positions to be inside the border if they're not, and re-call anchoredAt() with a
-//     * @param border How close to the edge of the screen can be to this widget. E.g. a value of 0 means the left most
-//     *               edge of the widget can align exactly with the left most edge of the screen, but it cannot start
-//     *               rendering further to the left of the screen and get cut off.
-//     * @return this widget
-//     */
-//    public T clampedOntoScreen(int border) {
-//        // TODO this function needs to account for xScale, yScale, as x and y are both in 1080p space, and
-//        //   Settings.WIDTH etc. may not be in the same coordinate system. (Need to verify / do testing here!)
-//
-//        // Bottom left
-//        if (targetX < border)
-//            this.targetX = border;
-//        if (targetY < border)
-//            this.targetY = border;
-//
-//        // Top right
-//        if (targetX + getWidth() > (Settings.WIDTH - border))
-//            this.targetX = Settings.WIDTH - border - getWidth();
-//        if (targetY + getHeight() > (Settings.HEIGHT - border))
-//            this.targetY = Settings.HEIGHT - border - getHeight();
-//
-//        // TODO: might want to not instantly move to target; but instead use this function to just make sure the target
-//        //   is clamped. Need to do some testing to see what makes more sense...
-//        anchoredAt(targetX, targetY, AnchorPosition.LEFT_BOTTOM, InterpolationSpeed.INSTANT);
-//
-//        return (T)this;
-//    }
-
     // --------------------------------------------------------------------------------
-
     // These can be obtained before (x,y) are set by the anchor
+    // --------------------------------------------------------------------------------
 
     /**
      * The total width of this widget (includes the content width and both left and right margins). Safe to use before anchoring (values should be accurate after constructor).
@@ -405,8 +399,9 @@ public abstract class AbstractWidget<T extends AbstractWidget<T>> {
      */
     public float getHeight() { return marginBottom + getContentHeight() + marginTop; }
 
+    // --------------------------------------------------------------------------------
     // These should only be used after setting the anchor position
-
+    // --------------------------------------------------------------------------------
     /**
      * The left-most point of the inner content area, useful for internal widget rendering. Undefined behavior if used before anchoring at least once.
      * @return the left-most point (past the left margin)
@@ -480,6 +475,9 @@ public abstract class AbstractWidget<T extends AbstractWidget<T>> {
 
     // --------------------------------------------------------------------------------
 
+    /**
+     * Moves the widget to the target anchor position. This occurs when an <code>anchorAt</code> is called with an <code>InterpolationSpeed</code> other than <code>InterpolationSpeed.INSTANT</code>.
+     */
     protected void moveTowardsTarget() {
         if (x != targetX || y != targetY) {
             this.x = interpolationSpeed.interpolate(x, targetX);
@@ -494,6 +492,12 @@ public abstract class AbstractWidget<T extends AbstractWidget<T>> {
     public final void render(SpriteBatch sb) {
         moveTowardsTarget();
         renderWidget(sb);
+
+        if (hasInteractivity)
+            hb.render(sb);
+
+        if (hasMoveable)
+            moveable.render(sb);
     }
 
     /**
@@ -501,11 +505,56 @@ public abstract class AbstractWidget<T extends AbstractWidget<T>> {
      * Custom widgets should implement this method for rendering. Use the inner content positions (e.g. {@link #getContentLeft()}, {@link #getContentWidth()}, etc.) to determine any position information necessary for rendering at a specific location. If the library is used as intended, these content locations should be accurate to where the widget needs to be rendered, as they reflect the most up to date location set by an anchoredAt call (this automatically will be interpolated if the anchorAt move is set to occur over several frames).
      * </p>
      * <p>
-     * Note: you NEED to revert any changes you make to the SpriteBatch (e.g. setting a shader, changing the perspective matrix, etc.) by the time this function returns, as the SpriteBatch will be reused for rendering other widgets and which will not expect those changes. You also don't technically need to render to this particular SpriteBatch (e.g. you can render to your own batch if you know what you're doing), but the general intent of this function is to render the widget.
+     * Note: you NEED to revert any changes you make to the SpriteBatch (e.g. setting a shader, changing the perspective matrix, etc.) by the time this function returns, as the SpriteBatch will be reused for rendering other widgets which will not expect those changes. You also don't technically need to render to this particular SpriteBatch (e.g. you can render to your own batch if you know what you're doing), as long as you follow the general intent of this function to render the widget.
      * </p>
      * @param sb the SpriteBatch the widget should be rendered on
      */
     protected abstract void renderWidget(SpriteBatch sb);
+
+    // --------------------------------------------------------------------------------
+    // Interactivity
+    // --------------------------------------------------------------------------------
+
+    protected void scaleHitboxToContent() {
+        if (this.hb == null)
+            this.hb = new Hitbox(getContentWidth() * Settings.xScale, getContentHeight() * Settings.yScale);
+        else
+            this.hb.resize(getContentWidth() * Settings.xScale, getContentHeight() * Settings.yScale);
+
+        if (hasMoveable) {
+            this.moveable.hb.resize(getContentWidth() * Settings.xScale, getContentHeight() * Settings.yScale);
+        }
+
+    }
+
+    protected void enableInteractivity() {
+        this.hasInteractivity = true;
+        scaleHitboxToContent();
+    }
+
+    public T onLeftClick(Consumer<T> onLeftClick) {
+        this.onLeftClick = onLeftClick;
+        enableInteractivity();
+        return (T)this;
+    }
+
+    public T onRightClick(Consumer<T> onRightClick) {
+        this.onRightClick = onRightClick;
+        enableInteractivity();
+        return (T)this;
+    }
+
+    public T onMouseEnter(Consumer<T> onMouseEnter) {
+        this.onMouseEnter = onMouseEnter;
+        enableInteractivity();
+        return (T)this;
+    }
+
+    public T onMouseLeave(Consumer<T> onMouseLeave) {
+        this.onMouseLeave = onMouseLeave;
+        enableInteractivity();
+        return (T)this;
+    }
 
     /**
      * Update this widget if it requires any logic updates each frame. Mostly for interactive widgets (as this is the spot to update hitboxes to see if they're moused over or clicked, etc.) which need updates each frame. Container widgets (e.g. {@link easel.ui.layouts.VerticalLayout}) will pass updates to all their children. The top-most widget in the hierarchy can subscribe to BaseMod's post update subscriber (or via some other SpirePatch), but everything else lower down should NOT subscribe and instead just receive their update notifications from their parent widget. The update() function for non-interactive widgets with no children is essentially a NO-OP.
@@ -517,10 +566,119 @@ public abstract class AbstractWidget<T extends AbstractWidget<T>> {
         updateWidget();
     }
 
-    private void updateInteractivity() {
-        // Update interactive pieces of this widget
+    private void moveHitboxToTarget(float targetLeft, float targetBottom) {
+        float centerX = targetLeft + (0.5f * getContentWidth());
+        float centerY = targetBottom + (0.5f * getContentHeight());
+
+        if (hasInteractivity)
+            hb.move(centerX * Settings.xScale,
+                    centerY * Settings.yScale);
+
+        if (hasMoveable)
+            moveable.hb.move(centerX * Settings.xScale,
+                    centerY * Settings.yScale);
     }
 
+    protected void updateInteractivity() {
+        // Update interactive pieces of this widget
+        if (hasInteractivity) {
+            hb.update();
+
+            // Hover (mouse enter / leave)
+            updateHoverTransitions();
+
+            // Mouse button down / up
+            updateLeftClicks();
+            updateRightClicks();
+        }
+
+        if (hasMoveable) {
+            moveable.update();
+        }
+    }
+
+    private void updateHoverTransitions() {
+        if (hb.hovered && !isHovered) {
+            onMouseEnter.accept((T)this);
+
+            Easel.logger.info("Hover started");
+            Easel.logger.info(this);
+
+            isHovered = true;
+        }
+        else if (!hb.hovered && isHovered){
+            onMouseLeave.accept((T)this);
+
+            Easel.logger.info("Hover finished");
+            Easel.logger.info(this);
+
+            isHovered = false;
+        }
+    }
+
+    private void updateLeftClicks() {
+        // Left click started
+        if (isHovered && InputHelper.justClickedLeft) {
+            leftClickStarted = true;
+        }
+        else if (hb.hovered && CInputActionSet.select.isJustPressed()) {
+            CInputActionSet.select.unpress();
+            onLeftClick.accept((T)this);
+
+            Easel.logger.info("Clicked (using CInputActionSet)");
+            Easel.logger.info(this);
+        }
+
+        // Left click ended
+        if (leftClickStarted && InputHelper.justReleasedClickLeft) {
+            if (isHovered) {
+                onLeftClick.accept((T)this);
+
+                Easel.logger.info("Clicked (regular)");
+                Easel.logger.info(this);
+            }
+
+            leftClickStarted = false;
+        }
+    }
+
+    private void updateRightClicks() {
+        // Right click started
+        if (isHovered && InputHelper.justClickedRight) {
+            rightClickStarted = true;
+        }
+        // Should look into how to use input action set for right clicks - e.g. what is the key used when previewing card upgrades in shops?
+//        else if (hb.hovered && CInputActionSet.???.isJustPressed()) {
+//            CInputActionSet.select.unpress();
+//            onLeftClick.accept((T)this);
+//
+//            Easel.logger.info("Clicked (using CInputActionSet)");
+//            Easel.logger.info(this);
+//        }
+
+        // Right click ended
+        if (rightClickStarted && InputHelper.justReleasedClickRight) {
+            if (isHovered) {
+                onRightClick.accept((T)this);
+
+                Easel.logger.info("Right Clicked (regular)");
+                Easel.logger.info(this);
+            }
+
+            rightClickStarted = false;
+        }
+    }
+
+    public T makeMoveable() {
+        this.hasMoveable = true;
+        this.moveable = new MoveableWidget2(this);
+
+        return (T)this;
+    }
+
+    /**
+     * Required for interactive components. For containers, make sure to call <code>update()</code> on all children. For widgets that require some sort of updates each frame, you can do so here.
+     */
     protected void updateWidget() {
 
     }

@@ -87,6 +87,12 @@ public class WidgetSwapper<T extends Enum<T>> extends AbstractWidget<WidgetSwapp
     }
 
     @Override
+    protected void updateWidget() {
+        if (activeWidget != null)
+            activeWidget.update();
+    }
+
+    @Override
     public void show() {
         if (activeWidget != null)
             activeWidget.show();

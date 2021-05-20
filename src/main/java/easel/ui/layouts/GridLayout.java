@@ -217,6 +217,22 @@ public final class GridLayout extends AbstractWidget<GridLayout> {
         return this;
     }
 
+    /**
+     * Makes evenly distributed rows/cols for a certain width and height. Convenience function for performing both {@link #withNEvenlySizedRows(float, int)} and {@link #withNEvenlySizedCols(float, int)} in one function call.
+     * @param totalWidth the total width of the grid
+     * @param totalHeight the total height of the grid
+     * @param numRows the number of rows in the grid
+     * @param numCols the number of cols in the grid
+     * @return this layout
+     * @see #withNEvenlySizedRows(float, int)
+     * @see #withNEvenlySizedCols(float, int)
+     */
+    public GridLayout withRowsCols(float totalWidth, float totalHeight, int numRows, int numCols) {
+        withNEvenlySizedRows(totalHeight, numRows);
+        withNEvenlySizedCols(totalWidth, numCols);
+        return this;
+    }
+
     // --------------------------------------------------------------------------------
 
 
@@ -262,57 +278,96 @@ public final class GridLayout extends AbstractWidget<GridLayout> {
     // --------------------------------------------------------------------------------
 
     /**
-     * Let this grid manage the given widget. The widget will be placed at the specified anchor position at the desired (row, col) position in the grid next time {@link #anchoredAt(float, float, AnchorPosition)} is called. This widget will replace any existing widget at the same (row, col) position if it already exists.
-     * NOTE: assumes that (row,col) will be a valid position in the grid, but no bounds checking is provided. The grid will add this widget to its tracked HashMap regardless.
+     * <p>
+     * Let this grid manage the given widget. This function uses the specified anchor (ignoring <code>defaultChildAnchor</code>) to position this child inside its grid cell. The widget is moved into the proper position next time {@link #anchoredAt(float, float, AnchorPosition)} (or another in the <code>anchoredAt</code> family) is called.
+     * </p>
+     * <p>
+     * NOTE: This widget will replace any existing widget at the same (row, col) position if it already exists. It also assumes that (row,col) will be a valid position in the grid, but no bounds checking is provided. The grid will add this widget to its tracked HashMap regardless.
+     * </p>
      * @param row the row the widget will be placed in (0 is the top-most row)
      * @param col the col the widget will be placed in (0 is the left-most column)
      * @param widget the widget to track
      * @param anchorPosition how the child will be situated inside the (row, col) grid cell [which may be wider and taller than the widget's own width/height]
-     * @see #addChild(int, int, AbstractWidget, AnchorPosition)
      * @see #withChild(int, int, AbstractWidget)
-     * @see #withDefaultChildAnchorPosition(AnchorPosition)
-     */
-    public void addChild(int row, int col, AbstractWidget widget, AnchorPosition anchorPosition) {
-        children.put(new GridLocation(row, col), new LayoutItem(widget, anchorPosition));
-    }
-
-    /**
-     * Convenience function for {@link #addChild(int, int, AbstractWidget, AnchorPosition)}. Uses the <code>defaultChildAnchor</code> anchor set by the {@link #withDefaultChildAnchorPosition(AnchorPosition)} method (if that method isn't used when building, the <code>defaultChildAnchor</code> defaults to LEFT_TOP).
-     * @param row the row the widget will be placed in (0 is the top-most row)
-     * @param col the col the widget will be placed in (0 is the left-most column)
-     * @param widget the widget to track
-     * @see #addChild(int, int, AbstractWidget, AnchorPosition)
-     */
-    public void addChild(int row, int col, AbstractWidget widget) {
-        addChild(row, col, widget, defaultChildAnchor);
-    }
-
-    /**
-     * Convenience function.
-     * @param row the row the widget will be placed in (0 is the top-most row)
-     * @param col the col the widget will be placed in (0 is the left-most column)
-     * @param widget the widget to track
-     * @see #addChild(int, int, AbstractWidget)
-     * @return this
-     */
-    public GridLayout withChild(int row, int col, AbstractWidget widget) {
-        addChild(row, col, widget, defaultChildAnchor);
-        return this;
-    }
-
-    /**
-     * Convenience function.
-     * @param row the row the widget will be placed in (0 is the top-most row)
-     * @param col the col the widget will be placed in (0 is the left-most column)
-     * @param widget the widget to track
-     * @param anchorPosition how the child will be situated inside the (row, col) grid cell [which may be wider and taller than the widget's own width/height]
-     * @see #addChild(int, int, AbstractWidget, AnchorPosition)
-     * @return this
      */
     public GridLayout withChild(int row, int col, AbstractWidget widget, AnchorPosition anchorPosition) {
-        addChild(row, col, widget, anchorPosition);
+        children.put(new GridLocation(row, col), new LayoutItem(widget, anchorPosition));
         return this;
     }
+
+    /**
+     * <p>
+     * Let this grid manage the given widget. This function uses the current <code>defaultChildAnchor</code> position to set this child's position inside its grid cell (see {@link #withDefaultChildAnchorPosition(AnchorPosition)} for details). The widget is moved into the proper position next time {@link #anchoredAt(float, float, AnchorPosition)} (or another in the <code>anchoredAt</code> family) is called.
+     * </p>
+     * <p>
+     * NOTE: This widget will replace any existing widget at the same (row, col) position if it already exists. It also assumes that (row,col) will be a valid position in the grid, but no bounds checking is provided. The grid will add this widget to its tracked HashMap regardless.
+     * </p>
+     * @param row the row the widget will be placed in (0 is the top-most row)
+     * @param col the col the widget will be placed in (0 is the left-most column)
+     * @param widget the widget to track
+     * @see #withChild(int, int, AbstractWidget, AnchorPosition)
+     * @see #withDefaultChildAnchorPosition(AnchorPosition)
+     */
+    public GridLayout withChild(int row, int col, AbstractWidget widget) {
+        return withChild(row, col, widget, defaultChildAnchor);
+    }
+
+    /**
+     * Adds the provided children to the specified row, starting at column 0. E.g. the first widget provided will be placed in the row at column 0, the second in the row at column 1, etc.
+     * @param row the row to add the children into
+     * @param widgets a list of child widgets
+     * @return this layout
+     * @see #withChild(int, int, AbstractWidget, AnchorPosition)
+     */
+    public GridLayout withChildrenInRow(int row, AbstractWidget... widgets) {
+        for (int col = 0; col < widgets.length; ++col) {
+            withChild(row, col, widgets[col]);
+        }
+
+        return this;
+    }
+
+    /**
+     * Adds the provided children to the specified column, starting at row 0. E.g. the first widget provided will be placed in the column in row 0, the second in the column in row 1, etc.
+     * @param col the column to add the children into
+     * @param widgets a list of child widgets
+     * @return this layout
+     * @see #withChild(int, int, AbstractWidget, AnchorPosition)
+     */
+    public GridLayout withChildrenInCol(int col, AbstractWidget... widgets) {
+        for (int row = 0; row < widgets.length; ++row) {
+            withChild(row, col, widgets[row]);
+        }
+
+        return this;
+    }
+
+//    /**
+//     * Convenience function.
+//     * @param row the row the widget will be placed in (0 is the top-most row)
+//     * @param col the col the widget will be placed in (0 is the left-most column)
+//     * @param widget the widget to track
+//     * @see #addChild(int, int, AbstractWidget)
+//     * @return this
+//     */
+//    public GridLayout withChild(int row, int col, AbstractWidget widget) {
+//        addChild(row, col, widget, defaultChildAnchor);
+//        return this;
+//    }
+
+//    /**
+//     * Convenience function.
+//     * @param row the row the widget will be placed in (0 is the top-most row)
+//     * @param col the col the widget will be placed in (0 is the left-most column)
+//     * @param widget the widget to track
+//     * @param anchorPosition how the child will be situated inside the (row, col) grid cell [which may be wider and taller than the widget's own width/height]
+//     * @see #addChild(int, int, AbstractWidget, AnchorPosition)
+//     * @return this
+//     */
+//    public GridLayout withChild(int row, int col, AbstractWidget widget, AnchorPosition anchorPosition) {
+//        addChild(row, col, widget, anchorPosition);
+//        return this;
+//    }
 
     // --------------------------------------------------------------------------------
     // Convenient row / col position access
@@ -338,6 +393,30 @@ public final class GridLayout extends AbstractWidget<GridLayout> {
 
     private float getRowHeight(int row) {
         return (row < rowHeights.size()) ? rowHeights.get(row) : 0.0f;
+    }
+
+    // --------------------------------------------------------------------------------
+
+    public GridLayout resizeRowToFitTallestChild(int row) {
+        if (row > rowHeights.size())
+            return this;
+
+        float maxHeightInRow = children.entrySet().stream()
+                .filter(entry -> entry.getKey().row == row)
+                .map(entry -> entry.getValue().widget.getHeight())
+                .max(Float::compareTo)
+                .orElse(0.0f);
+
+        rowHeights.set(row, maxHeightInRow);
+
+        return this;
+    }
+
+    public GridLayout resizeRowsToFitTallestChildren() {
+        for (int row = 0; row < rowHeights.size(); ++row)
+            resizeRowToFitTallestChild(row);
+
+        return this;
     }
 
     // --------------------------------------------------------------------------------
