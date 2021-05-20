@@ -12,7 +12,7 @@ import com.megacrit.cardcrawl.helpers.ImageMaster;
 import easel.ui.AbstractWidget;
 import easel.ui.AnchorPosition;
 import easel.ui.debug.DebugWidget;
-import easel.ui.interactive.MoveableWidget2;
+import easel.ui.interactive.MoveableWidget;
 import easel.ui.layouts.GridLayout;
 import easel.utils.SoundHelper;
 import org.apache.logging.log4j.LogManager;
@@ -62,7 +62,7 @@ public class Easel implements PostInitializeSubscriber, RenderSubscriber, PostUp
                                         .onMouseEnter(w -> w.setColor(DebugWidget.DEBUG_COLOR_1))
                                         .onMouseLeave(w -> w.setColor(DebugWidget.DEBUG_COLOR_0))
                                         .onRightClick(w -> SoundHelper.cawCaw()),
-                                new MoveableWidget2(100, 100, grid)
+                                new MoveableWidget(100, 100, grid)
                         )
                         //.resizeRowsToFitTallestChildren()
                         .onLeftClick(onClick -> SoundHelper.screenCloseSound())

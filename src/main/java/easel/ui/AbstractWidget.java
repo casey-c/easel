@@ -6,7 +6,7 @@ import com.megacrit.cardcrawl.helpers.Hitbox;
 import com.megacrit.cardcrawl.helpers.controller.CInputActionSet;
 import com.megacrit.cardcrawl.helpers.input.InputHelper;
 import easel.Easel;
-import easel.ui.interactive.MoveableWidget2;
+import easel.ui.interactive.MoveableWidget;
 
 import java.util.function.Consumer;
 
@@ -123,7 +123,7 @@ public abstract class AbstractWidget<T extends AbstractWidget<T>> {
     protected Consumer<T> onMouseLeave = NOOP;
 
     private boolean hasMoveable;
-    private MoveableWidget2 moveable;
+    private MoveableWidget moveable;
 
     // --------------------------------------------------------------------------------
 
@@ -502,12 +502,39 @@ public abstract class AbstractWidget<T extends AbstractWidget<T>> {
 
     /**
      * <p>
+     * Renders top level (especially tooltip) effects. Like {@link #render(SpriteBatch)}, but deliberately delayed. If any of your widgets require custom (Widget-based, not base-game TipHelper based) tooltips or other specific rendering that needs to go on top of all other widgets in the hierarchy, you'll need to set your root node to call this after its main {@link #render(SpriteBatch)} completes.
+     * </p>
+     * <p>
+     * If you are hooking into BaseMod's <code>RenderSubscriber</code> for your base class, you can simply call this after your main call to <code>rootWidget.render(spriteBatch)</code>. All layout managers and other container widgets will extend the calls down the tree automatically (much like how <code>render()</code> works), meaning you only need to call this at the highest level of your widget hierarchy.
+     * </p>
+     * <pre>
+     * {@code
+     * public void receiveRender(SpriteBatch spriteBatch) {
+     *     // Our normal render call will trickle down the hierarchy in a breadth-first manner, rendering every descendant widget.
+     *     baseWidget.render(spriteBatch);
+     *
+     *     // Call this after the above so that we can support custom tooltips (if desired); also trickles down the tree
+     *     baseWidget.renderTopLevel(spriteBatch);
+     * }
+     * }
+     * </pre>
+     * <p>
+     * Note that this is only required if you are using custom widgets that need to be rendered last (on top of everything). If you are sticking to base game style tooltips (e.g. using something like the <code>TipHelper</code> statics), this is NOT required. However, if you do end up needing to draw on top of all widgets in your hierarchy, this is a solid way to do it as it follows the same breadth-first visit order but occurs after all the regular rendering takes place.
+     * </p>
+     * @param sb the SpriteBatch to render on
+     * @see #render(SpriteBatch)
+     */
+    public void renderTopLevel(SpriteBatch sb) { }
+
+    /**
+     * <p>
      * Custom widgets should implement this method for rendering. Use the inner content positions (e.g. {@link #getContentLeft()}, {@link #getContentWidth()}, etc.) to determine any position information necessary for rendering at a specific location. If the library is used as intended, these content locations should be accurate to where the widget needs to be rendered, as they reflect the most up to date location set by an anchoredAt call (this automatically will be interpolated if the anchorAt move is set to occur over several frames).
      * </p>
      * <p>
      * Note: you NEED to revert any changes you make to the SpriteBatch (e.g. setting a shader, changing the perspective matrix, etc.) by the time this function returns, as the SpriteBatch will be reused for rendering other widgets which will not expect those changes. You also don't technically need to render to this particular SpriteBatch (e.g. you can render to your own batch if you know what you're doing), as long as you follow the general intent of this function to render the widget.
      * </p>
      * @param sb the SpriteBatch the widget should be rendered on
+     * @see #renderTopLevel(SpriteBatch)
      */
     protected abstract void renderWidget(SpriteBatch sb);
 
@@ -515,11 +542,16 @@ public abstract class AbstractWidget<T extends AbstractWidget<T>> {
     // Interactivity
     // --------------------------------------------------------------------------------
 
+    /**
+     * This should be called whenever the <code>getContentWidth()</code> or <code>getContentHeight()</code> changes.
+     */
     protected void scaleHitboxToContent() {
-        if (this.hb == null)
-            this.hb = new Hitbox(getContentWidth() * Settings.xScale, getContentHeight() * Settings.yScale);
-        else
-            this.hb.resize(getContentWidth() * Settings.xScale, getContentHeight() * Settings.yScale);
+        if (hasInteractivity) {
+            if (this.hb == null)
+                this.hb = new Hitbox(getContentWidth() * Settings.xScale, getContentHeight() * Settings.yScale);
+            else
+                this.hb.resize(getContentWidth() * Settings.xScale, getContentHeight() * Settings.yScale);
+        }
 
         if (hasMoveable) {
             this.moveable.hb.resize(getContentWidth() * Settings.xScale, getContentHeight() * Settings.yScale);
@@ -527,32 +559,32 @@ public abstract class AbstractWidget<T extends AbstractWidget<T>> {
 
     }
 
-    protected void enableInteractivity() {
+    protected void initializeInteractivity() {
         this.hasInteractivity = true;
         scaleHitboxToContent();
     }
 
     public T onLeftClick(Consumer<T> onLeftClick) {
         this.onLeftClick = onLeftClick;
-        enableInteractivity();
+        initializeInteractivity();
         return (T)this;
     }
 
     public T onRightClick(Consumer<T> onRightClick) {
         this.onRightClick = onRightClick;
-        enableInteractivity();
+        initializeInteractivity();
         return (T)this;
     }
 
     public T onMouseEnter(Consumer<T> onMouseEnter) {
         this.onMouseEnter = onMouseEnter;
-        enableInteractivity();
+        initializeInteractivity();
         return (T)this;
     }
 
     public T onMouseLeave(Consumer<T> onMouseLeave) {
         this.onMouseLeave = onMouseLeave;
-        enableInteractivity();
+        initializeInteractivity();
         return (T)this;
     }
 
@@ -669,9 +701,22 @@ public abstract class AbstractWidget<T extends AbstractWidget<T>> {
         }
     }
 
+    /**
+     * <p>
+     * Makes this widget click-and-drag-able. Left+Click and hold anywhere inside this widget's inner content bounds (e.g. in between <code>getContentLeft()</code> and <code>getContentRight()</code> etc.) to make the widget (and all its descendants) move along with the mouse. Release left click to stop moving.
+     * </p>
+     * <p>
+     * The hitbox used for this movement is created with the current dimensions of this widget (inner content width/height), and will move along with any updates to the anchor position (e.g. {@link #anchoredAt(float, float, AnchorPosition)}). Note that if you resize the widget later on (adjusting either <code>getContentWidth()</code> or <code>getContentHeight()</code> after the initial constructor / initialization phase), you may need to manually call {@link #scaleHitboxToContent()}, or this moveable hitbox won't correspond to the proper area.
+     * </p>
+     * <p>
+     * This is provided as a convenience function to easily make a widget moveable. For more complex move semantics and more flexibility, the recommended approach is to attach an external hitbox widget using {@link MoveableWidget} and attach it to the highest level widget you're trying to move (making sure the attached hitbox widget moves along with the desired target widget). More details can be found on that widget's documentation page.
+     * </p>
+     * @return this widget
+     * @see MoveableWidget
+     */
     public T makeMoveable() {
         this.hasMoveable = true;
-        this.moveable = new MoveableWidget2(this);
+        this.moveable = new MoveableWidget(this);
 
         return (T)this;
     }
@@ -679,9 +724,7 @@ public abstract class AbstractWidget<T extends AbstractWidget<T>> {
     /**
      * Required for interactive components. For containers, make sure to call <code>update()</code> on all children. For widgets that require some sort of updates each frame, you can do so here.
      */
-    protected void updateWidget() {
-
-    }
+    protected void updateWidget() { }
 
     // --------------------------------------------------------------------------------
     // Usually for hitboxes, but can be used to enable/disable computations required each frame - these should recurse

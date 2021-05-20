@@ -289,6 +289,7 @@ public final class GridLayout extends AbstractWidget<GridLayout> {
      * @param widget the widget to track
      * @param anchorPosition how the child will be situated inside the (row, col) grid cell [which may be wider and taller than the widget's own width/height]
      * @see #withChild(int, int, AbstractWidget)
+     * @return this layout
      */
     public GridLayout withChild(int row, int col, AbstractWidget widget, AnchorPosition anchorPosition) {
         children.put(new GridLocation(row, col), new LayoutItem(widget, anchorPosition));
@@ -307,6 +308,7 @@ public final class GridLayout extends AbstractWidget<GridLayout> {
      * @param widget the widget to track
      * @see #withChild(int, int, AbstractWidget, AnchorPosition)
      * @see #withDefaultChildAnchorPosition(AnchorPosition)
+     * @return this layout
      */
     public GridLayout withChild(int row, int col, AbstractWidget widget) {
         return withChild(row, col, widget, defaultChildAnchor);
@@ -495,33 +497,26 @@ public final class GridLayout extends AbstractWidget<GridLayout> {
 //                getContentWidth() * Settings.xScale,
 //                getContentHeight() * Settings.yScale);
 
-        children.values()
-                .stream()
-                .map(a -> a.widget)
-                .forEach(w -> w.render(sb));
+        children.values().forEach(w -> w.widget.render(sb));
+    }
+
+    @Override
+    public void renderTopLevel(SpriteBatch sb) {
+        children.values().forEach(c -> c.widget.renderTopLevel(sb));
     }
 
     @Override
     public void updateWidget() {
-        children.values()
-                .stream()
-                .map(a -> a.widget)
-                .forEach(AbstractWidget::update);
+        children.values().forEach(w -> w.widget.update());
     }
 
     @Override
     public void show() {
-        children.values()
-                .stream()
-                .map(a -> a.widget)
-                .forEach(AbstractWidget::show);
+        children.values().forEach(w -> w.widget.show());
     }
 
     @Override
     public void hide() {
-        children.values()
-                .stream()
-                .map(a -> a.widget)
-                .forEach(AbstractWidget::hide);
+        children.values().forEach(w -> w.widget.hide());
     }
 }

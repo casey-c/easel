@@ -81,6 +81,8 @@ abstract class AbstractOneDimensionalLayout<T extends AbstractOneDimensionalLayo
     // --------------------------------------------------------------------------------
 
     @Override protected void renderWidget(SpriteBatch sb) { children.forEach(w -> w.widget.render(sb)); }
+    @Override public void renderTopLevel(SpriteBatch sb) { children.forEach(w -> w.widget.renderTopLevel(sb)); }
+
     @Override public void hide() { children.forEach(w -> w.widget.hide()); }
     @Override public void show() { children.forEach(w -> w.widget.show()); }
 }
