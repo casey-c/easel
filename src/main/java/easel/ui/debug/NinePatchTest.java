@@ -1,9 +1,11 @@
 package easel.ui.debug;
 
+import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import easel.ui.AbstractWidget;
 import easel.ui.AnchorPosition;
 import easel.ui.InterpolationSpeed;
+import easel.ui.graphics.DualNinePatchWidget;
 import easel.ui.graphics.NinePatchWidget;
 import easel.ui.layouts.GridLayout;
 import easel.utils.SoundHelper;
@@ -11,7 +13,7 @@ import easel.utils.textures.TextureDatabase;
 import easel.utils.textures.TextureManager;
 
 public class NinePatchTest extends AbstractWidget<NinePatchTest> {
-    private NinePatchWidget np;
+    private DualNinePatchWidget np;
     private GridLayout grid;
 
     public NinePatchTest() {
@@ -33,7 +35,8 @@ public class NinePatchTest extends AbstractWidget<NinePatchTest> {
 
         grid.resizeRowToFitTallestChild(1);
 
-        this.np = new NinePatchWidget(100, 100, TextureManager.get(TextureDatabase.TOOLTIP_BASE))
+        this.np = new DualNinePatchWidget(100, 100, TextureManager.get(TextureDatabase.TOOLTIP_BASE), TextureManager.get(TextureDatabase.TOOLTIP_TRIM))
+                .withColors(Color.BLUE, Color.CYAN)
                 .scaleToFullWidget(grid);
     }
 
