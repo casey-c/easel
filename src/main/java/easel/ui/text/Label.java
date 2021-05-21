@@ -12,7 +12,7 @@ import easel.ui.AbstractWidget;
  * Labels are the quick and easy way to render text with a widget. Labels can change their text dynamically with {@link #withText(String)}, but doing so will alter the size of the widget and may require re-anchoring.
  * </p>
  * <p>
- * Labels won't handle "smart text" effects (e.g. text wrapping, inline use of color modifiers, " NL " for newlines, etc.), as this widget is just a simple wrapper over <code>FontHelper.renderFontLeftDownAligned()</code>. For more flexible text rendering, consider using a {@link SmartLabel} instead (not yet implemented).
+ * Labels won't handle "smart text" effects (e.g. text wrapping, inline use of color modifiers, " NL " for newlines, etc.), as this widget is just a simple wrapper over <code>FontHelper.renderFontLeftDownAligned()</code>. For more flexible text rendering, consider using a SmartLabel instead (not yet implemented).
  * </p>
  */
 public class Label extends AbstractWidget<Label> {
