@@ -5,8 +5,8 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import easel.ui.AbstractWidget;
 import easel.ui.AnchorPosition;
 import easel.ui.InterpolationSpeed;
-import easel.ui.graphics.DualNinePatchWidget;
-import easel.ui.graphics.NinePatchWidget;
+import easel.ui.graphics.ninepatch.DualNinePatchWidget;
+import easel.ui.graphics.pie.PieChartWidget;
 import easel.ui.layouts.GridLayout;
 import easel.utils.SoundHelper;
 import easel.utils.textures.TextureDatabase;
@@ -33,7 +33,9 @@ public class NinePatchTest extends AbstractWidget<NinePatchTest> {
             }
         }
 
-        grid.resizeRowToFitTallestChild(1);
+        grid.withChild(1, 1, new PieChartWidget(100, 100).withCounts(6, 4, 0, 1));
+
+        //grid.resizeRowToFitTallestChild(1);
 
         this.np = new DualNinePatchWidget(100, 100, TextureManager.get(TextureDatabase.TOOLTIP_BASE), TextureManager.get(TextureDatabase.TOOLTIP_TRIM))
                 .withColors(Color.BLUE, Color.CYAN)

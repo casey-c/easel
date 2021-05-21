@@ -1,4 +1,4 @@
-package easel.ui.graphics;
+package easel.ui.graphics.ninepatch;
 
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.Texture;
