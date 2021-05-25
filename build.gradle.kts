@@ -1,8 +1,9 @@
 plugins {
     java
-    maven
-    `maven-publish`
+    id("maven-publish")
 }
+
+group = "com.github.casey-c"
 
 /*
 Setup environment variables
@@ -56,4 +57,12 @@ tasks.register<Copy>("buildAndCopyJAR") {
 
     from("build/libs/$modName.jar")
     into("$stsInstallLocation\\mods")
+}
+
+publishing {
+    publications {
+        create<MavenPublication>("easel") {
+            from(components["java"])
+        }
+    }
 }
