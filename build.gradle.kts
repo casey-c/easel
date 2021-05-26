@@ -59,10 +59,57 @@ tasks.register<Copy>("buildAndCopyJAR") {
     into("$stsInstallLocation\\mods")
 }
 
+// --------------------------------------------------------------------------------
+
+java {
+    withSourcesJar()
+    withJavadocJar()
+}
+
 publishing {
     publications {
         create<MavenPublication>("easel") {
             from(components["java"])
         }
     }
+
+    repositories {
+        maven {
+            name = "easel"
+            url = uri(layout.buildDirectory.dir("repo"))
+        }
+    }
 }
+
+// --------------------------------------------------------------------------------
+
+// --------------------------------------------------------------------------------
+
+// New source/javadoc jars for maven publishing
+
+//tasks.register<Jar>("sourcesJar") {
+//    dependsOn("classes")
+//    archiveClassifier.set("sources")
+//    from(sourceSets.main.get().allSource)
+//}
+//
+//tasks.register<Jar>("javadocJar") {
+//    dependsOn("javadoc")
+//    archiveClassifier.set("javadoc")
+//    from(tasks["javadoc"])
+//}
+//
+//artifacts {
+//    add("archives", tasks["sourcesJar"])
+//    add("archives", tasks["javadocJar"])
+//}
+
+// --------------------------------------------------------------------------------
+
+//publishing {
+//    publications {
+//        create<MavenPublication>("easel") {
+//            from(components["java"])
+//        }
+//    }
+//}
