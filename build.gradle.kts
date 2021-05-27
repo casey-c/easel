@@ -1,9 +1,10 @@
 plugins {
     java
     `maven-publish`
+    signing
 }
 
-group = "com.github.casey-c"
+group = "io.github.casey-c"
 version = "0.0.1"
 
 /*
@@ -109,3 +110,19 @@ publishing {
         }
     }
 }
+
+signing {
+    sign(publishing.publications["easel"])
+}
+
+// --------------------------------------------------------------------------------
+// Note to self (steps for publishing to maven central):
+// See: https://central.sonatype.org/publish/publish-manual/
+// 1. Run the publishToMavenLocal task to build up the repo in ~/.m2/repositories/io/github/casey-c/easel
+//     - the local repo should contain the javadoc, source, and main library jars as well as automatic gpg signed version
+// 2. Build a "bundled" jar containing everything in this folder
+//     - $ jar -cvf bundle.jar *
+// 3. Upload to https://s01.oss.sonatype.org/ (Staging upload -> Artifact bundle)
+// 4. Verify that it closes correctly / click release button to sync with maven central
+// 5. ???
+// 6. profit?
