@@ -4,6 +4,7 @@ plugins {
 }
 
 group = "com.github.casey-c"
+version = "0.0.1"
 
 /*
 Setup environment variables
@@ -64,6 +65,11 @@ tasks.register<Copy>("buildAndCopyJAR") {
 java {
     withSourcesJar()
     withJavadocJar()
+}
+
+artifacts {
+    add("archives", tasks["sourcesJar"])
+    add("archives", tasks["javadocJar"])
 }
 
 publishing {
