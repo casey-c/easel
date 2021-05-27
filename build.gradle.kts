@@ -24,6 +24,8 @@ dependencies {
     compileOnly(fileTree(compileOnlyLibs))
 }
 
+// --------------------------------------------------------------------------------
+
 tasks.register<Jar>("buildJavadocJAR") {
     group = "Slay the Spire"
     description = "Builds the javadoc jar"
