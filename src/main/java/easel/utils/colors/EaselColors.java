@@ -149,4 +149,84 @@ public class EaselColors {
      */
     public static Color QUAL_YELLOW() { return activePalette.QUAL_YELLOW(); }
 
+    // ----------------------------------------------------------------------------------------------------------------------------------------------------------------
+    // More saturated header colors (shouldn't be used with excessive colors around, as they tend to dominate)
+
+    /**
+     * @return a strongly saturated red color; avoid using lots of other colors nearby, as this tends to dominate
+     */
+    public static Color HEADER_STRONG_RED() { return activePalette.HEADER_STRONG_RED(); }
+
+    /**
+     * @return a strongly saturated blue color; avoid using lots of other colors nearby, as this tends to dominate
+     */
+    public static Color HEADER_STRONG_BLUE() { return activePalette.HEADER_STRONG_BLUE(); }
+
+    /**
+     * @return a strongly saturated green color; avoid using lots of other colors nearby, as this tends to dominate
+     */
+    public static Color HEADER_STRONG_GREEN() { return activePalette.HEADER_STRONG_GREEN(); }
+
+    /**
+     * @return a strongly saturated purple color; avoid using lots of other colors nearby, as this tends to dominate
+     */
+    public static Color HEADER_STRONG_PURPLE() { return activePalette.HEADER_STRONG_PURPLE(); }
+
+    // --------------------------------------------------------------------------------
+    // The "default" header colors (mostly desaturated) - can be used with other colors as they won't compete as much
+
+    /**
+     * @return a desaturated red for standard header background use
+     */
+    public static Color HEADER_RED() { return activePalette.HEADER_RED(); }
+
+    /**
+     * @return a desaturated blue for standard header background use
+     */
+    public static Color HEADER_BLUE() { return activePalette.HEADER_BLUE(); }
+
+    /**
+     * @return a desaturated green for standard header background use
+     */
+    public static Color HEADER_GREEN() { return activePalette.HEADER_GREEN(); }
+
+    /**
+     * @return a desaturated purple for standard header background use
+     */
+    public static Color HEADER_PURPLE() { return activePalette.HEADER_PURPLE(); }
+
+    // --------------------------------------------------------------------------------
+    // The "special" header colors - not quite "strong" as they can be used with other colors but unusual enough to not
+    // be super common
+
+    /**
+     * @return a very dark blue
+     */
+    public static Color HEADER_DEEP_BLUE() { return activePalette.HEADER_DEEP_BLUE(); }
+
+    /**
+     * @return a lighter, paleish blue
+     */
+    public static Color HEADER_SLATE() { return activePalette.HEADER_SLATE(); }
+
+    /**
+     * @return a lighter, blueish green
+     */
+    public static Color HEADER_SEA_GLASS() { return activePalette.HEADER_SEA_GLASS(); }
+
+    /**
+     * @return a maroonish, pale brownish red
+     */
+    public static Color HEADER_WOOD() { return activePalette.HEADER_WOOD(); }
+
+    /**
+     * @return a light yellow green, can be considered suitable for "yellow"
+     */
+    public static Color HEADER_LIGHT_ALGAE() { return activePalette.HEADER_LIGHT_ALGAE(); }
+
+    /**
+     * @return a dark yellow green
+     */
+    public static Color HEADER_DARK_ALGAE() { return activePalette.HEADER_DARK_ALGAE(); }
+
 }
