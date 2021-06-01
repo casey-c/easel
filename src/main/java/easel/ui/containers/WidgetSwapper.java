@@ -1,4 +1,4 @@
-package easel.ui.misc;
+package easel.ui.containers;
 
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import easel.Easel;
