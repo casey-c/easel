@@ -39,26 +39,9 @@ public class Easel implements PostInitializeSubscriber, RenderSubscriber, PostUp
         widgets.add(
                 new LargeHeaderedContainer(500, 500)
                         .withHeader("Title")
-                        .withHeaderColor(EaselColors.HEADER_RED())
+                        .withHeaderColor(EaselColors.TOOLTIP_BASE())
                         .withHeaderHorizontalAlignment(AnchorPosition.CENTER)
-                        .onLeftClick(container -> {
-                            if (KeyHelper.isShiftPressed()) {
-                                if (KeyHelper.isAltPressed())
-                                    container.withHeaderHorizontalAlignment(AnchorPosition.CENTER);
-                                else
-                                    container.withHeaderHorizontalAlignment(AnchorPosition.LEFT_CENTER);
-                            }
-
-                            container.withHeader("Title", "Subtitle")
-                                    .anchoredCenteredOnScreen();
-                        })
-                        .onRightClick(container -> {
-                            if (KeyHelper.isShiftPressed())
-                                container.withHeaderHorizontalAlignment(AnchorPosition.RIGHT_CENTER);
-
-                            container.withHeader("Title")
-                                    .anchoredCenteredOnScreen();
-                        })
+                        //.makeMoveable()
                         .anchoredCenteredOnScreen()
         );
     }
@@ -67,7 +50,12 @@ public class Easel implements PostInitializeSubscriber, RenderSubscriber, PostUp
     @Override
     public void receiveRender(SpriteBatch sb) {
         GraphicsHelper.dimFullScreen(sb, true);
-        widgets.forEach(widget -> widget.render(sb));
+
+        widgets.forEach(widget -> {
+            widget
+                    .anchoredCenteredOnMouse(40, -40, AnchorPosition.LEFT_TOP, 20)
+                    .render(sb);
+        });
     }
 
     @Override

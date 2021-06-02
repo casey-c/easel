@@ -1,6 +1,7 @@
 package easel.ui.interactive;
 
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.megacrit.cardcrawl.core.Settings;
 import com.megacrit.cardcrawl.helpers.input.InputHelper;
 import easel.ui.AbstractWidget;
 import easel.ui.AnchorPosition;
@@ -67,8 +68,8 @@ public class MoveableWidget extends AbstractWidget<MoveableWidget> {
 
     private void updateCurrentlyMoving() {
         // Update the widget position to the mouse
-        int currMouseX = InputHelper.mX;
-        int currMouseY = InputHelper.mY;
+        int currMouseX = (int)((float)InputHelper.mX / Settings.xScale);
+        int currMouseY = (int)((float)InputHelper.mY / Settings.yScale);
 
         int deltaX = startingMouseX - currMouseX;
         int deltaY = startingMouseY - currMouseY;

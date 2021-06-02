@@ -372,11 +372,58 @@ public abstract class AbstractWidget<T extends AbstractWidget<T>> {
      * @see #anchoredCenteredOnScreen()
      * @see #anchoredAt(float, float, AnchorPosition, InterpolationSpeed)
      */
-    public T anchoredCenteredOnScreen(InterpolationSpeed withDelay) {
+    public final T anchoredCenteredOnScreen(InterpolationSpeed withDelay) {
         float screenCenterX = (Settings.WIDTH / 2.0f) / Settings.xScale;
         float screenCenterY = (Settings.HEIGHT / 2.0f) / Settings.yScale;
 
         return anchoredAt(screenCenterX, screenCenterY, AnchorPosition.CENTER, withDelay);
+    }
+
+    /**
+     * Instantly moves the widget such that the center of the widget is centered on the mouse position. Convenience function for {@link #anchoredCenteredOnMouse(float, float, AnchorPosition)} with no offset and {@link AnchorPosition#CENTER} as the anchor.
+     * @return this widget
+     */
+    public final T anchoredCenteredOnMouse() {
+        return anchoredCenteredOnMouse(0, 0, AnchorPosition.CENTER);
+    }
+
+    /**
+     * Instantly moves the widget such that the center of the widget is centered on the mouse position, but with an attempt to stay in bounds. Convenience function for {@link #anchoredCenteredOnMouse(float, float, AnchorPosition, float)} with no offset and {@link AnchorPosition#CENTER} as the anchor.
+     * @see #anchoredAt(float, float, AnchorPosition, float)
+     * @param clampedBorder how close the widget is allowed to get to the sides of the screen
+     * @return this widget
+     */
+    public final T anchoredCenteredOnMouse(float clampedBorder) {
+        return anchoredCenteredOnMouse(0, 0, AnchorPosition.CENTER,clampedBorder);
+    }
+
+    /**
+     * Instantly moves the widget to the current mouse position. Uses the given anchor position to determine which point on the widget will be put at the mouse position, customizable with offsets. E.g., if you use offsets of (10px and -10px) and an anchor of {@link AnchorPosition#LEFT_TOP}, the widget will have its top left corner 10 pixels to the right and 10 pixels down from the current mouse position.
+     * @param offsetX horizontal adjustment off the mouse position (positive values are towards the right of the screen)
+     * @param offsetY vertical adjustment off the mouse position (positive values are towards the top of the screen)
+     * @param anchorPosition which piece of the widget will be anchored to the mouse position + offsets
+     * @return this widget
+     */
+    public final T anchoredCenteredOnMouse(float offsetX, float offsetY, AnchorPosition anchorPosition) {
+        float scaledX = InputHelper.mX / Settings.xScale;
+        float scaledY = InputHelper.mY / Settings.yScale;
+
+        return anchoredAt(scaledX + offsetX, scaledY + offsetY, anchorPosition);
+    }
+
+    /**
+     * Instantly moves the widget to the current mouse position. Uses the given anchor position to determine which point on the widget will be put at the mouse position, customizable with offsets and affected by clamping so that it attempts to stay on screen. E.g., if you use offsets of (10px and -10px) and an anchor of {@link AnchorPosition#LEFT_TOP}, and a clampedBorder of 10, the widget will have its top left corner 10 pixels to the right and 10 pixels down from the current mouse position unless doing so would render the widget off screen.
+     * @param offsetX horizontal adjustment off the mouse position (positive values are towards the right of the screen)
+     * @param offsetY vertical adjustment off the mouse position (positive values are towards the top of the screen)
+     * @param anchorPosition which piece of the widget will be anchored to the mouse position + offsets
+     * @param clampedBorder how close the widget is allowed to get to the sides of the screen
+     * @return this widget
+     */
+    public final T anchoredCenteredOnMouse(float offsetX, float offsetY, AnchorPosition anchorPosition, float clampedBorder) {
+        float scaledX = InputHelper.mX / Settings.xScale;
+        float scaledY = InputHelper.mY / Settings.yScale;
+
+        return anchoredAt(scaledX + offsetX, scaledY + offsetY, anchorPosition, clampedBorder);
     }
 
     // --------------------------------------------------------------------------------
