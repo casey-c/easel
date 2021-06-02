@@ -17,7 +17,7 @@ public enum TextureDatabase {
         this.texture = new Texture(internalPath);
     }
 
-    public Texture get() {
+    public Texture getTexture() {
         return texture;
     }
 }

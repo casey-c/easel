@@ -50,4 +50,16 @@ public class GraphicsHelper {
                     color);
         }
     }
+
+    private static final Color DEBUG_DIM_COLOR = new Color(0f, 0f, 0f, 0.6f);
+
+    /**
+     * DEBUG: Draws a black rectangle over the entire screen, useful for dimming or obscuring the background. The dim percentage is NOT configurable (it's either fully black or 60% black), so this function isn't intended for anything other than debugging. The code itself is simple enough to repurpose in something more flexible, should it be needed (make sure you cache the color and not re-construct it every frame).
+     * @param sb the SpriteBatch to draw the black rectangle on
+     * @param fullyDark if true, will render a fully black rectangle which will completely hide everything underneath; if false, the
+     */
+    public static void dimFullScreen(SpriteBatch sb, boolean fullyDark) {
+        Color color = fullyDark ? Color.BLACK : DEBUG_DIM_COLOR;
+        drawRect(sb, 0, 0, Settings.WIDTH, Settings.HEIGHT, color);
+    }
 }

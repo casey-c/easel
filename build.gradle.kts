@@ -51,7 +51,7 @@ tasks.register<Copy>("buildAndCopyJAR") {
 
     dependsOn("buildJAR")
 
-    from("build/libs/$modName.jar")
+    from("build/libs/$modName-$version.jar")
     into("$stsInstallLocation\\mods")
 }
 

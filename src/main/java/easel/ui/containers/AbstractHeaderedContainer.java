@@ -2,10 +2,8 @@ package easel.ui.containers;
 
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
-import com.sun.istack.internal.NotNull;
 import easel.ui.AbstractWidget;
 import easel.ui.AnchorPosition;
-import easel.ui.InterpolationSpeed;
 import easel.utils.colors.EaselColors;
 
 public abstract class AbstractHeaderedContainer<T extends AbstractHeaderedContainer<T>> extends AbstractWidget<T> {
@@ -45,7 +43,7 @@ public abstract class AbstractHeaderedContainer<T extends AbstractHeaderedContai
         return (T)this;
     }
 
-    public T withHeader(@NotNull AbstractWidget customHeaderWidget) {
+    public T withHeader(AbstractWidget customHeaderWidget) {
         this.headerType = ContainerHeaderType.CUSTOM;
         this.customHeaderWidget = customHeaderWidget;
         return (T)this;

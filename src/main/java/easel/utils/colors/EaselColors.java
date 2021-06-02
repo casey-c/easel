@@ -1,7 +1,6 @@
 package easel.utils.colors;
 
 import com.badlogic.gdx.graphics.Color;
-import com.sun.istack.internal.NotNull;
 import easel.ui.InterpolationSpeed;
 
 /**
@@ -108,7 +107,7 @@ public class EaselColors {
      * Sets the active color palette to be used by ALL mods using easel.
      * @param palette the new palette choice
      */
-    static void setActivePalette(@NotNull ColorPalette palette) {
+    static void setActivePalette(ColorPalette palette) {
         activePalette = palette;
     }
 

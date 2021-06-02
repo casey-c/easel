@@ -37,7 +37,7 @@ public class NinePatchTest extends AbstractWidget<NinePatchTest> {
 
         //grid.resizeRowToFitTallestChild(1);
 
-        this.np = new DualNinePatchWidget(100, 100, TextureManager.get(TextureDatabase.TOOLTIP_BASE), TextureManager.get(TextureDatabase.TOOLTIP_TRIM))
+        this.np = new DualNinePatchWidget(100, 100, TextureManager.getTexture(TextureDatabase.TOOLTIP_BASE), TextureManager.getTexture(TextureDatabase.TOOLTIP_TRIM))
                 .withColors(Color.BLUE, Color.CYAN)
                 .scaleToFullWidget(grid);
     }
