@@ -8,7 +8,7 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.evacipated.cardcrawl.modthespire.lib.SpireInitializer;
 import easel.ui.AnchorPosition;
 import easel.ui.InterpolationSpeed;
-import easel.ui.graphics.ninepatch.SmallHeaderedNinePatch;
+import easel.ui.graphics.ninepatch.headered.SmallHeaderedNinePatch;
 import easel.utils.GraphicsHelper;
 import easel.utils.KeyHelper;
 import easel.utils.colors.EaselColors;

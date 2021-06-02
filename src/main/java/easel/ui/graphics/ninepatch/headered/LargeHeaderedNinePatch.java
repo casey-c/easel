@@ -1,4 +1,4 @@
-package easel.ui.graphics.ninepatch;
+package easel.ui.graphics.ninepatch.headered;
 
 import easel.utils.textures.TextureAtlasDatabase;
 import easel.utils.textures.TextureManager;

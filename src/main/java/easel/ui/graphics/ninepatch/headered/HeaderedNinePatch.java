@@ -1,4 +1,4 @@
-package easel.ui.graphics.ninepatch;
+package easel.ui.graphics.ninepatch.headered;
 
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
@@ -6,6 +6,7 @@ import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import easel.ui.AbstractWidget;
 import easel.ui.AnchorPosition;
 import easel.ui.InterpolationSpeed;
+import easel.ui.graphics.ninepatch.LayeredNinePatch;
 import easel.utils.colors.EaselColors;
 
 public abstract class HeaderedNinePatch<T extends HeaderedNinePatch<T>> extends AbstractWidget<T> {
@@ -73,6 +74,6 @@ public abstract class HeaderedNinePatch<T extends HeaderedNinePatch<T>> extends 
 
     @Override
     protected void renderWidget(SpriteBatch sb) {
-        patches.renderWidget(sb);
+        patches.render(sb);
     }
 }
