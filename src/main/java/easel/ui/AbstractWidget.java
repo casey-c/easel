@@ -732,4 +732,19 @@ public abstract class AbstractWidget<T extends AbstractWidget<T>> {
 
     public void show() {}
     public void hide() {}
+
+    // --------------------------------------------------------------------------------
+
+
+    @Override
+    public String toString() {
+        return "AbstractWidget{ " +
+                "getContentLeft() = " + getContentLeft() + ", " +
+                "getContentBottom() = " + getContentBottom() + ", " +
+                "getContentRight() = " + getContentRight() + ", " +
+                "getContentTop() = " + getContentTop() + ", " +
+                "getContentWidth() = " + getContentWidth() + ", " +
+                "getContentHeight() = " + getContentHeight() + " " +
+                " }";
+    }
 }

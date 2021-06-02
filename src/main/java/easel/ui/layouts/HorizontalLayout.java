@@ -54,6 +54,12 @@ public class HorizontalLayout extends AbstractOneDimensionalLayout<HorizontalLay
         }
     }
 
+    @Override
+    public void clear() {
+        super.clear();
+        this.totalWidth = 0;
+    }
+
     /**
      * Replaces the <code>desiredHeight</code> set in the constructor ({@link #HorizontalLayout(float, float)}) with the height of the tallest child. Useful for dynamically scaling the height of this widget to fit the heights of its children. NOTE: should call this function AFTER adding all children and before anchoring.
      * @return this widget

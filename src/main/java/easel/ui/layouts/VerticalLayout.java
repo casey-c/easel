@@ -39,6 +39,12 @@ public class VerticalLayout extends AbstractOneDimensionalLayout<VerticalLayout>
     }
 
     @Override
+    public void clear() {
+        super.clear();
+        this.totalHeight = 0;
+    }
+
+    @Override
     protected void anchorChildren(InterpolationSpeed withDelay) {
         float left = getContentLeft();
         float currY = getContentTop();
