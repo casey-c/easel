@@ -6,7 +6,7 @@ import com.megacrit.cardcrawl.helpers.Hitbox;
 import com.megacrit.cardcrawl.helpers.controller.CInputActionSet;
 import com.megacrit.cardcrawl.helpers.input.InputHelper;
 import easel.Easel;
-import easel.ui.interactive.MoveableWidget;
+import easel.ui.interactive.MovableWidget;
 
 import java.util.function.Consumer;
 
@@ -122,8 +122,8 @@ public abstract class AbstractWidget<T extends AbstractWidget<T>> {
     protected Consumer<T> onMouseEnter = NOOP;
     protected Consumer<T> onMouseLeave = NOOP;
 
-    private boolean hasMoveable;
-    private MoveableWidget moveable;
+    private boolean hasMovable;
+    private MovableWidget movableWidget;
 
     // --------------------------------------------------------------------------------
 
@@ -543,8 +543,8 @@ public abstract class AbstractWidget<T extends AbstractWidget<T>> {
         if (hasInteractivity)
             hb.render(sb);
 
-        if (hasMoveable)
-            moveable.render(sb);
+        if (hasMovable)
+            movableWidget.render(sb);
     }
 
     /**
@@ -600,8 +600,8 @@ public abstract class AbstractWidget<T extends AbstractWidget<T>> {
                 this.hb.resize(getContentWidth() * Settings.xScale, getContentHeight() * Settings.yScale);
         }
 
-        if (hasMoveable) {
-            this.moveable.hb.resize(getContentWidth() * Settings.xScale, getContentHeight() * Settings.yScale);
+        if (hasMovable) {
+            this.movableWidget.hb.resize(getContentWidth() * Settings.xScale, getContentHeight() * Settings.yScale);
         }
 
     }
@@ -653,8 +653,8 @@ public abstract class AbstractWidget<T extends AbstractWidget<T>> {
             hb.move(centerX * Settings.xScale,
                     centerY * Settings.yScale);
 
-        if (hasMoveable)
-            moveable.hb.move(centerX * Settings.xScale,
+        if (hasMovable)
+            movableWidget.hb.move(centerX * Settings.xScale,
                     centerY * Settings.yScale);
     }
 
@@ -671,8 +671,8 @@ public abstract class AbstractWidget<T extends AbstractWidget<T>> {
             updateRightClicks();
         }
 
-        if (hasMoveable) {
-            moveable.update();
+        if (hasMovable) {
+            movableWidget.update();
         }
     }
 
@@ -756,14 +756,14 @@ public abstract class AbstractWidget<T extends AbstractWidget<T>> {
      * The hitbox used for this movement is created with the current dimensions of this widget (inner content width/height), and will move along with any updates to the anchor position (e.g. {@link #anchoredAt(float, float, AnchorPosition)}). Note that if you resize the widget later on (adjusting either <code>getContentWidth()</code> or <code>getContentHeight()</code> after the initial constructor / initialization phase), you may need to manually call {@link #scaleHitboxToContent()}, or this moveable hitbox won't correspond to the proper area.
      * </p>
      * <p>
-     * This is provided as a convenience function to easily make a widget moveable. For more complex move semantics and more flexibility, the recommended approach is to attach an external hitbox widget using {@link MoveableWidget} and attach it to the highest level widget you're trying to move (making sure the attached hitbox widget moves along with the desired target widget). More details can be found on that widget's documentation page.
+     * This is provided as a convenience function to easily make a widget moveable. For more complex move semantics and more flexibility, the recommended approach is to attach an external hitbox widget using {@link MovableWidget} and attach it to the highest level widget you're trying to move (making sure the attached hitbox widget moves along with the desired target widget). More details can be found on that widget's documentation page.
      * </p>
      * @return this widget
-     * @see MoveableWidget
+     * @see MovableWidget
      */
-    public T makeMoveable() {
-        this.hasMoveable = true;
-        this.moveable = new MoveableWidget(this);
+    public T makeMovable() {
+        this.hasMovable = true;
+        this.movableWidget = new MovableWidget(this);
 
         return (T)this;
     }

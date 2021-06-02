@@ -12,7 +12,7 @@ import easel.ui.AnchorPosition;
 // TODO: special options to adjust which mouse controls work as moving?
 //   (e.g. right click / drag vs. left click / drag, or require SHIFT/ALT to be held, etc.
 //   right now only considers left click and drag
-public class MoveableWidget extends AbstractWidget<MoveableWidget> {
+public class MovableWidget extends AbstractWidget<MovableWidget> {
     private final float width;
     private final float height;
     private final AbstractWidget moveTarget;
@@ -40,9 +40,9 @@ public class MoveableWidget extends AbstractWidget<MoveableWidget> {
      * @param width the width of the hitbox area
      * @param height the height of the hitbox area
      * @param moveTarget the widget which will be moved as users click and drag inside the hitbox area
-     * @see #MoveableWidget(AbstractWidget)
+     * @see #MovableWidget(AbstractWidget)
      */
-    public MoveableWidget(float width, float height, AbstractWidget moveTarget) {
+    public MovableWidget(float width, float height, AbstractWidget moveTarget) {
         this.width = width;
         this.height = height;
 
@@ -53,10 +53,10 @@ public class MoveableWidget extends AbstractWidget<MoveableWidget> {
     }
 
     /**
-     * A simplified version of {@link #MoveableWidget(float, float, AbstractWidget)}, which takes the hitbox size information directly from the <code>moveTarget</code>. This version is used by the {@link AbstractWidget#makeMoveable()} convenience function to attach the moveable area to the entire source widget.
+     * A simplified version of {@link #MovableWidget(float, float, AbstractWidget)}, which takes the hitbox size information directly from the <code>moveTarget</code>. This version is used by the {@link AbstractWidget#makeMovable()} convenience function to attach the moveable area to the entire source widget.
      * @param moveTarget the widget which will be moved as users click and drag inside the hitbox area
      */
-    public MoveableWidget(AbstractWidget moveTarget) {
+    public MovableWidget(AbstractWidget moveTarget) {
         this.width = moveTarget.getContentWidth();
         this.height = moveTarget.getContentHeight();
 

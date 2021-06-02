@@ -10,7 +10,6 @@ import easel.ui.AbstractWidget;
 import easel.ui.AnchorPosition;
 import easel.ui.containers.LargeHeaderedContainer;
 import easel.utils.GraphicsHelper;
-import easel.utils.KeyHelper;
 import easel.utils.colors.EaselColors;
 import easel.utils.textures.TextureManager;
 import org.apache.logging.log4j.LogManager;
@@ -41,7 +40,7 @@ public class Easel implements PostInitializeSubscriber, RenderSubscriber, PostUp
                         .withHeader("Title")
                         .withHeaderColor(EaselColors.TOOLTIP_BASE())
                         .withHeaderHorizontalAlignment(AnchorPosition.CENTER)
-                        //.makeMoveable()
+                        //.makeMovable()
                         .anchoredCenteredOnScreen()
         );
     }
