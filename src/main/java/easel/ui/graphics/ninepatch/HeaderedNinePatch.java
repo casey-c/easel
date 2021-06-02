@@ -9,66 +9,37 @@ import easel.ui.InterpolationSpeed;
 import easel.utils.colors.EaselColors;
 
 public abstract class HeaderedNinePatch<T extends HeaderedNinePatch<T>> extends AbstractWidget<T> {
-    private float width;
-    private float height;
-
-    private NinePatchWidget trim;
-    private NinePatchWidget base;
-    private NinePatchWidget header;
+    private LayeredNinePatch patches;
 
     private static final Color DEFAULT_TRIM_COLOR = EaselColors.TOOLTIP_TRIM();
     private static final Color DEFAULT_BASE_COLOR = EaselColors.TOOLTIP_BASE();
     private static final Color DEFAULT_HEADER_COLOR = EaselColors.HEADER_SLATE();
 
+    private enum Layers {
+        BASE, HEADER, TRIM
+    }
+
     public HeaderedNinePatch(float width, float height, int patchLeft, int patchRight, int patchTop, int patchBottom, TextureAtlas atlas) {
-        this.base = new NinePatchWidget(width,
-                height,
-                patchLeft,
-                patchRight,
-                patchTop,
-                patchBottom,
-                atlas.findRegion("base"))
-                .withColor(DEFAULT_BASE_COLOR)
-        ;
-
-        this.header = new NinePatchWidget(width,
-                height,
-                patchLeft,
-                patchRight,
-                patchTop,
-                patchBottom,
-                atlas.findRegion("header"))
-                .withColor(DEFAULT_HEADER_COLOR)
-        ;
-
-        this.trim = new NinePatchWidget(width,
-                height,
-                patchLeft,
-                patchRight,
-                patchTop,
-                patchBottom,
-                atlas.findRegion("trim"))
-                .withColor(DEFAULT_TRIM_COLOR)
-        ;
-
-        this.width = width;
-        this.height = height;
+        this.patches = new LayeredNinePatch(width, height, patchLeft, patchRight, patchTop, patchBottom)
+                .withLayer(atlas.findRegion("base"), DEFAULT_BASE_COLOR)
+                .withLayer(atlas.findRegion("header"), DEFAULT_HEADER_COLOR)
+                .withLayer(atlas.findRegion("trim"), DEFAULT_TRIM_COLOR);
     }
 
     // --------------------------------------------------------------------------------
 
     public T withHeaderColor(Color headerColor) {
-        this.header.withColor(headerColor);
+        this.patches.withLayerColor(Layers.HEADER.ordinal(), headerColor);
         return (T)this;
     }
 
     public T withBaseColor(Color baseColor) {
-        this.base.withColor(baseColor);
+        this.patches.withLayerColor(Layers.BASE.ordinal(), baseColor);
         return (T)this;
     }
 
     public T withTrimColor(Color trimColor) {
-        this.trim.withColor(trimColor);
+        this.patches.withLayerColor(Layers.TRIM.ordinal(), trimColor);
         return (T)this;
     }
 
@@ -78,22 +49,30 @@ public abstract class HeaderedNinePatch<T extends HeaderedNinePatch<T>> extends 
     public T anchoredAt(float x, float y, AnchorPosition anchorPosition, InterpolationSpeed withDelay) {
         super.anchoredAt(x, y, anchorPosition, withDelay);
 
-        base.anchoredAt(x, y, anchorPosition, withDelay);
-        header.anchoredAt(x, y, anchorPosition, withDelay);
-        trim.anchoredAt(x, y, anchorPosition, withDelay);
+        patches.anchoredAt(x, y, anchorPosition, withDelay);
 
         return (T)this;
     }
 
     // --------------------------------------------------------------------------------
 
-    @Override public float getContentWidth() { return width; }
-    @Override public float getContentHeight() { return height; }
+    public T scaleToFullWidget(AbstractWidget widget) {
+        patches.scaleToFullWidget(widget);
+        return (T) this;
+    }
+
+    public T withDimensions(float width, float height) {
+        patches.withDimensions(width, height);
+        return (T) this;
+    }
+
+    // --------------------------------------------------------------------------------
+
+    @Override public float getContentWidth() { return patches.getContentWidth(); }
+    @Override public float getContentHeight() { return patches.getContentHeight(); }
 
     @Override
     protected void renderWidget(SpriteBatch sb) {
-        base.render(sb);
-        header.render(sb);
-        trim.render(sb);
+        patches.renderWidget(sb);
     }
 }

@@ -6,7 +6,6 @@ import basemod.interfaces.PostUpdateSubscriber;
 import basemod.interfaces.RenderSubscriber;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.evacipated.cardcrawl.modthespire.lib.SpireInitializer;
-import com.megacrit.cardcrawl.helpers.input.InputHelper;
 import easel.ui.AnchorPosition;
 import easel.ui.InterpolationSpeed;
 import easel.ui.graphics.ninepatch.SmallHeaderedNinePatch;

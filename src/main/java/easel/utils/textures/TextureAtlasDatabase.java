@@ -3,7 +3,9 @@ package easel.utils.textures;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 
 public enum TextureAtlasDatabase {
-    SMALL_HEADERED_TOOL_TIP("easel/textures/headeredToolTips/SmallHeaderedToolTip.atlas");
+    SMALL_HEADERED_TOOL_TIP("easel/textures/headeredToolTips/SmallHeaderedToolTip.atlas"),
+    LARGE_HEADERED_TOOL_TIP("easel/textures/headeredToolTips/LargeHeaderedToolTip.atlas")
+    ;
 
     private final String internalPath;
     private TextureAtlas atlas;
