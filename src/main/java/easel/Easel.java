@@ -8,11 +8,7 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.evacipated.cardcrawl.modthespire.lib.SpireInitializer;
 import easel.ui.AbstractWidget;
 import easel.ui.AnchorPosition;
-import easel.ui.InterpolationSpeed;
 import easel.ui.containers.LargeHeaderedContainer;
-import easel.ui.graphics.ninepatch.headered.SmallHeaderedNinePatch;
-import easel.ui.layouts.VerticalLayout;
-import easel.ui.text.Label;
 import easel.utils.GraphicsHelper;
 import easel.utils.KeyHelper;
 import easel.utils.colors.EaselColors;
@@ -43,15 +39,27 @@ public class Easel implements PostInitializeSubscriber, RenderSubscriber, PostUp
         widgets.add(
                 new LargeHeaderedContainer(500, 500)
                         .withHeader("Title")
+                        .withHeaderColor(EaselColors.HEADER_RED())
+                        .withHeaderHorizontalAlignment(AnchorPosition.CENTER)
                         .onLeftClick(container -> {
+                            if (KeyHelper.isShiftPressed()) {
+                                if (KeyHelper.isAltPressed())
+                                    container.withHeaderHorizontalAlignment(AnchorPosition.CENTER);
+                                else
+                                    container.withHeaderHorizontalAlignment(AnchorPosition.LEFT_CENTER);
+                            }
+
                             container.withHeader("Title", "Subtitle")
                                     .anchoredCenteredOnScreen();
                         })
                         .onRightClick(container -> {
+                            if (KeyHelper.isShiftPressed())
+                                container.withHeaderHorizontalAlignment(AnchorPosition.RIGHT_CENTER);
+
                             container.withHeader("Title")
                                     .anchoredCenteredOnScreen();
                         })
-                        .anchoredAt(1920, 50, AnchorPosition.LEFT_BOTTOM, 20)
+                        .anchoredCenteredOnScreen()
         );
     }
 

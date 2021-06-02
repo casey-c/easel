@@ -97,4 +97,34 @@ public enum AnchorPosition {
     public float getYFromTop(float top, float height) {
         return getYFromBottom(top - height, height);
     }
+
+    /**
+     * Produces a new anchor position which takes the horizontal position from <code>horizontal</code> and the vertical position from <code>vertical</code>.
+     * @param horizontal determines if the output anchor is <code>LEFT_</code>, <code>CENTER_</code>, or <code>RIGHT_</code>.
+     * @param vertical determines if the output anchor is <code>_BOTTOM</code>, <code>_CENTER</code>, or <code>_TOP</code>.
+     * @return a new anchor
+     */
+    public static AnchorPosition combine(AnchorPosition horizontal, AnchorPosition vertical) {
+        if (horizontal.isLeft()) {
+            if (vertical.isBottom())
+                return LEFT_BOTTOM;
+            else if (vertical.isCenterY())
+                return LEFT_CENTER;
+            else return LEFT_TOP;
+        }
+        else if (horizontal.isCenterX()) {
+            if (vertical.isBottom())
+                return CENTER_BOTTOM;
+            else if (vertical.isCenterY())
+                return CENTER;
+            else return CENTER_TOP;
+        }
+        else {
+            if (vertical.isBottom())
+                return RIGHT_BOTTOM;
+            else if (vertical.isCenterY())
+                return RIGHT_CENTER;
+            else return RIGHT_TOP;
+        }
+    }
 }

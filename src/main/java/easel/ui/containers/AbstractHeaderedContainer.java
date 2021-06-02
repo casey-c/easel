@@ -34,13 +34,17 @@ public abstract class AbstractHeaderedContainer<T extends AbstractHeaderedContai
 
     protected VerticalLayout titleSubtitleLayout;
 
+    // For left / right aligned headers, allows the titleSubtitleLayout to not touch the sides
+    private static final float HEADER_HORIZONTAL_PADDING = 20;
+
     // --------------------------------------------------------------------------------
 
     public AbstractHeaderedContainer(float width, float height) {
         this.totalWidth = width;
         this.totalHeight = height;
 
-        titleSubtitleLayout = new VerticalLayout(totalWidth, 20);
+        titleSubtitleLayout = new VerticalLayout(totalWidth, 20)
+                .withDefaultChildAnchorPosition(AnchorPosition.LEFT_CENTER);
 
         buildBackgroundWithoutHeader();
     }
@@ -72,7 +76,7 @@ public abstract class AbstractHeaderedContainer<T extends AbstractHeaderedContai
         buildBackgroundWithHeader();
 
         titleSubtitleLayout.clear();
-        titleSubtitleLayout.withChild(new Label(title));
+        titleSubtitleLayout.withChild(new Label(title)).resizeWidthToWidestChild();
 
         return (T)this;
     }
@@ -85,7 +89,8 @@ public abstract class AbstractHeaderedContainer<T extends AbstractHeaderedContai
 
         titleSubtitleLayout
                 .withChild(new Label(title))
-                .withChild(new Label(subtitle));
+                .withChild(new Label(subtitle))
+                .resizeWidthToWidestChild();
 
         return (T)this;
     }
@@ -113,6 +118,7 @@ public abstract class AbstractHeaderedContainer<T extends AbstractHeaderedContai
 
     public T withHeaderHorizontalAlignment(AnchorPosition anchorPosition) {
         this.headerHorizontalAlignment = anchorPosition;
+        titleSubtitleLayout.withDefaultChildAnchorPosition(anchorPosition);
         return (T)this;
     }
 
@@ -284,11 +290,12 @@ public abstract class AbstractHeaderedContainer<T extends AbstractHeaderedContai
 
         // Anchor title/subtitle
         if (headerType == ContainerHeaderType.TITLE || headerType == ContainerHeaderType.TITLE_SUBTITLE) {
-            final float PADDING = 20; // TODO Don't let it go too close to the left or right sides?
-            float titleSubtitleLeft = headerHorizontalAlignment.getXFromLeft(getContentLeft() + PADDING, getContentWidth() - 2 * PADDING);
-            float titleSubtitleBottom = AnchorPosition.CENTER.getYFromTop(getContentTop(), getHeaderHeight());
+            final float tsX = headerHorizontalAlignment.getXFromLeft(getContentLeft() + HEADER_HORIZONTAL_PADDING, getContentWidth() - 2 * HEADER_HORIZONTAL_PADDING);
+            final float tsY = AnchorPosition.CENTER.getYFromTop(getContentTop(), getHeaderHeight());
 
-            titleSubtitleLayout.anchoredAt(titleSubtitleLeft, titleSubtitleBottom, AnchorPosition.LEFT_CENTER, withDelay);
+            AnchorPosition tsAnchor = AnchorPosition.combine(headerHorizontalAlignment, AnchorPosition.CENTER);
+
+            titleSubtitleLayout.anchoredAt(tsX, tsY, tsAnchor, withDelay);
         }
 
         // Anchor content
