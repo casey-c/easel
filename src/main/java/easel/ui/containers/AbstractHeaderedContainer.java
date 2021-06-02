@@ -4,53 +4,110 @@ import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import easel.ui.AbstractWidget;
 import easel.ui.AnchorPosition;
+import easel.ui.InterpolationSpeed;
+import easel.ui.graphics.ninepatch.headered.HeaderedNinePatch;
+import easel.ui.graphics.ninepatch.headered.NoHeaderedNinePatch;
+import easel.ui.layouts.VerticalLayout;
+import easel.ui.text.Label;
 import easel.utils.colors.EaselColors;
 
-public abstract class AbstractHeaderedContainer<T extends AbstractHeaderedContainer<T>> extends AbstractWidget<T> {
+public abstract class AbstractHeaderedContainer<T extends AbstractHeaderedContainer<T, H>, H extends HeaderedNinePatch<H>> extends AbstractWidget<T> {
+    protected float totalWidth;
+    protected float totalHeight;
 
     protected AnchorPosition headerHorizontalAlignment = AnchorPosition.LEFT_CENTER;
     protected ContainerHeaderType headerType = ContainerHeaderType.NONE;
+
     protected Color headerColor = EaselColors.HEADER_SLATE();
     protected AbstractWidget customHeaderWidget;
+
+    protected NoHeaderedNinePatch backgroundWithoutHeader;
+    protected H backgroundWithHeader;
 
     protected float mainContentPaddingLeft;
     protected float mainContentPaddingRight;
     protected float mainContentPaddingBottom;
     protected float mainContentPaddingTop;
 
-    protected float totalWidth;
-    protected float totalHeight;
-
     protected AbstractWidget mainContentWidget;
     protected AnchorPosition contentAnchor = AnchorPosition.LEFT_TOP;
+
+    protected VerticalLayout titleSubtitleLayout;
 
     // --------------------------------------------------------------------------------
 
     public AbstractHeaderedContainer(float width, float height) {
         this.totalWidth = width;
         this.totalHeight = height;
+
+        titleSubtitleLayout = new VerticalLayout(totalWidth, 20);
+
+        buildBackgroundWithoutHeader();
     }
 
     // --------------------------------------------------------------------------------
 
+    protected abstract void buildBackgroundWithHeader();
+
+    protected void buildBackgroundWithoutHeader() {
+        this.backgroundWithoutHeader = new NoHeaderedNinePatch(totalWidth, totalHeight);
+    }
+
+    protected float getHeaderHeight() {
+        if (hasHeader())
+            return backgroundWithHeader.getHeaderHeight();
+        else
+            return backgroundWithoutHeader.getHeaderHeight();
+    }
+
+    // --------------------------------------------------------------------------------
+
+    protected boolean hasHeader() {
+        return headerType.hasHeader() && backgroundWithHeader != null;
+    }
+
+
     public T withHeader(String title) {
         this.headerType = ContainerHeaderType.TITLE;
+        buildBackgroundWithHeader();
+
+        titleSubtitleLayout.clear();
+        titleSubtitleLayout.withChild(new Label(title));
+
         return (T)this;
     }
 
     public T withHeader(String title, String subtitle) {
         this.headerType = ContainerHeaderType.TITLE_SUBTITLE;
+        buildBackgroundWithHeader();
+
+        titleSubtitleLayout.clear();
+
+        titleSubtitleLayout
+                .withChild(new Label(title))
+                .withChild(new Label(subtitle));
+
         return (T)this;
     }
 
     public T withHeader(AbstractWidget customHeaderWidget) {
         this.headerType = ContainerHeaderType.CUSTOM;
+        buildBackgroundWithHeader();
+
         this.customHeaderWidget = customHeaderWidget;
+
         return (T)this;
     }
 
     public T withHeaderColor(Color headerColor) {
+        // Lets us cache the header color if the user calls withHeaderColor before a withHeader() build
         this.headerColor = headerColor;
+
+        // If it already exists (e.g. they called withHeader() first), update the header layer's color
+        if (hasHeader()) {
+            backgroundWithHeader.withHeaderColor(headerColor);
+        }
+
         return (T)this;
     }
 
@@ -59,18 +116,6 @@ public abstract class AbstractHeaderedContainer<T extends AbstractHeaderedContai
         return (T)this;
     }
 
-    protected float getHeaderHeight() {
-        switch (headerType) {
-            case TITLE:
-                return headerTitleOnlyHeight();
-            case TITLE_SUBTITLE:
-                return headerTitleSubtitleHeight();
-            case CUSTOM:
-                return customHeaderWidget.getHeight();
-            default:
-                return 0;
-        }
-    }
 
     // --------------------------------------------------------------------------------
 
@@ -170,16 +215,6 @@ public abstract class AbstractHeaderedContainer<T extends AbstractHeaderedContai
 
     // --------------------------------------------------------------------------------
 
-    /**
-     * @return the height of the header area if only a single title is given.
-     */
-    protected abstract float headerTitleOnlyHeight();
-
-    /**
-     * @return the height of the header area if both a title and a subtitle are given
-     */
-    protected abstract float headerTitleSubtitleHeight();
-
     // --------------------------------------------------------------------------------
 
     /**
@@ -235,9 +270,69 @@ public abstract class AbstractHeaderedContainer<T extends AbstractHeaderedContai
     @Override public float getContentWidth() { return totalWidth; }
     @Override public float getContentHeight() { return totalHeight; }
 
+    // --------------------------------------------------------------------------------
+
+    @Override
+    public T anchoredAt(float x, float y, AnchorPosition anchorPosition, InterpolationSpeed withDelay) {
+        super.anchoredAt(x, y, anchorPosition, withDelay);
+
+        // Anchor the background
+        if (hasHeader())
+            backgroundWithHeader.anchoredAt(x, y, anchorPosition, withDelay);
+        else
+            backgroundWithoutHeader.anchoredAt(x, y, anchorPosition, withDelay);
+
+        // Anchor title/subtitle
+        if (headerType == ContainerHeaderType.TITLE || headerType == ContainerHeaderType.TITLE_SUBTITLE) {
+            final float PADDING = 20; // TODO Don't let it go too close to the left or right sides?
+            float titleSubtitleLeft = headerHorizontalAlignment.getXFromLeft(getContentLeft() + PADDING, getContentWidth() - 2 * PADDING);
+            float titleSubtitleBottom = AnchorPosition.CENTER.getYFromTop(getContentTop(), getHeaderHeight());
+
+            titleSubtitleLayout.anchoredAt(titleSubtitleLeft, titleSubtitleBottom, AnchorPosition.LEFT_CENTER, withDelay);
+        }
+
+        // Anchor content
+        if (mainContentWidget != null) {
+            mainContentWidget.anchoredAt(getMainAreaLeft(), getMainAreaTop(), AnchorPosition.LEFT_TOP, withDelay);
+        }
+
+        return (T) this;
+    }
+
+
+    // --------------------------------------------------------------------------------
+
+    protected void renderBackground(SpriteBatch sb) {
+        if (hasHeader())
+            backgroundWithHeader.render(sb);
+        else
+            backgroundWithoutHeader.render(sb);
+    }
+
+    protected void renderHeader(SpriteBatch sb) {
+        switch (headerType) {
+            case NONE:
+                break;
+            case TITLE:
+            case TITLE_SUBTITLE:
+                titleSubtitleLayout.render(sb);
+                break;
+            case CUSTOM:
+                customHeaderWidget.render(sb);
+                break;
+        }
+    }
+
+    protected void renderContent(SpriteBatch sb) {
+        if (mainContentWidget != null)
+            mainContentWidget.render(sb);
+    }
+
     @Override
     protected void renderWidget(SpriteBatch sb) {
-
+        renderBackground(sb);
+        renderHeader(sb);
+        renderContent(sb);
     }
 
     // --------------------------------------------------------------------------------

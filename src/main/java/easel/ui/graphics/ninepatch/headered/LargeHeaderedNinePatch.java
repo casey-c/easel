@@ -15,4 +15,6 @@ public class LargeHeaderedNinePatch extends HeaderedNinePatch<LargeHeaderedNineP
                 64,
                 TextureManager.getTextureAtlas(TextureAtlasDatabase.LARGE_HEADERED_TOOL_TIP));
     }
+
+    @Override public int getHeaderHeight() { return HEADER_HEIGHT; }
 }

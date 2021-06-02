@@ -6,15 +6,21 @@ import basemod.interfaces.PostUpdateSubscriber;
 import basemod.interfaces.RenderSubscriber;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.evacipated.cardcrawl.modthespire.lib.SpireInitializer;
+import easel.ui.AbstractWidget;
 import easel.ui.AnchorPosition;
 import easel.ui.InterpolationSpeed;
+import easel.ui.containers.LargeHeaderedContainer;
 import easel.ui.graphics.ninepatch.headered.SmallHeaderedNinePatch;
+import easel.ui.layouts.VerticalLayout;
+import easel.ui.text.Label;
 import easel.utils.GraphicsHelper;
 import easel.utils.KeyHelper;
 import easel.utils.colors.EaselColors;
 import easel.utils.textures.TextureManager;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+
+import java.util.ArrayList;
 
 @SpireInitializer
 public class Easel implements PostInitializeSubscriber, RenderSubscriber, PostUpdateSubscriber {
@@ -28,46 +34,36 @@ public class Easel implements PostInitializeSubscriber, RenderSubscriber, PostUp
         BaseMod.subscribe(this);
     }
 
-    private SmallHeaderedNinePatch widget;
+    private ArrayList<AbstractWidget> widgets = new ArrayList<>();
 
     @Override
     public void receivePostInitialize() {
         TextureManager.loadTextures();
 
-        widget = new SmallHeaderedNinePatch(500, 500)
-                .onRightClick(s -> {
-                    s.withHeaderColor(EaselColors.HEADER_RED())
-                            .anchoredAt(0, 0, AnchorPosition.CENTER, InterpolationSpeed.MEDIUM, 20);
-                })
-                .onLeftClick(s -> {
-                    if (KeyHelper.isShiftPressed()) {
-                        s.withHeaderColor(EaselColors.HEADER_DEEP_BLUE())
-                                .anchoredCenteredOnScreen(InterpolationSpeed.FAST);
-                    }
-                    else {
-                        if (KeyHelper.isAltPressed()) {
-                            s.withHeaderColor(EaselColors.HEADER_BLUE())
-                                    .anchoredCenteredOnScreen(InterpolationSpeed.MEDIUM);
-                        }
-                        else {
-                            s.withHeaderColor(EaselColors.HEADER_DARK_ALGAE())
-                                    .anchoredCenteredOnScreen(InterpolationSpeed.SLOW);
-                        }
-                    }
-                })
-                .anchoredCenteredOnScreen()
-        ;
+        widgets.add(
+                new LargeHeaderedContainer(500, 500)
+                        .withHeader("Title")
+                        .onLeftClick(container -> {
+                            container.withHeader("Title", "Subtitle")
+                                    .anchoredCenteredOnScreen();
+                        })
+                        .onRightClick(container -> {
+                            container.withHeader("Title")
+                                    .anchoredCenteredOnScreen();
+                        })
+                        .anchoredAt(1920, 50, AnchorPosition.LEFT_BOTTOM, 20)
+        );
     }
 
 
     @Override
     public void receiveRender(SpriteBatch sb) {
         GraphicsHelper.dimFullScreen(sb, true);
-        widget.render(sb);
+        widgets.forEach(widget -> widget.render(sb));
     }
 
     @Override
     public void receivePostUpdate() {
-        widget.update();
+        widgets.forEach(AbstractWidget::update);
     }
 }

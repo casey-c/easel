@@ -4,5 +4,9 @@ enum ContainerHeaderType {
     NONE,
     TITLE,
     TITLE_SUBTITLE,
-    CUSTOM
+    CUSTOM;
+
+    public boolean hasHeader() {
+        return this != NONE;
+    }
 }

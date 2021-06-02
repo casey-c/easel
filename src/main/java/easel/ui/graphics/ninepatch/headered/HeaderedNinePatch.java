@@ -6,11 +6,10 @@ import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import easel.ui.AbstractWidget;
 import easel.ui.AnchorPosition;
 import easel.ui.InterpolationSpeed;
-import easel.ui.graphics.ninepatch.LayeredNinePatch;
 import easel.utils.colors.EaselColors;
 
 public abstract class HeaderedNinePatch<T extends HeaderedNinePatch<T>> extends AbstractWidget<T> {
-    private LayeredNinePatch patches;
+    private easel.ui.graphics.ninepatch.HeaderedNinePatch patches;
 
     private static final Color DEFAULT_TRIM_COLOR = EaselColors.TOOLTIP_TRIM();
     private static final Color DEFAULT_BASE_COLOR = EaselColors.TOOLTIP_BASE();
@@ -21,7 +20,7 @@ public abstract class HeaderedNinePatch<T extends HeaderedNinePatch<T>> extends 
     }
 
     public HeaderedNinePatch(float width, float height, int patchLeft, int patchRight, int patchTop, int patchBottom, TextureAtlas atlas) {
-        this.patches = new LayeredNinePatch(width, height, patchLeft, patchRight, patchTop, patchBottom)
+        this.patches = new easel.ui.graphics.ninepatch.HeaderedNinePatch(width, height, patchLeft, patchRight, patchTop, patchBottom)
                 .withLayer(atlas.findRegion("base"), DEFAULT_BASE_COLOR)
                 .withLayer(atlas.findRegion("header"), DEFAULT_HEADER_COLOR)
                 .withLayer(atlas.findRegion("trim"), DEFAULT_TRIM_COLOR);
@@ -43,6 +42,10 @@ public abstract class HeaderedNinePatch<T extends HeaderedNinePatch<T>> extends 
         this.patches.withLayerColor(Layers.TRIM.ordinal(), trimColor);
         return (T)this;
     }
+
+    // --------------------------------------------------------------------------------
+
+    public abstract int getHeaderHeight();
 
     // --------------------------------------------------------------------------------
 
