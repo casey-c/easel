@@ -72,8 +72,5 @@ public abstract class ShaderWidget<T extends ShaderWidget<T>> extends AbstractWi
         // Reset
         sb.setShader(oldShader);
         sb.begin();
-
-        // DEBUG
-        GraphicsHelper.drawDebugRects(sb, this);
     }
 }

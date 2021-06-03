@@ -39,26 +39,25 @@ public class Easel implements PostInitializeSubscriber, RenderSubscriber, PostUp
         TextureManager.loadTextures();
 
         widgets.add(
-//                new LargeHeaderedContainer(500, 500)
-//                        .withHeader("Title")
-//                        .withHeaderColor(EaselColors.TOOLTIP_BASE())
-//                        .withHeaderHorizontalAlignment(AnchorPosition.CENTER)
-//                        //.makeMovable()
-//                        .anchoredCenteredOnScreen()
-                new PieChartWidget(200, 200)
-                        .withMargins(100, 50)
-                        .withCounts(6, 4, 2, 1)
-                        .withColors(EaselColors.QUAL_RED(), EaselColors.QUAL_GREEN(), EaselColors.QUAL_BLUE(), EaselColors.QUAL_PURPLE())
-                        .onRightClick(pie -> {
-                            Random random = new Random();
+                new LargeHeaderedContainer(500, 500)
+                        .withHeader("Pie Chart Tests")
+                        .withHeaderColor(EaselColors.TOOLTIP_TRIM())
+                        .withContent(
+                                new PieChartWidget(200, 200)
+                                        .withMargins(100, 50)
+                                        .withCounts(6, 4, 2, 1)
+                                        .withColors(EaselColors.QUAL_RED(), EaselColors.QUAL_GREEN(), EaselColors.QUAL_BLUE(), EaselColors.QUAL_PURPLE())
+                                        .onRightClick(pie -> {
+                                            Random random = new Random();
 
-                            int a = random.nextInt(5) + 1;
-                            int b = random.nextInt(5) + 1;
-                            int c = random.nextInt(5) + 1;
-                            int d = random.nextInt(5) + 1;
+                                            int a = random.nextInt(5) + 1;
+                                            int b = random.nextInt(5) + 1;
+                                            int c = random.nextInt(5) + 1;
+                                            int d = random.nextInt(5) + 1;
 
-                            pie.withCounts(a, b, c, d);
-                        })
+                                            pie.withCounts(a, b, c, d);
+                                        })
+                        )
                         .makeMovable()
                         .anchoredCenteredOnScreen()
         );
