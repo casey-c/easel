@@ -1,33 +1,68 @@
 package easel.ui.graphics.pie;
 
+import com.badlogic.gdx.graphics.Color;
 import easel.ui.graphics.ShaderWidget;
+import java.util.Arrays;
 
 /**
  * Not intended for use (yet?). This class needs a LOT of generifying. Currently only allows 4 regions (hardcoded), and isn't ready for production. Will need to spend a lot more effort into tweaking the GLSL and Java code to make it useable beyond this. For now, consider this deprecated as it may be removed or changed entirely at any time.
  */
-@Deprecated
 public class PieChartWidget extends ShaderWidget<PieChartWidget> {
-    private float theta0, theta1, theta2;
-    static final float TWO_PI = (float)Math.PI * 2.0f;
+    private static final float TWO_PI = (float)Math.PI * 2.0f;
+
+    private int numThetas;
+    private float[] thetas;
+
+    private int numColors;
+    private float[] colors;
 
     public PieChartWidget(float width, float height) {
         super(width, height, "easel/shaders/pie/vert.glsl", "easel/shaders/pie/frag.glsl");
     }
 
+    public PieChartWidget withCounts(int... counts) {
 
-    public PieChartWidget withCounts(int a, int b, int c, int d) {
-        float total = a + b + c + d;
+        this.numThetas = counts.length - 1;
+        this.thetas = new float[numThetas];
 
-        if (total == 0)
+        float total = Arrays.stream(counts).sum();
+
+        // Safety check (there should be at least one nonzero count)
+        if (total < 1.0f) {
+            for (int i = 0; i < numThetas - 1; ++i)
+                this.thetas[i] = 0;
+
             return this;
+        }
 
-        float percentA = (float)a / total;
-        float percentB = (float)b / total;
-        float percentC = (float)c / total;
+        float sumThetaSoFar = 0.0f;
 
-        this.theta0 = percentA * TWO_PI;
-        this.theta1 = theta0 + (percentB * TWO_PI);
-        this.theta2 = theta1 + (percentC * TWO_PI);
+        int index = 0;
+
+        for (int i = 0; i < counts.length && i < numThetas; ++i) {
+            int curr = counts[i];
+
+            float currTheta = ((float)curr / total) * TWO_PI;
+            thetas[index++] = sumThetaSoFar + (currTheta);
+
+            sumThetaSoFar += currTheta;
+        }
+
+        return this;
+    }
+
+    public PieChartWidget withColors(Color... colors) {
+        this.numColors = colors.length;
+
+        this.colors = new float[numColors * 4];
+
+        int index = 0;
+        for (Color c : colors) {
+            this.colors[index++] = c.r;
+            this.colors[index++] = c.g;
+            this.colors[index++] = c.b;
+            this.colors[index++] = c.a;
+        }
 
         return this;
     }
@@ -36,8 +71,10 @@ public class PieChartWidget extends ShaderWidget<PieChartWidget> {
     protected void setUniforms() {
         shaderProgram.setUniformf("borderSize", 2.0f / Math.min(getContentWidth(), getContentHeight()));
 
-        shaderProgram.setUniformf("theta0", theta0);
-        shaderProgram.setUniformf("theta1", theta1);
-        shaderProgram.setUniformf("theta2", theta2);
+        shaderProgram.setUniformi("numThetas", numThetas);
+        shaderProgram.setUniform1fv("thetas", thetas, 0, numThetas);
+
+        shaderProgram.setUniformi("numColors", numColors);
+        shaderProgram.setUniform4fv("colors", colors, 0, numColors * 4);
     }
 }

@@ -11,19 +11,25 @@ varying vec2 v_texCoord0;
 
 uniform float radius = 0.45;
 uniform float diameter = 0.9;
+
+//uniform float theta0 = PI / 2.0;
+//uniform float theta1 = PI;
+//uniform float theta2 = (3 * PI) / 2.0;
+
+//uniform mat4 colors = mat4(
+    //vec4(0.380, 0.102, 0.133, 1.0), // attacks
+    //vec4(0.165, 0.282, 0.165, 1.0), // skills
+    //vec4(0.125, 0.290, 0.482, 1.0), // powers
+    //vec4(0.224, 0.165, 0.259, 1.0)  // curses
+//);
+
 uniform float borderSize;
 
-uniform float theta0 = PI / 2.0;
-uniform float theta1 = PI;
-uniform float theta2 = (3 * PI) / 2.0;
+uniform int numThetas;
+uniform float thetas[32];
 
-// TODO: probably should load these from the CPU
-uniform mat4 colors = mat4(
-    vec4(0.380, 0.102, 0.133, 1.0), // attacks
-    vec4(0.165, 0.282, 0.165, 1.0), // skills
-    vec4(0.125, 0.290, 0.482, 1.0), // powers
-    vec4(0.224, 0.165, 0.259, 1.0)  // curses
-);
+uniform int numColors;
+uniform vec4 colors[32];
 
 // --------------------------------------------------------------------------------
 // Simple helpers
@@ -52,6 +58,8 @@ float computeAlpha(float dist) {
 // Math helpers
 // --------------------------------------------------------------------------------
 
+/*
+ 
 // Produces a one-hot vector describing which section of the chart
 // we're in. e.g. (1, 0, 0, 0) says we're in the space from 
 // [theta = 0 → theta = theta_0)
@@ -63,6 +71,7 @@ vec4 computeOneHotLocation(float theta) {
 
     return vec4(in0_1, in1_2, in2_3, in3_4);
 }
+*/
 
 // Computes the distance between a point and a normalized vector defining a line.
 // Assumes the origin is (0.5, 0.5). The algorithm here is simply projecting the 
@@ -112,28 +121,48 @@ vec4 applyOuterBorder(float dist, vec4 color) {
     }
 }
 
-
-
 vec4 applyInnerBorder(vec2 point, vec4 color) {
-    vec2 lineDefault = getNormalLineThroughAngle(0);
-    vec2 line0 = getNormalLineThroughAngle(theta0);
-    vec2 line1 = getNormalLineThroughAngle(theta1);
-    vec2 line2 = getNormalLineThroughAngle(theta2);
+    //vec2 lineDefault = getNormalLineThroughAngle(0);
+    //vec2 line0 = getNormalLineThroughAngle(theta0);
+    //vec2 line1 = getNormalLineThroughAngle(theta1);
+    //vec2 line2 = getNormalLineThroughAngle(theta2);
 
     float lower = 0.0;
     float upper = borderSize / 2.0;
 
-    float de = onProperSide(point, 0)      ? 1.0 - smoothstep(lower, upper, polarLinePointDistance(point, lineDefault)) : 0.0;
-    float d0 = onProperSide(point, theta0) ? 1.0 - smoothstep(lower, upper, polarLinePointDistance(point, line0)) : 0.0;
-    float d1 = onProperSide(point, theta1) ? 1.0 - smoothstep(lower, upper, polarLinePointDistance(point, line1)) : 0.0;
-    float d2 = onProperSide(point, theta2) ? 1.0 - smoothstep(lower, upper, polarLinePointDistance(point, line2)) : 0.0;
+    //float de = onProperSide(point, 0)      ? 1.0 - smoothstep(lower, upper, polarLinePointDistance(point, lineDefault)) : 0.0;
+    //float d0 = onProperSide(point, theta0) ? 1.0 - smoothstep(lower, upper, polarLinePointDistance(point, line0)) : 0.0;
+    //float d1 = onProperSide(point, theta1) ? 1.0 - smoothstep(lower, upper, polarLinePointDistance(point, line1)) : 0.0;
+    //float d2 = onProperSide(point, theta2) ? 1.0 - smoothstep(lower, upper, polarLinePointDistance(point, line2)) : 0.0;
 
-    color = blendWithWhite(color, de);
-    color = blendWithWhite(color, d0);
-    color = blendWithWhite(color, d1);
-    color = blendWithWhite(color, d2);
+    // Do for the theta = 0 line
+    vec2 line = getNormalLineThroughAngle(0);
+    float amt = onProperSide(point, 0) ? 1.0 - smoothstep(lower, upper, polarLinePointDistance(point, line)) : 0.0;
+    color = blendWithWhite(color, amt);
+
+    // And then the rest of the thetas
+    for (int i = 0; i < numThetas; ++i) {
+        vec2 line = getNormalLineThroughAngle(thetas[i]);
+        float amt = onProperSide(point, thetas[i]) ? 1.0 - smoothstep(lower, upper, polarLinePointDistance(point, line)) : 0.0;
+
+        color = blendWithWhite(color, amt);
+    }
+
+    //color = blendWithWhite(color, de);
+    //color = blendWithWhite(color, d0);
+    //color = blendWithWhite(color, d1);
+    //color = blendWithWhite(color, d2);
 
     return color;
+}
+
+vec4 getBaseColor(float theta) {
+    for (int i = 0; i < numThetas; ++i) {
+        if (theta < thetas[i])
+            return colors[i];
+    }
+
+    return colors[numColors - 1];
 }
 
 // --------------------------------------------------------------------------------
@@ -145,10 +174,9 @@ void main()
     float distFromCenter = distance(vec2(0.5), v_texCoord0);
 
     float theta = computeTheta(diffFromCenter);
-    vec4 oneHot = computeOneHotLocation(theta);
 
-    // Main colors
-    vec4 color = vec4((colors * oneHot).rgb, computeAlpha(distFromCenter));
+    // Base Colors
+    vec4 color = vec4(getBaseColor(theta).rgb, computeAlpha(distFromCenter));
 
     // Borders render on top of the colors
     color = applyOuterBorder(distFromCenter, color);
