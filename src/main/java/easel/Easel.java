@@ -4,14 +4,11 @@ import basemod.BaseMod;
 import basemod.interfaces.PostInitializeSubscriber;
 import basemod.interfaces.PostUpdateSubscriber;
 import basemod.interfaces.RenderSubscriber;
-import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.evacipated.cardcrawl.modthespire.lib.SpireInitializer;
 import easel.ui.AbstractWidget;
-import easel.ui.AnchorPosition;
 import easel.ui.containers.LargeHeaderedContainer;
 import easel.ui.graphics.pie.PieChartWidget;
-import easel.utils.GraphicsHelper;
 import easel.utils.colors.EaselColors;
 import easel.utils.textures.TextureManager;
 import org.apache.logging.log4j.LogManager;
@@ -40,8 +37,8 @@ public class Easel implements PostInitializeSubscriber, RenderSubscriber, PostUp
 
         widgets.add(
                 new LargeHeaderedContainer(500, 500)
-                        .withHeader("Pie Chart Tests")
-                        .withHeaderColor(EaselColors.TOOLTIP_TRIM())
+                        .withHeader("Pie Chart Tests", "Subtitle")
+                        .withHeaderColor(EaselColors.HEADER_PURPLE())
                         .withContent(
                                 new PieChartWidget(200, 200)
                                         .withMargins(100, 50)
@@ -58,6 +55,7 @@ public class Easel implements PostInitializeSubscriber, RenderSubscriber, PostUp
                                             pie.withCounts(a, b, c, d);
                                         })
                         )
+                        .scaleToContent()
                         .makeMovable()
                         .anchoredCenteredOnScreen()
         );

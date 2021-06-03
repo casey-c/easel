@@ -161,6 +161,32 @@ public class HeaderedNinePatch extends AbstractWidget<HeaderedNinePatch> {
         return this;
     }
 
+    /**
+     * Scales all currently tracked layers to the given width. May require re-anchoring afterwards.
+     * @param width the new width, in pixels
+     * @return this widget
+     * @see NinePatchWidget#withWidth(float)
+     */
+    public HeaderedNinePatch withWidth(float width) {
+        this.width = width;
+        scaleHitboxToContent();
+        layers.forEach(layer -> layer.withWidth(width));
+        return this;
+    }
+
+    /**
+     * Scales all currently tracked layers to the given height. May require re-anchoring afterwards.
+     * @param height the new height, in pixels
+     * @return this widget
+     * @see NinePatchWidget#withHeight(float)
+     */
+    public HeaderedNinePatch withHeight(float height) {
+        this.height = height;
+        scaleHitboxToContent();
+        layers.forEach(layer -> layer.withHeight(height));
+        return this;
+    }
+
     @Override
     public HeaderedNinePatch anchoredAt(float x, float y, AnchorPosition anchorPosition, InterpolationSpeed withDelay) {
         super.anchoredAt(x, y, anchorPosition, withDelay);

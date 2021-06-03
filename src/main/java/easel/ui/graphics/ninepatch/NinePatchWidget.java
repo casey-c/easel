@@ -113,6 +113,22 @@ public class NinePatchWidget extends AbstractWidget<NinePatchWidget> {
         return this;
     }
 
+    public NinePatchWidget withWidth(float width) {
+        this.prefWidth = width;
+
+        scaleHitboxToContent();
+
+        return this;
+    }
+
+    public NinePatchWidget withHeight(float height) {
+        this.prefHeight = height;
+
+        scaleHitboxToContent();
+
+        return this;
+    }
+
     /**
      * <p>
      * Resizes this widget to adjust to the full size of the provided widget (convenience). E.g. the new width of this widget when rendered is the value of {@link AbstractWidget#getWidth()} at the time of this function call (it will not update automatically if the source widget changes in size in the future). Note that this takes the full size of the given widget (including margins), and not the inner content sizes (e.g. it does NOT look at {@link AbstractWidget#getContentWidth()}). This is because you often want to scale your nine patch to be a bit bigger than the widget(s) it is supposed to be surrounding, and margins ({@link AbstractWidget#withMargins(float)}) let you do that quite easily. You can use {@link #withDimensions(float, float)} to use precisely specified width/height should you need more control.

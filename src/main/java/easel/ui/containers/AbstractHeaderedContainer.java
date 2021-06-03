@@ -15,7 +15,6 @@ public abstract class AbstractHeaderedContainer<T extends AbstractHeaderedContai
     protected float totalWidth;
     protected float totalHeight;
 
-    //protected AnchorPosition headerHorizontalAlignment = AnchorPosition.LEFT_CENTER;
     protected AnchorPosition headerAnchor = AnchorPosition.CENTER;
     protected ContainerHeaderType headerType = ContainerHeaderType.NONE;
 
@@ -24,11 +23,6 @@ public abstract class AbstractHeaderedContainer<T extends AbstractHeaderedContai
 
     protected NoHeaderedNinePatch backgroundWithoutHeader;
     protected H backgroundWithHeader;
-
-//    protected float mainContentPaddingLeft;
-//    protected float mainContentPaddingRight;
-//    protected float mainContentPaddingBottom;
-//    protected float mainContentPaddingTop;
 
     protected AbstractWidget mainContentWidget;
     protected AnchorPosition contentAnchor = AnchorPosition.CENTER;
@@ -46,7 +40,7 @@ public abstract class AbstractHeaderedContainer<T extends AbstractHeaderedContai
 
         titleSubtitleLayout = new VerticalLayout(totalWidth, 20)
                 .withMargins(20, 10)
-                .withDefaultChildAnchorPosition(AnchorPosition.LEFT_CENTER);
+                .withDefaultChildAnchorPosition(headerAnchor);
 
         buildBackgroundWithoutHeader();
     }
@@ -118,69 +112,53 @@ public abstract class AbstractHeaderedContainer<T extends AbstractHeaderedContai
         return (T)this;
     }
 
-//    public T withHeaderHorizontalAlignment(AnchorPosition anchorPosition) {
-//        this.headerHorizontalAlignment = anchorPosition;
-//        titleSubtitleLayout.withDefaultChildAnchorPosition(anchorPosition);
-//        return (T)this;
-//    }
-
     public T withHeaderAlignment(AnchorPosition headerAnchor) {
         this.headerAnchor = headerAnchor;
         titleSubtitleLayout.withDefaultChildAnchorPosition(headerAnchor);
         return (T) this;
     }
 
-
     // --------------------------------------------------------------------------------
 
-//    /**
-//     * Set the padding around all sides of the main content widget. This is a convenience function to call {@link #withMainContentPadding(float, float, float, float)} with all padding being the same amount.
-//     * @param all the width (or height) of the amount of padding between the main content and the sides of the overall container, in pixels
-//     * @return this widget
-//     * @see #withMainContentPadding(float, float, float, float)
-//     */
-//    public T withMainContentPadding(float all) {
-//        return withMainContentPadding(all, all, all, all);
-//    }
-//
-//    /**
-//     * Set the horizontal padding on the left and right sides of the main content widget. This is a convenience function to call {@link #withMainContentPadding(float, float, float, float)} with the given value for the left and right and reusing the existing bottom and top padding.
-//     * @param horizontalPadding the width of the spacing allotted between the main content's left hand side and the left of the container, and similarly between its right hand side and the right side of the overall container, in pixels
-//     * @return this widget
-//     * @see #withMainContentPadding(float, float, float, float)
-//     */
-//    public T withMainContentHorizontalPadding(float horizontalPadding) {
-//        return withMainContentPadding(horizontalPadding, horizontalPadding, mainContentPaddingBottom, mainContentPaddingTop);
-//    }
-//
-//    /**
-//     * Set the vertical padding on the bottom and top sides of the main content widget. This is a convenience function to call {@link #withMainContentPadding(float, float, float, float)} with the given value for the bottom and top and reusing the existing left and right padding.
-//     * @param verticalPadding the height of the spacing allotted between the main content's bottom side and the bottom of the container, and similarly between its top side and the bottom of the header, in pixels
-//     * @return this widget
-//     * @see #withMainContentPadding(float, float, float, float)
-//     */
-//    public T withMainContentVerticalPadding(float verticalPadding) {
-//        return withMainContentPadding(mainContentPaddingLeft, mainContentPaddingRight, verticalPadding, verticalPadding);
-//    }
-//
-//    /**
-//     * Set the padding around each side of the main content widget. Note that the main content widget is what is in the primary area of the container, and it gets set by {@link #withContent(AbstractWidget)}. With this function, you can easily set the amount of space between the left edge of the total widget and the left edge of the main content widget, and the spacing between the top of the main content widget and the bottom of the header, etc.
-//     * @param left how much space between the left of the main content and the left side of the overall container
-//     * @param right how much space between the right of the main content and the right side of the overall container
-//     * @param bottom how much space between the bottom of the main content and the bottom of the overall container
-//     * @param top how much space between the top of the main content and the bottom of the header
-//     * @return this widget
-//     * @see #withMainContentPadding(float)
-//     * @see #withMainContentHorizontalPadding(float)
-//     * @see #withMainContentVerticalPadding(float)
-//     */
-//    public T withMainContentPadding(float left, float right, float bottom, float top) {
-//        this.mainContentPaddingLeft = left;
-//        this.mainContentPaddingRight = right;
-//        this.mainContentPaddingBottom = bottom;
-//        this.mainContentPaddingTop = top;
-//        return (T)this;
-//    }
+    public T withWidth(float width) {
+        this.totalWidth = width;
+
+        if (headerType.hasHeader() && backgroundWithHeader != null) {
+            backgroundWithHeader.withWidth(width);
+        }
+        else if (backgroundWithoutHeader != null) {
+            backgroundWithoutHeader.withWidth(width);
+        }
+
+        return (T) this;
+    }
+
+    public T withHeight(float height) {
+        this.totalHeight = height;
+
+        if (headerType.hasHeader() && backgroundWithHeader != null) {
+            backgroundWithHeader.withHeight(height);
+        }
+        else if (backgroundWithoutHeader != null) {
+            backgroundWithoutHeader.withHeight(height);
+        }
+
+        return (T) this;
+    }
+
+    public T withDimensions(float width, float height) {
+        this.totalWidth = width;
+        this.totalHeight = height;
+
+        if (headerType.hasHeader() && backgroundWithHeader != null) {
+            backgroundWithHeader.withDimensions(width, height);
+        }
+        else if (backgroundWithoutHeader != null) {
+            backgroundWithoutHeader.withDimensions(width, height);
+        }
+
+        return (T) this;
+    }
 
     // --------------------------------------------------------------------------------
 
@@ -210,32 +188,28 @@ public abstract class AbstractHeaderedContainer<T extends AbstractHeaderedContai
     }
 
     public T scaleToContent() {
-        // TODO
-        return (T)this;
+        scaleToContentWidth();
+        return scaleToContentHeight();
     }
 
     public T scaleToContentWidth() {
-        // TODO
-        return (T)this;
+        if (mainContentWidget != null)
+            return withWidth(mainContentWidget.getWidth());
+        else
+            return (T)this;
     }
 
     public T scaleToContentHeight() {
-        // TODO
-        return (T)this;
+        if (mainContentWidget != null)
+            return withHeight(mainContentWidget.getHeight() + getHeaderHeight());
+        else
+            return (T)this;
     }
 
     // --------------------------------------------------------------------------------
 
     // --------------------------------------------------------------------------------
 
-//    /**
-//     * The width of the main content area, after subtracting out the left and right main horizontal padding.
-//     * @return the width of the main content area
-//     */
-//    public float getMainAreaWidth() {
-//        return getContentWidth() - (mainContentPaddingLeft + mainContentPaddingRight);
-//    }
-//
     /**
      * The height of the main content area beneath the header. If no header exists, this just devolves to {@link #getContentHeight()}.
      * @return the height of the main content area
@@ -244,30 +218,6 @@ public abstract class AbstractHeaderedContainer<T extends AbstractHeaderedContai
         return getContentHeight() - getHeaderHeight();
     }
 
-//    /**
-//     * The left-most point of the main content area. Depends on {@link #getContentLeft()} and the main left horizontal padding, so should only be considered accurate after an {@link #anchoredAt(float, float, AnchorPosition)} has taken place.
-//     * @return the left-most point of the main content area
-//     */
-//    public float getMainAreaLeft() {
-//        return getContentLeft() + mainContentPaddingLeft;
-//    }
-//
-//    /**
-//     * The right-most point of the main content area. Depends on {@link #getContentRight()} and the main right horizontal padding, so should only be considered accurate after an {@link #anchoredAt(float, float, AnchorPosition)} has taken place.
-//     * @return the right-most point of the main content area
-//     */
-//    public float getMainAreaRight() {
-//        return getContentRight() - mainContentPaddingRight;
-//    }
-//
-//    /**
-//     * The bottom-most point of the main content area. Depends on {@link #getContentBottom()} and the main bottom vertical padding, so should only be considered accurate after an {@link #anchoredAt(float, float, AnchorPosition)} has taken place.
-//     * @return the bottom-most point of the main content area
-//     */
-//    public float getMainAreaBottom() {
-//        return getContentBottom() + mainContentPaddingBottom;
-//    }
-//
     /**
      * The top-most point of the main content area. Depends on {@link #getContentBottom()} and {@link #getContentAreaHeight()}, so should only be considered accurate after an {@link #anchoredAt(float, float, AnchorPosition)} has taken place.
      * @return the top-most point of the main content area

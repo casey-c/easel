@@ -70,6 +70,16 @@ public abstract class HeaderedNinePatch<T extends HeaderedNinePatch<T>> extends 
         return (T) this;
     }
 
+    public T withWidth(float width) {
+        patches.withWidth(width);
+        return (T) this;
+    }
+
+    public T withHeight(float height) {
+        patches.withHeight(height);
+        return (T) this;
+    }
+
     // --------------------------------------------------------------------------------
 
     @Override public float getContentWidth() { return patches.getContentWidth(); }
