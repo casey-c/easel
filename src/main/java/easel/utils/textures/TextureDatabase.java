@@ -4,7 +4,9 @@ import com.badlogic.gdx.graphics.Texture;
 
 public enum TextureDatabase {
     TOOLTIP_BASE("easel/textures/np_tooltip_base.png"),
-    TOOLTIP_TRIM("easel/textures/np_tooltip_trim.png");
+    TOOLTIP_TRIM("easel/textures/np_tooltip_trim.png"),
+    BLACK_GRADIENT_VERTICAL("easel/textures/black_gradient_vertical.png")
+    ;
 
     private final String internalPath;
     private Texture texture;

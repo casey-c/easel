@@ -2,6 +2,7 @@ package easel.ui.containers;
 
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.megacrit.cardcrawl.core.Settings;
 import easel.ui.AbstractWidget;
 import easel.ui.AnchorPosition;
 import easel.ui.InterpolationSpeed;
@@ -9,6 +10,7 @@ import easel.ui.graphics.ninepatch.headered.HeaderedNinePatch;
 import easel.ui.graphics.ninepatch.headered.NoHeaderedNinePatch;
 import easel.ui.layouts.VerticalLayout;
 import easel.ui.text.Label;
+import easel.utils.EaselFonts;
 import easel.utils.colors.EaselColors;
 
 public abstract class AbstractHeaderedContainer<T extends AbstractHeaderedContainer<T, H>, H extends HeaderedNinePatch<H>> extends AbstractWidget<T> {
@@ -38,7 +40,7 @@ public abstract class AbstractHeaderedContainer<T extends AbstractHeaderedContai
         this.totalWidth = width;
         this.totalHeight = height;
 
-        titleSubtitleLayout = new VerticalLayout(totalWidth, 20)
+        titleSubtitleLayout = new VerticalLayout(totalWidth, 10)
                 .withMargins(20, 10)
                 .withDefaultChildAnchorPosition(headerAnchor);
 
@@ -72,7 +74,9 @@ public abstract class AbstractHeaderedContainer<T extends AbstractHeaderedContai
         buildBackgroundWithHeader();
 
         titleSubtitleLayout.clear();
-        titleSubtitleLayout.withChild(new Label(title)).resizeWidthToWidestChild();
+        titleSubtitleLayout
+                .withChild(new Label(title, EaselFonts.SMALLER_TIP_BODY, Settings.CREAM_COLOR))
+                .resizeWidthToWidestChild();
 
         return (T)this;
     }
@@ -84,8 +88,8 @@ public abstract class AbstractHeaderedContainer<T extends AbstractHeaderedContai
         titleSubtitleLayout.clear();
 
         titleSubtitleLayout
-                .withChild(new Label(title))
-                .withChild(new Label(subtitle))
+                .withChild(new Label(title, EaselFonts.SMALLER_TIP_BODY, Settings.CREAM_COLOR))
+                .withChild(new Label(subtitle, EaselFonts.MEDIUM_ITALIC, Color.GRAY))
                 .resizeWidthToWidestChild();
 
         return (T)this;

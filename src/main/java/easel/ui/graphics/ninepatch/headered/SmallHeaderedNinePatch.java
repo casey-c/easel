@@ -1,7 +1,6 @@
 package easel.ui.graphics.ninepatch.headered;
 
 import easel.utils.textures.TextureAtlasDatabase;
-import easel.utils.textures.TextureManager;
 
 public class SmallHeaderedNinePatch extends HeaderedNinePatch<SmallHeaderedNinePatch> {
     private static final int HEADER_HEIGHT = 80;
@@ -13,7 +12,8 @@ public class SmallHeaderedNinePatch extends HeaderedNinePatch<SmallHeaderedNineP
                 64,
                 HEADER_HEIGHT,
                 64,
-                TextureManager.getTextureAtlas(TextureAtlasDatabase.SMALL_HEADERED_TOOL_TIP));
+                TextureAtlasDatabase.SMALL_HEADERED_TOOL_TIP.getAtlas()
+        );
     }
 
     @Override public int getHeaderHeight() { return HEADER_HEIGHT; }

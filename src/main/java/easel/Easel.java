@@ -8,10 +8,15 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.evacipated.cardcrawl.modthespire.lib.SpireInitializer;
 import easel.ui.AbstractWidget;
 import easel.ui.AnchorPosition;
+import easel.ui.containers.HeaderlessContainer;
 import easel.ui.containers.LargeHeaderedContainer;
+import easel.ui.containers.SmallHeaderedContainer;
+import easel.ui.graphics.ninepatch.headered.SmallHeaderedNinePatch;
 import easel.ui.graphics.pie.PieChartWidget;
+import easel.ui.text.Label;
+import easel.utils.EaselFonts;
 import easel.utils.colors.EaselColors;
-import easel.utils.textures.TextureManager;
+import easel.utils.textures.TextureLoader;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -34,7 +39,8 @@ public class Easel implements PostInitializeSubscriber, RenderSubscriber, PostUp
 
     @Override
     public void receivePostInitialize() {
-        TextureManager.loadTextures();
+        TextureLoader.loadTextures();
+        EaselFonts.loadFonts();
 
         widgets.add(
                 new LargeHeaderedContainer(500, 500)
@@ -62,6 +68,21 @@ public class Easel implements PostInitializeSubscriber, RenderSubscriber, PostUp
                         .scaleToContent()
                         .makeMovable()
                         .anchoredCenteredOnScreen()
+        );
+
+        widgets.add(
+                new SmallHeaderedContainer(400, 200)
+                        .withHeader("Smaller", "This has less header height")
+                        .makeMovable()
+                        .anchoredAt(1920, 100, AnchorPosition.LEFT_BOTTOM, 20)
+        );
+
+        widgets.add(
+                new HeaderlessContainer(200, 400)
+                        .makeMovable()
+                        .withContent(new Label("This has no header...").withMargins(40))
+                        .scaleToContent()
+                        .anchoredAt(300, 300, AnchorPosition.CENTER)
         );
     }
 

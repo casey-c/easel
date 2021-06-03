@@ -1,30 +1,36 @@
 package easel.utils;
 
 import basemod.BaseMod;
-import basemod.interfaces.PostInitializeSubscriber;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
-import com.evacipated.cardcrawl.modthespire.lib.SpireInitializer;
 import easel.Easel;
+import easel.utils.colors.EaselColors;
 
-@SpireInitializer
-public class EaselFonts implements PostInitializeSubscriber {
-    public static void initialize() { new EaselFonts(); }
-
-    public EaselFonts() {
-        BaseMod.subscribe(this);
-    }
-
+public class EaselFonts {
     /**
      * A slightly smaller version of {@link com.megacrit.cardcrawl.helpers.FontHelper#tipBodyFont}.
      */
     public static BitmapFont SMALLER_TIP_BODY;
 
-    @Override
-    public void receivePostInitialize() {
+    /**
+     * A medium sized italic font.
+     */
+    public static BitmapFont MEDIUM_ITALIC;
+
+    /**
+     * Initializes the fonts. Automatically called by the Easel API at game boot.
+     */
+    public static void loadFonts() {
+        // Setup all fonts
         SMALLER_TIP_BODY = new BitmapFontBuilder()
                 .withSize(18)
                 .build();
 
-        Easel.logger.info("Initialized " + 1 + " extra font(s).");
+        MEDIUM_ITALIC = new BitmapFontBuilder()
+                .withSize(18)
+                .withItalic()
+                .withShadow(EaselColors.ONE_TENTH_TRANSPARENT_BLACK)
+                .build();
+
+        Easel.logger.info("Initialized " + 2 + " extra font(s).");
     }
 }

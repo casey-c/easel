@@ -18,7 +18,7 @@ import java.util.ArrayList;
  * This widget includes a couple helper functions to push layers onto the structure (see {@link #withLayer(Texture)} etc., which add a layer above any existing layers), and to manipulate the dimensions of the overall group, along with some basic methods to tweak the layer colors based on the index of when they were added.
  * </p>
  */
-public class HeaderedNinePatch extends AbstractWidget<HeaderedNinePatch> {
+public class LayeredNinePatch extends AbstractWidget<LayeredNinePatch> {
     private float width;
     private float height;
 
@@ -33,11 +33,11 @@ public class HeaderedNinePatch extends AbstractWidget<HeaderedNinePatch> {
      * Construct a new layered nine patch with the given width and height. The NinePatch parameters (e.g. how far the corners of the patch stretch out, see {@link NinePatchWidget} for more details) are defaulted to 32 px from each side. All future layers added (with {@link #withLayer(TextureRegion)} etc.) will use these dimensions.
      * @param width the width of all layers
      * @param height the height of all layers
-     * @see #HeaderedNinePatch(float, float, int, int, int, int)
+     * @see #LayeredNinePatch(float, float, int, int, int, int)
      * @see com.badlogic.gdx.graphics.g2d.NinePatch#NinePatch(Texture)
      * @see #withLayer(TextureRegion)
      */
-    public HeaderedNinePatch(float width, float height) {
+    public LayeredNinePatch(float width, float height) {
         this(width, height, 32, 32, 32, 32);
     }
 
@@ -49,11 +49,11 @@ public class HeaderedNinePatch extends AbstractWidget<HeaderedNinePatch> {
      * @param patchRight the width of the right-most edge of the ninepatch
      * @param patchTop the height of the top edge of the ninepatch
      * @param patchBottom the height of the bottom edge of the ninepatch
-     * @see #HeaderedNinePatch(float, float)
+     * @see #LayeredNinePatch(float, float)
      * @see com.badlogic.gdx.graphics.g2d.NinePatch#NinePatch(Texture, int, int, int, int)
      * @see #withLayer(TextureRegion)
      */
-    public HeaderedNinePatch(float width, float height, int patchLeft, int patchRight, int patchTop, int patchBottom) {
+    public LayeredNinePatch(float width, float height, int patchLeft, int patchRight, int patchTop, int patchBottom) {
         this.width = width;
         this.height = height;
 
@@ -72,7 +72,7 @@ public class HeaderedNinePatch extends AbstractWidget<HeaderedNinePatch> {
      * @see #withLayer(Texture)
      * @see #withLayer(TextureRegion, Color)
      */
-    public HeaderedNinePatch withLayer(TextureRegion textureRegion) {
+    public LayeredNinePatch withLayer(TextureRegion textureRegion) {
         layers.add(new NinePatchWidget(width, height, patchLeft, patchRight, patchTop, patchBottom, textureRegion));
         return this;
     }
@@ -84,7 +84,7 @@ public class HeaderedNinePatch extends AbstractWidget<HeaderedNinePatch> {
      * @return this widget
      * @see #withLayer(TextureRegion)
      */
-    public HeaderedNinePatch withLayer(TextureRegion textureRegion, Color color) {
+    public LayeredNinePatch withLayer(TextureRegion textureRegion, Color color) {
         layers.add(new NinePatchWidget(width, height, patchLeft, patchRight, patchTop, patchBottom, textureRegion).withColor(color));
         return this;
     }
@@ -96,7 +96,7 @@ public class HeaderedNinePatch extends AbstractWidget<HeaderedNinePatch> {
      * @see #withLayer(TextureRegion)
      * @see #withLayer(Texture, Color)
      */
-    public HeaderedNinePatch withLayer(Texture texture) {
+    public LayeredNinePatch withLayer(Texture texture) {
         layers.add(new NinePatchWidget(width, height, patchLeft, patchRight, patchTop, patchBottom, texture));
         return this;
     }
@@ -109,10 +109,11 @@ public class HeaderedNinePatch extends AbstractWidget<HeaderedNinePatch> {
      * @see #withLayer(Texture)
      * @see #withLayer(TextureRegion)
      */
-    public HeaderedNinePatch withLayer(Texture texture, Color color) {
+    public LayeredNinePatch withLayer(Texture texture, Color color) {
         layers.add(new NinePatchWidget(width, height, patchLeft, patchRight, patchTop, patchBottom, texture).withColor(color));
         return this;
     }
+
 
     // --------------------------------------------------------------------------------
 
@@ -122,7 +123,7 @@ public class HeaderedNinePatch extends AbstractWidget<HeaderedNinePatch> {
      * @param color the color for that particular layer to render with
      * @return this widget
      */
-    public HeaderedNinePatch withLayerColor(int index, Color color) {
+    public LayeredNinePatch withLayerColor(int index, Color color) {
         if (index >= 0 && index < layers.size()) {
             layers.get(index).withColor(color);
         }
@@ -138,7 +139,7 @@ public class HeaderedNinePatch extends AbstractWidget<HeaderedNinePatch> {
      * @return this widget
      * @see NinePatchWidget#scaleToFullWidget(AbstractWidget)
      */
-    public HeaderedNinePatch scaleToFullWidget(AbstractWidget widget) {
+    public LayeredNinePatch scaleToFullWidget(AbstractWidget widget) {
         withDimensions(widget.getWidth(), widget.getHeight());
         return this;
     }
@@ -150,7 +151,7 @@ public class HeaderedNinePatch extends AbstractWidget<HeaderedNinePatch> {
      * @return this widget
      * @see NinePatchWidget#withDimensions(float, float)
      */
-    public HeaderedNinePatch withDimensions(float width, float height) {
+    public LayeredNinePatch withDimensions(float width, float height) {
         this.width = width;
         this.height = height;
 
@@ -167,7 +168,7 @@ public class HeaderedNinePatch extends AbstractWidget<HeaderedNinePatch> {
      * @return this widget
      * @see NinePatchWidget#withWidth(float)
      */
-    public HeaderedNinePatch withWidth(float width) {
+    public LayeredNinePatch withWidth(float width) {
         this.width = width;
         scaleHitboxToContent();
         layers.forEach(layer -> layer.withWidth(width));
@@ -180,7 +181,7 @@ public class HeaderedNinePatch extends AbstractWidget<HeaderedNinePatch> {
      * @return this widget
      * @see NinePatchWidget#withHeight(float)
      */
-    public HeaderedNinePatch withHeight(float height) {
+    public LayeredNinePatch withHeight(float height) {
         this.height = height;
         scaleHitboxToContent();
         layers.forEach(layer -> layer.withHeight(height));
@@ -188,13 +189,14 @@ public class HeaderedNinePatch extends AbstractWidget<HeaderedNinePatch> {
     }
 
     @Override
-    public HeaderedNinePatch anchoredAt(float x, float y, AnchorPosition anchorPosition, InterpolationSpeed withDelay) {
+    public LayeredNinePatch anchoredAt(float x, float y, AnchorPosition anchorPosition, InterpolationSpeed withDelay) {
         super.anchoredAt(x, y, anchorPosition, withDelay);
         layers.forEach(layer -> layer.anchoredAt(x, y, anchorPosition, withDelay));
         return this;
     }
 
     // --------------------------------------------------------------------------------
+
 
     @Override public float getContentWidth() { return width; }
     @Override public float getContentHeight() { return height; }

@@ -101,6 +101,9 @@ public class EaselColors {
     // Common colors
     // --------------------------------------------------------------------------------
 
+    public static final Color ONE_TENTH_TRANSPARENT_BLACK = new Color(0.0f, 0.0f, 0.0f, 0.1f);
+    public static final Color HALF_TRANSPARENT_WHITE = new Color(1.0f, 1.0f, 1.0f, 0.5f);
+
     private static ColorPalette activePalette = new EaselDark();
 
     /**
