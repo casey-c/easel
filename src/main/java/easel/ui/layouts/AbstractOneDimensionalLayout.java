@@ -32,6 +32,17 @@ abstract class AbstractOneDimensionalLayout<T extends AbstractOneDimensionalLayo
     }
 
     /**
+     * Forcibly sets the anchor position of all current children to the given value. This is useful if you change desired anchors later and have previously added children with different anchors. This function does not update the <code>defaultChildAnchorPosition</code>, so any future children added will continue to use that value if not manually set.
+     * @param forcedChildAnchorPosition the new anchor to set all existing children to
+     * @return this layout
+     */
+    public T withUpdateAllChildAnchors(AnchorPosition forcedChildAnchorPosition) {
+        for (LayoutItem child : children)
+            child.anchor = forcedChildAnchorPosition;
+        return (T) this;
+    }
+
+    /**
      * Stop managing all widgets previously managed by this layout.
      */
     public void clear() {

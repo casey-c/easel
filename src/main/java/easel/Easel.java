@@ -7,6 +7,7 @@ import basemod.interfaces.RenderSubscriber;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.evacipated.cardcrawl.modthespire.lib.SpireInitializer;
 import easel.ui.AbstractWidget;
+import easel.ui.AnchorPosition;
 import easel.ui.containers.LargeHeaderedContainer;
 import easel.ui.graphics.pie.PieChartWidget;
 import easel.utils.colors.EaselColors;
@@ -38,12 +39,14 @@ public class Easel implements PostInitializeSubscriber, RenderSubscriber, PostUp
         widgets.add(
                 new LargeHeaderedContainer(500, 500)
                         .withHeader("Pie Chart Tests", "Subtitle")
+                        //.withHeaderAlignment(AnchorPosition.LEFT_TOP)
                         .withHeaderColor(EaselColors.HEADER_PURPLE())
+                        .withContentAnchor(AnchorPosition.LEFT_TOP)
                         .withContent(
                                 new PieChartWidget(200, 200)
-                                        .withMargins(100, 50)
-                                        .withCounts(6, 4, 2, 1)
-                                        .withColors(EaselColors.QUAL_RED(), EaselColors.QUAL_GREEN(), EaselColors.QUAL_BLUE(), EaselColors.QUAL_PURPLE())
+                                        .withMargins(50)
+                                        .withCounts(6, 4, 2, 1, 3)
+                                        .withColors(EaselColors.QUAL_RED(), EaselColors.QUAL_GREEN(), EaselColors.QUAL_BLUE(), EaselColors.QUAL_PURPLE(), EaselColors.QUAL_YELLOW())
                                         .onRightClick(pie -> {
                                             Random random = new Random();
 
@@ -51,8 +54,9 @@ public class Easel implements PostInitializeSubscriber, RenderSubscriber, PostUp
                                             int b = random.nextInt(5) + 1;
                                             int c = random.nextInt(5) + 1;
                                             int d = random.nextInt(5) + 1;
+                                            int e = random.nextInt(5) + 1;
 
-                                            pie.withCounts(a, b, c, d);
+                                            pie.withCounts(a, b, c, d, e);
                                         })
                         )
                         .scaleToContent()
