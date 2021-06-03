@@ -240,7 +240,7 @@ public abstract class AbstractWidget<T extends AbstractWidget<T>> {
             this.y = targetY;
         }
 
-        moveHitboxToTarget(targetX, targetY);
+        moveHitboxToTarget(targetX + marginLeft, targetY + marginBottom);
 
         return (T)this;
     }

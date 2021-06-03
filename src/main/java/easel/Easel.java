@@ -46,7 +46,7 @@ public class Easel implements PostInitializeSubscriber, RenderSubscriber, PostUp
 //                        //.makeMovable()
 //                        .anchoredCenteredOnScreen()
                 new PieChartWidget(200, 200)
-                        //.withMargins(50)
+                        .withMargins(100, 50)
                         .withCounts(6, 4, 2, 1)
                         .withColors(EaselColors.QUAL_RED(), EaselColors.QUAL_GREEN(), EaselColors.QUAL_BLUE(), EaselColors.QUAL_PURPLE())
                         .onRightClick(pie -> {
