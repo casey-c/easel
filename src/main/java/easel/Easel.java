@@ -11,6 +11,8 @@ import easel.ui.AnchorPosition;
 import easel.ui.containers.HeaderlessContainer;
 import easel.ui.containers.LargeHeaderedContainer;
 import easel.ui.containers.SmallHeaderedContainer;
+import easel.ui.containers.StyledContainer;
+import easel.ui.debug.DebugWidget;
 import easel.ui.graphics.ninepatch.headered.SmallHeaderedNinePatch;
 import easel.ui.graphics.pie.PieChartWidget;
 import easel.ui.text.Label;
@@ -37,52 +39,30 @@ public class Easel implements PostInitializeSubscriber, RenderSubscriber, PostUp
 
     private ArrayList<AbstractWidget> widgets = new ArrayList<>();
 
+    private AnchorPosition ap = AnchorPosition.LEFT_TOP;
+
     @Override
     public void receivePostInitialize() {
         TextureLoader.loadTextures();
         EaselFonts.loadFonts();
 
         widgets.add(
-                new LargeHeaderedContainer(500, 500)
+                new StyledContainer(400, 400)
                         .withHeader("Pie Chart Tests", "Subtitle")
-                        //.withHeaderAlignment(AnchorPosition.LEFT_TOP)
-                        .withHeaderColor(EaselColors.HEADER_PURPLE())
-                        .withContentAnchor(AnchorPosition.LEFT_TOP)
+//                        .withHeader(new DebugWidget(40, 40), true)
+                        .onRightClick(container -> {
+                            ap = ap.next();
+                            container.withContentAnchor(ap);
+                            container.refreshAnchor();
+                        })
                         .withContent(
                                 new PieChartWidget(200, 200)
-                                        .withMargins(50)
-                                        .withCounts(6, 4, 2, 1, 3)
                                         .withColors(EaselColors.QUAL_RED(), EaselColors.QUAL_GREEN(), EaselColors.QUAL_BLUE(), EaselColors.QUAL_PURPLE(), EaselColors.QUAL_YELLOW())
-                                        .onRightClick(pie -> {
-                                            Random random = new Random();
-
-                                            int a = random.nextInt(5) + 1;
-                                            int b = random.nextInt(5) + 1;
-                                            int c = random.nextInt(5) + 1;
-                                            int d = random.nextInt(5) + 1;
-                                            int e = random.nextInt(5) + 1;
-
-                                            pie.withCounts(a, b, c, d, e);
-                                        })
-                        )
+                                        .withCounts(6, 4, 3, 2, 1),
+                                true)
                         .scaleToContent()
                         .makeMovable()
                         .anchoredCenteredOnScreen()
-        );
-
-        widgets.add(
-                new SmallHeaderedContainer(400, 200)
-                        .withHeader("Smaller", "This has less header height")
-                        .makeMovable()
-                        .anchoredAt(1920, 100, AnchorPosition.LEFT_BOTTOM, 20)
-        );
-
-        widgets.add(
-                new HeaderlessContainer(200, 400)
-                        .makeMovable()
-                        .withContent(new Label("This has no header...").withMargins(40))
-                        .scaleToContent()
-                        .anchoredAt(300, 300, AnchorPosition.CENTER)
         );
     }
 

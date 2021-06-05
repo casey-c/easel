@@ -6,6 +6,9 @@ import com.megacrit.cardcrawl.core.Settings;
 import com.megacrit.cardcrawl.helpers.ImageMaster;
 import easel.ui.AbstractWidget;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+
 public class DebugWidget extends AbstractWidget<DebugWidget> {
     public static final Color DEBUG_COLOR_0 = new Color(0.384f, 0.690f, 0.388f, 0.500f);
     public static final Color DEBUG_COLOR_1 = new Color(0.384f, 0.388f, 0.690f, 0.500f);

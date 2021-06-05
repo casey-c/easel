@@ -1,5 +1,7 @@
 package easel.ui;
 
+import java.util.Random;
+
 /**
  * Enum specifying nine anchorable positions which are mostly used for aligning widgets into the proper location. Contains some helper methods to make working with the anchors a bit easier.
  */
@@ -126,5 +128,43 @@ public enum AnchorPosition {
                 return RIGHT_CENTER;
             else return RIGHT_TOP;
         }
+    }
+
+    /**
+     * DEBUG.
+     * @return a random anchor position out of the nine possibilities
+     * @see #randomAnchor(AnchorPosition)
+     */
+    public static AnchorPosition randomAnchor() {
+        Random random = new Random();
+        int index = random.nextInt(values().length);
+        return values()[index];
+    }
+
+    /**
+     * DEBUG. Note: will loop until it randomly finds an anchor that isn't the one given - consider using {@link #next()} instead, which will cycle through the enum and not have to loop.
+     * @param previous the anchor position to skip (can't be in the output)
+     * @return a random anchor position excluding the <code>previous</code>
+     * @see #next()
+     * @see #randomAnchor()
+     */
+    public static AnchorPosition randomAnchor(AnchorPosition previous) {
+        Random random = new Random();
+
+        while (true) {
+            int index = random.nextInt(values().length);
+            AnchorPosition next = values()[index];
+
+            if (next != previous)
+                return next;
+        }
+    }
+
+    /**
+     * DEBUG.
+     * @return the next anchor in the enum (will loop back around and cycle forever)
+     */
+    public AnchorPosition next() {
+        return values()[(ordinal() + 1) % values().length];
     }
 }

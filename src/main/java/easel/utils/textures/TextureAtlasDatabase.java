@@ -5,6 +5,7 @@ import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 public enum TextureAtlasDatabase {
     SMALL_HEADERED_TOOL_TIP("easel/textures/headeredToolTips/SmallHeadered.atlas"),
     LARGE_HEADERED_TOOL_TIP("easel/textures/headeredToolTips/LargeHeadered.atlas"),
+    STYLED_CONTAINER("easel/textures/container/StyledContainer.atlas"),
     NO_HEADERED_TOOL_TIP("easel/textures/headeredToolTips/NoHeadered.atlas")
     ;
 

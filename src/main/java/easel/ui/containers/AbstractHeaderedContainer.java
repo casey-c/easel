@@ -118,7 +118,7 @@ public abstract class AbstractHeaderedContainer<T extends AbstractHeaderedContai
 
     public T withHeaderAlignment(AnchorPosition headerAnchor) {
         this.headerAnchor = headerAnchor;
-        titleSubtitleLayout.withUpdateAllChildAnchors(headerAnchor);
+        titleSubtitleLayout.forceChildAnchors(headerAnchor);
         return (T) this;
     }
 
