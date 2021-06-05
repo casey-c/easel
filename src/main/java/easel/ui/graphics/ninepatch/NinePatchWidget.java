@@ -8,6 +8,7 @@ import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.megacrit.cardcrawl.core.Settings;
 import easel.ui.AbstractWidget;
 import easel.ui.AnchorPosition;
+import easel.ui.InterpolationSpeed;
 
 /**
  * <p>
@@ -64,8 +65,8 @@ public class NinePatchWidget extends AbstractWidget<NinePatchWidget> {
     public NinePatchWidget(float width, float height, int patchLeft, int patchRight, int patchTop, int patchBottom, TextureRegion texRegion) {
         this.np = new NinePatch(texRegion, patchLeft, patchRight, patchTop, patchBottom);
 
-        this.prefWidth = width;
-        this.prefHeight = height;
+        this.prefWidth = Math.round(width);
+        this.prefHeight = Math.round(height);
     }
 
     /**
@@ -83,8 +84,8 @@ public class NinePatchWidget extends AbstractWidget<NinePatchWidget> {
     public NinePatchWidget(float width, float height, int patchLeft, int patchRight, int patchTop, int patchBottom, Texture texture) {
         this.np = new NinePatch(texture, patchLeft, patchRight, patchTop, patchBottom);
 
-        this.prefWidth = width;
-        this.prefHeight = height;
+        this.prefWidth = Math.round(width);
+        this.prefHeight = Math.round(height);
     }
 
     /**
@@ -105,8 +106,8 @@ public class NinePatchWidget extends AbstractWidget<NinePatchWidget> {
      * @see #scaleToFullWidget(AbstractWidget)
      */
     public NinePatchWidget withDimensions(float width, float height) {
-        this.prefWidth = width;
-        this.prefHeight = height;
+        this.prefWidth = Math.round(width);
+        this.prefHeight = Math.round(height);
 
         scaleHitboxToContent();
 
@@ -114,7 +115,7 @@ public class NinePatchWidget extends AbstractWidget<NinePatchWidget> {
     }
 
     public NinePatchWidget withWidth(float width) {
-        this.prefWidth = width;
+        this.prefWidth = Math.round(width);
 
         scaleHitboxToContent();
 
@@ -122,7 +123,7 @@ public class NinePatchWidget extends AbstractWidget<NinePatchWidget> {
     }
 
     public NinePatchWidget withHeight(float height) {
-        this.prefHeight = height;
+        this.prefHeight = Math.round(height);
 
         scaleHitboxToContent();
 
@@ -146,6 +147,11 @@ public class NinePatchWidget extends AbstractWidget<NinePatchWidget> {
 
     @Override public float getContentWidth() { return prefWidth; }
     @Override public float getContentHeight() { return prefHeight; }
+
+    @Override
+    public NinePatchWidget anchoredAt(float x, float y, AnchorPosition anchorPosition, InterpolationSpeed withDelay) {
+        return super.anchoredAt(Math.round(x), Math.round(y), anchorPosition, withDelay);
+    }
 
     @Override
     protected void renderWidget(SpriteBatch sb) {
