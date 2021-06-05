@@ -300,8 +300,13 @@ public class StyledContainer extends AbstractWidget<StyledContainer> {
                 defaultHeader.render(sb);
 
             npHeaderTrim.render(sb);
+        }
 
-            // Vertical shadow under header
+        if (content != null)
+            content.render(sb);
+
+        if (hasHeader) {
+            // Vertical shadow under header (this will render on top of the content, but it probably never ends up mattering)
             float left = (getContentLeft() + OUTER_TRIM_SIZE) * Settings.xScale;
             float bottom = (getContentTop() - getHeaderHeight() - SHADOW_SIZE) * Settings.yScale;
             float width = (getContentWidth() - 2 * OUTER_TRIM_SIZE) * Settings.xScale;
@@ -310,9 +315,6 @@ public class StyledContainer extends AbstractWidget<StyledContainer> {
             sb.setColor(EaselColors.HALF_TRANSPARENT_WHITE);
             sb.draw(SHADOW_TEXTURE, left, bottom, width, height);
         }
-
-        if (content != null)
-            content.render(sb);
 
         npFullTrim.render(sb);
     }

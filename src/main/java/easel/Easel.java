@@ -15,6 +15,7 @@ import easel.ui.containers.StyledContainer;
 import easel.ui.debug.DebugWidget;
 import easel.ui.graphics.ninepatch.headered.SmallHeaderedNinePatch;
 import easel.ui.graphics.pie.PieChartWidget;
+import easel.ui.layouts.HorizontalLayout;
 import easel.ui.text.Label;
 import easel.utils.EaselFonts;
 import easel.utils.colors.EaselColors;
@@ -47,23 +48,48 @@ public class Easel implements PostInitializeSubscriber, RenderSubscriber, PostUp
         EaselFonts.loadFonts();
 
         widgets.add(
-                new StyledContainer(400, 400)
-                        .withHeader("Pie Chart Tests", "Subtitle")
-//                        .withHeader(new DebugWidget(40, 40), true)
+                new StyledContainer(100, 100)
                         .onRightClick(container -> {
                             ap = ap.next();
                             container.withContentAnchor(ap);
-                            container.refreshAnchor();
                         })
-                        .withContent(
-                                new PieChartWidget(200, 200)
-                                        .withColors(EaselColors.QUAL_RED(), EaselColors.QUAL_GREEN(), EaselColors.QUAL_BLUE(), EaselColors.QUAL_PURPLE(), EaselColors.QUAL_YELLOW())
-                                        .withCounts(6, 4, 3, 2, 1),
-                                true)
+                        .withContent(new Label("No Header"), true)
                         .scaleToContent()
                         .makeMovable()
-                        .anchoredCenteredOnScreen()
         );
+
+        widgets.add(
+                new StyledContainer(500, 500)
+                        .withHeader("Title")
+                        .onRightClick(container -> {
+                            ap = ap.next();
+                            container.withContentAnchor(ap);
+                        })
+                        .withContent(new Label("Just the title"), true)
+                        .scaleToContent()
+                        .makeMovable()
+        );
+
+        widgets.add(
+                new StyledContainer(500, 500)
+                        .withHeader("Title", "Subtitle")
+                        .onRightClick(container -> {
+                            ap = ap.next();
+                            container.withContentAnchor(ap);
+                        })
+                        .withContent(new DebugWidget(100, 100).withMargins(100), false)
+                        .scaleToContent()
+                        .makeMovable()
+        );
+
+        // Make a nice starting location for all these widgets
+        HorizontalLayout layout = new HorizontalLayout(100, 40);
+
+        for (AbstractWidget w : widgets) {
+            layout.withChild(w);
+        }
+
+        layout.anchoredCenteredOnScreen();
     }
 
 
