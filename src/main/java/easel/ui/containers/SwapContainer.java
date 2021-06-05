@@ -6,8 +6,13 @@ import easel.ui.AbstractWidget;
 import easel.ui.AnchorPosition;
 import easel.ui.InterpolationSpeed;
 
+// TODO: make sure withView has been called at least once before using, and that withWidget has been made for all views
+//   or at least that it doesn't crash if you omit these two critical things!
 public class SwapContainer<T extends Enum<T>> extends AbstractWidget<SwapContainer<T>> {
     private AbstractWidget[] widgets;
+
+    private Class<T> clz;
+    private T currentView;
     private AbstractWidget activeWidget = null;
 
     private boolean isShowing = false;
@@ -18,6 +23,7 @@ public class SwapContainer<T extends Enum<T>> extends AbstractWidget<SwapContain
     public SwapContainer(Class<T> clz) {
         int numItems = clz.getEnumConstants().length;
         widgets = new AbstractWidget[numItems];
+        this.clz = clz;
     }
 
     public SwapContainer<T> withWidget(T option, AbstractWidget widget) {
@@ -25,54 +31,73 @@ public class SwapContainer<T extends Enum<T>> extends AbstractWidget<SwapContain
     }
 
     public SwapContainer<T> withWidget(T option, AbstractWidget widget, boolean activeView) {
-        widgets[option.ordinal()] = widget;
+        this.widgets[option.ordinal()] = widget;
 
         if (widget.getWidth() > maxWidth)
-            maxWidth = widget.getWidth();
+            this.maxWidth = widget.getWidth();
         if (widget.getHeight() > maxHeight)
-            maxHeight = widget.getHeight();
+            this.maxHeight = widget.getHeight();
 
-        if (activeView)
-            activeWidget = widget;
+        if (activeView) {
+            this.activeWidget = widget;
+            this.currentView = option;
+        }
+
+        scaleHitboxToContent();
 
         return this;
     }
 
     // --------------------------------------------------------------------------------
 
-    public void setView(T choice) {
+    public SwapContainer<T> withView(T choice) {
         AbstractWidget target = widgets[choice.ordinal()];
+
+        // TODO: target may be null here!
 
         // Hide existing widget if we had been showing it
         if (isShowing && target != activeWidget && activeWidget != null)
             activeWidget.hide();
 
-        activeWidget = target;
+        this.activeWidget = target;
+        this.currentView = choice;
 
         // Show new widget if we should be showing it
         if (isShowing && activeWidget != null)
             activeWidget.show();
+
+        return this;
     }
 
-    public SwapContainer<T> withView(T choice) {
-        setView(choice);
-        return this;
+    public SwapContainer<T> nextView() {
+        int next = (currentView.ordinal() + 1) % widgets.length;
+        return withView(clz.getEnumConstants()[next]);
     }
 
     // --------------------------------------------------------------------------------
 
     @Override
     public SwapContainer<T> anchoredAt(float x, float y, AnchorPosition anchorPosition, InterpolationSpeed withDelay) {
+        System.out.println("Anchoring swap container. hb: ");
+        System.out.println(hb);
+
+        super.anchoredAt(x, y, anchorPosition, withDelay);
+
+        System.out.println("POST Anchoring swap container. hb: ");
+        System.out.println(hb);
+
         for (AbstractWidget w : widgets) {
             if (w == null) {
                 Easel.logger.warn("Trying to anchor a null widget?");
             }
             else {
-                w.anchoredAt(x, y, anchorPosition, withDelay);
+                //w.anchoredAt(x, y, anchorPosition, withDelay);
+                w.anchoredAt(getContentLeft(), getContentBottom(), AnchorPosition.LEFT_BOTTOM, withDelay);
             }
         }
 
-        return super.anchoredAt(x, y, anchorPosition, withDelay);
+        //return super.anchoredAt(x, y, anchorPosition, withDelay);
+        return this;
     }
 
     // --------------------------------------------------------------------------------

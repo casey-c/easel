@@ -9,10 +9,12 @@ import com.evacipated.cardcrawl.modthespire.lib.SpireInitializer;
 import easel.ui.AbstractWidget;
 import easel.ui.AnchorPosition;
 import easel.ui.containers.StyledContainer;
+import easel.ui.containers.SwapContainer;
 import easel.ui.debug.DebugWidget;
 import easel.ui.layouts.HorizontalLayout;
 import easel.ui.text.Label;
 import easel.utils.EaselFonts;
+import easel.utils.KeyHelper;
 import easel.utils.textures.TextureLoader;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -34,6 +36,7 @@ public class Easel implements PostInitializeSubscriber, RenderSubscriber, PostUp
     private ArrayList<AbstractWidget> widgets = new ArrayList<>();
 
     private AnchorPosition ap = AnchorPosition.LEFT_TOP;
+    private enum SwapWindows { MAIN, SECONDARY };
 
     @Override
     public void receivePostInitialize() {
@@ -65,13 +68,22 @@ public class Easel implements PostInitializeSubscriber, RenderSubscriber, PostUp
 
         widgets.add(
                 new StyledContainer(500, 500)
-                        .withHeader("Title", "Subtitle")
+                        .withHeader("Swap Tests", "Right click to swap content")
                         .onRightClick(container -> {
                             ap = ap.next();
-                            container.withContentAnchor(ap);
+                            container.withContentAnchor(ap).refreshAnchor();
                         })
-                        .withContent(new DebugWidget(100, 100).withMargins(100), false)
-                        .scaleToContent()
+                        .withContent(
+                                new SwapContainer<>(SwapWindows.class)
+                                        .withWidget(SwapWindows.MAIN, new Label("Main Swap Area"), true)
+                                        .withWidget(SwapWindows.SECONDARY, new Label("Secondary Swap Area"))
+                                        .onLeftClick(container -> {
+                                            if (KeyHelper.isShiftPressed())
+                                                container.nextView();
+                                        }),
+                                true
+                        )
+                        //.scaleToContent()
                         .makeMovable()
         );
 

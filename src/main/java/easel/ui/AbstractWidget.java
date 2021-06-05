@@ -233,6 +233,9 @@ public abstract class AbstractWidget<T extends AbstractWidget<T>> {
         this.targetX = anchorPosition.isLeft() ? x : (anchorPosition.isCenterX() ? x - 0.5f * getWidth() : x - getWidth());
         this.targetY = anchorPosition.isBottom() ? y : (anchorPosition.isCenterY() ? y - 0.5f * getHeight() : y - getHeight());
 
+//        this.targetX = anchorPosition.getXFromRight(x, getWidth());
+//        this.targetY = anchorPosition.getYFromTop(y, getHeight());
+
         this.interpolationSpeed = withDelay;
 
         if (withDelay == InterpolationSpeed.INSTANT) {
@@ -240,7 +243,8 @@ public abstract class AbstractWidget<T extends AbstractWidget<T>> {
             this.y = targetY;
         }
 
-        moveHitboxToTarget(targetX + marginLeft, targetY + marginBottom);
+        //moveHitboxToTarget(targetX + marginLeft, targetY + marginBottom);
+        anchorHitboxOnTarget();
 
         return (T)this;
     }
@@ -658,17 +662,30 @@ public abstract class AbstractWidget<T extends AbstractWidget<T>> {
         updateWidget();
     }
 
-    private void moveHitboxToTarget(float targetLeft, float targetBottom) {
-        float centerX = targetLeft + (0.5f * getContentWidth());
-        float centerY = targetBottom + (0.5f * getContentHeight());
+//    private void moveHitboxToTarget(float targetLeft, float targetBottom) {
+//        float centerX = targetLeft + (0.5f * getContentWidth());
+//        float centerY = targetBottom + (0.5f * getContentHeight());
+//
+//        if (hasInteractivity)
+//            hb.move(centerX * Settings.xScale,
+//                    centerY * Settings.yScale);
+//
+//        if (hasMovable)
+//            movableWidget.hb.move(centerX * Settings.xScale,
+//                    centerY * Settings.yScale);
+//    }
+    private void anchorHitboxOnTarget() {
+        float cx = targetX + marginLeft + 0.5f * getContentWidth();
+        float cy = targetY + marginBottom + 0.5f * getContentHeight();
+
+        //public float getContentCenterX() { return x + marginLeft + 0.5f * getContentWidth(); }
+        //float cx = getContentCenterX();
+        //float cy = getContentCenterY();
 
         if (hasInteractivity)
-            hb.move(centerX * Settings.xScale,
-                    centerY * Settings.yScale);
-
+            hb.move(cx * Settings.xScale, cy * Settings.yScale);
         if (hasMovable)
-            movableWidget.hb.move(centerX * Settings.xScale,
-                    centerY * Settings.yScale);
+            movableWidget.hb.move(cx * Settings.xScale, cy * Settings.yScale);
     }
 
     protected void updateInteractivity() {
