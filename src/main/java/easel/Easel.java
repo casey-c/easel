@@ -8,23 +8,16 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.evacipated.cardcrawl.modthespire.lib.SpireInitializer;
 import easel.ui.AbstractWidget;
 import easel.ui.AnchorPosition;
-import easel.ui.containers.HeaderlessContainer;
-import easel.ui.containers.LargeHeaderedContainer;
-import easel.ui.containers.SmallHeaderedContainer;
 import easel.ui.containers.StyledContainer;
 import easel.ui.debug.DebugWidget;
-import easel.ui.graphics.ninepatch.headered.SmallHeaderedNinePatch;
-import easel.ui.graphics.pie.PieChartWidget;
 import easel.ui.layouts.HorizontalLayout;
 import easel.ui.text.Label;
 import easel.utils.EaselFonts;
-import easel.utils.colors.EaselColors;
 import easel.utils.textures.TextureLoader;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import java.util.ArrayList;
-import java.util.Random;
 
 @SpireInitializer
 public class Easel implements PostInitializeSubscriber, RenderSubscriber, PostUpdateSubscriber {

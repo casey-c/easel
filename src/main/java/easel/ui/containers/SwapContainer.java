@@ -6,7 +6,7 @@ import easel.ui.AbstractWidget;
 import easel.ui.AnchorPosition;
 import easel.ui.InterpolationSpeed;
 
-public class WidgetSwapper<T extends Enum<T>> extends AbstractWidget<WidgetSwapper<T>> {
+public class SwapContainer<T extends Enum<T>> extends AbstractWidget<SwapContainer<T>> {
     private AbstractWidget[] widgets;
     private AbstractWidget activeWidget = null;
 
@@ -15,16 +15,16 @@ public class WidgetSwapper<T extends Enum<T>> extends AbstractWidget<WidgetSwapp
     private float maxWidth = 0.0f;
     private float maxHeight = 0.0f;
 
-    public WidgetSwapper(Class<T> clz) {
+    public SwapContainer(Class<T> clz) {
         int numItems = clz.getEnumConstants().length;
         widgets = new AbstractWidget[numItems];
     }
 
-    public WidgetSwapper<T> withWidget(T option, AbstractWidget widget) {
+    public SwapContainer<T> withWidget(T option, AbstractWidget widget) {
         return withWidget(option, widget, false);
     }
 
-    public WidgetSwapper<T> withWidget(T option, AbstractWidget widget, boolean activeView) {
+    public SwapContainer<T> withWidget(T option, AbstractWidget widget, boolean activeView) {
         widgets[option.ordinal()] = widget;
 
         if (widget.getWidth() > maxWidth)
@@ -54,7 +54,7 @@ public class WidgetSwapper<T extends Enum<T>> extends AbstractWidget<WidgetSwapp
             activeWidget.show();
     }
 
-    public WidgetSwapper<T> withView(T choice) {
+    public SwapContainer<T> withView(T choice) {
         setView(choice);
         return this;
     }
@@ -62,7 +62,7 @@ public class WidgetSwapper<T extends Enum<T>> extends AbstractWidget<WidgetSwapp
     // --------------------------------------------------------------------------------
 
     @Override
-    public WidgetSwapper<T> anchoredAt(float x, float y, AnchorPosition anchorPosition, InterpolationSpeed withDelay) {
+    public SwapContainer<T> anchoredAt(float x, float y, AnchorPosition anchorPosition, InterpolationSpeed withDelay) {
         for (AbstractWidget w : widgets) {
             if (w == null) {
                 Easel.logger.warn("Trying to anchor a null widget?");
