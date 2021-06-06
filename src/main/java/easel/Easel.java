@@ -4,6 +4,7 @@ import basemod.BaseMod;
 import basemod.interfaces.PostInitializeSubscriber;
 import basemod.interfaces.PostUpdateSubscriber;
 import basemod.interfaces.RenderSubscriber;
+import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.evacipated.cardcrawl.modthespire.lib.SpireInitializer;
 import easel.ui.AbstractWidget;
@@ -11,6 +12,7 @@ import easel.ui.AnchorPosition;
 import easel.ui.containers.StyledContainer;
 import easel.ui.containers.SwapContainer;
 import easel.ui.debug.DebugWidget;
+import easel.ui.graphics.pie.PieChartWidget;
 import easel.ui.layouts.HorizontalLayout;
 import easel.ui.text.Label;
 import easel.utils.EaselFonts;
@@ -68,22 +70,28 @@ public class Easel implements PostInitializeSubscriber, RenderSubscriber, PostUp
 
         widgets.add(
                 new StyledContainer(500, 500)
-                        .withHeader("Swap Tests", "Right click to swap content")
+                        .withHeader("Swap Tests", "Very long header text compared to content")
                         .onRightClick(container -> {
                             ap = ap.next();
                             container.withContentAnchor(ap).refreshAnchor();
                         })
                         .withContent(
                                 new SwapContainer<>(SwapWindows.class)
-                                        .withWidget(SwapWindows.MAIN, new Label("Main Swap Area"), true)
-                                        .withWidget(SwapWindows.SECONDARY, new Label("Secondary Swap Area"))
+                                        .withWidget(SwapWindows.MAIN, new Label("1"), true)
+                                        .withWidget(SwapWindows.SECONDARY, new Label("2"))
                                         .onLeftClick(container -> {
                                             if (KeyHelper.isShiftPressed())
                                                 container.nextView();
                                         }),
                                 true
                         )
-                        //.scaleToContent()
+//                        .withContent(
+//                                new PieChartWidget(200, 200)
+//                                        .withCounts(1, 1)
+//                                        .withColors(Color.WHITE, Color.BLACK),
+//                                true
+//                        )
+                        .scaleToContent()
                         .makeMovable()
         );
 

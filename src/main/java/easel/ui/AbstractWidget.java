@@ -233,9 +233,6 @@ public abstract class AbstractWidget<T extends AbstractWidget<T>> {
         this.targetX = anchorPosition.isLeft() ? x : (anchorPosition.isCenterX() ? x - 0.5f * getWidth() : x - getWidth());
         this.targetY = anchorPosition.isBottom() ? y : (anchorPosition.isCenterY() ? y - 0.5f * getHeight() : y - getHeight());
 
-//        this.targetX = anchorPosition.getXFromRight(x, getWidth());
-//        this.targetY = anchorPosition.getYFromTop(y, getHeight());
-
         this.interpolationSpeed = withDelay;
 
         if (withDelay == InterpolationSpeed.INSTANT) {

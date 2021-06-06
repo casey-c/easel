@@ -10,6 +10,9 @@ import easel.ui.InterpolationSpeed;
 //   or at least that it doesn't crash if you omit these two critical things!
 public class SwapContainer<T extends Enum<T>> extends AbstractWidget<SwapContainer<T>> {
     private AbstractWidget[] widgets;
+    private AnchorPosition[] internalAnchors;
+
+    private AnchorPosition defaultChildAnchor = AnchorPosition.CENTER;
 
     private Class<T> clz;
     private T currentView;
@@ -23,15 +26,27 @@ public class SwapContainer<T extends Enum<T>> extends AbstractWidget<SwapContain
     public SwapContainer(Class<T> clz) {
         int numItems = clz.getEnumConstants().length;
         widgets = new AbstractWidget[numItems];
+        internalAnchors = new AnchorPosition[numItems];
+
+        for (int i = 0; i < numItems; ++i) {
+            internalAnchors[i] = defaultChildAnchor;
+            // TODO make the widgets have placeholder items here as well? - so no nulls?
+        }
+
         this.clz = clz;
     }
 
     public SwapContainer<T> withWidget(T option, AbstractWidget widget) {
-        return withWidget(option, widget, false);
+        return withWidget(option, widget, false, defaultChildAnchor);
     }
 
     public SwapContainer<T> withWidget(T option, AbstractWidget widget, boolean activeView) {
-        this.widgets[option.ordinal()] = widget;
+        return withWidget(option, widget, activeView, defaultChildAnchor);
+    }
+
+    public SwapContainer<T> withWidget(T view, AbstractWidget widget, boolean activeView, AnchorPosition childAnchor) {
+        this.widgets[view.ordinal()] = widget;
+        this.internalAnchors[view.ordinal()] = childAnchor;
 
         if (widget.getWidth() > maxWidth)
             this.maxWidth = widget.getWidth();
@@ -40,11 +55,27 @@ public class SwapContainer<T extends Enum<T>> extends AbstractWidget<SwapContain
 
         if (activeView) {
             this.activeWidget = widget;
-            this.currentView = option;
+            this.currentView = view;
         }
 
         scaleHitboxToContent();
 
+        return this;
+    }
+
+    public SwapContainer<T> withDefaultChildAnchor(AnchorPosition defaultChildAnchor) {
+        this.defaultChildAnchor = defaultChildAnchor;
+        return this;
+    }
+
+    public SwapContainer<T> forceChildAnchors(AnchorPosition forcedChildAnchorPosition) {
+        for (int i = 0; i < widgets.length; ++i)
+            internalAnchors[i] = forcedChildAnchorPosition;
+        return this;
+    }
+
+    public SwapContainer<T> updateAnchorAt(T view, AnchorPosition newAnchor) {
+        internalAnchors[view.ordinal()] = newAnchor;
         return this;
     }
 
@@ -78,25 +109,24 @@ public class SwapContainer<T extends Enum<T>> extends AbstractWidget<SwapContain
 
     @Override
     public SwapContainer<T> anchoredAt(float x, float y, AnchorPosition anchorPosition, InterpolationSpeed withDelay) {
-        System.out.println("Anchoring swap container. hb: ");
-        System.out.println(hb);
-
         super.anchoredAt(x, y, anchorPosition, withDelay);
 
-        System.out.println("POST Anchoring swap container. hb: ");
-        System.out.println(hb);
+        for (int i = 0; i < widgets.length; ++i) {
+            AbstractWidget w = widgets[i];
 
-        for (AbstractWidget w : widgets) {
             if (w == null) {
                 Easel.logger.warn("Trying to anchor a null widget?");
             }
             else {
-                //w.anchoredAt(x, y, anchorPosition, withDelay);
-                w.anchoredAt(getContentLeft(), getContentBottom(), AnchorPosition.LEFT_BOTTOM, withDelay);
+                AnchorPosition anchor = internalAnchors[i];
+
+                float wx = anchor.getXFromLeft(getContentLeft(), getContentWidth());
+                float wy = anchor.getYFromBottom(getContentBottom(), getContentHeight());
+
+                w.anchoredAt(wx, wy, anchor, withDelay);
             }
         }
 
-        //return super.anchoredAt(x, y, anchorPosition, withDelay);
         return this;
     }
 

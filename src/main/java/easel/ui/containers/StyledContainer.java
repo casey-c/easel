@@ -8,10 +8,12 @@ import com.megacrit.cardcrawl.core.Settings;
 import easel.ui.AbstractWidget;
 import easel.ui.AnchorPosition;
 import easel.ui.InterpolationSpeed;
+import easel.ui.debug.DebugWidget;
 import easel.ui.graphics.ninepatch.NinePatchWidget;
 import easel.ui.layouts.VerticalLayout;
 import easel.ui.text.Label;
 import easel.utils.EaselFonts;
+import easel.utils.GraphicsHelper;
 import easel.utils.colors.EaselColors;
 import easel.utils.textures.TextureAtlasDatabase;
 import easel.utils.textures.TextureDatabase;
@@ -267,6 +269,10 @@ public class StyledContainer extends AbstractWidget<StyledContainer> {
             float cx = contentAnchor.getXFromLeft(getContentLeft(), getContentWidth());
             float cy = contentAnchor.getYFromBottom(getContentBottom(), getMainContentAreaHeight());
 
+            // Note: if the content width is thinner than the header width (e.g. from defaultHeader.getWidth()),
+            //   the content anchoring may shift off a few pixels to the left and right and because of this
+            //   scaleToContent() WILL no longer make the contentAnchor obsolete
+
             content.anchoredAt(cx, cy, contentAnchor, withDelay);
         }
 
@@ -317,5 +323,11 @@ public class StyledContainer extends AbstractWidget<StyledContainer> {
         }
 
         npFullTrim.render(sb);
+
+//        GraphicsHelper.drawRect(sb, getContentLeft(), getContentBottom(), getContentWidth(), getContentHeight(), DebugWidget.DEBUG_COLOR_0);
+//        GraphicsHelper.drawRect(sb, getContentLeft(), getContentBottom(), getContentWidth(), getMainContentAreaHeight(), DebugWidget.DEBUG_COLOR_1);
+//
+//        GraphicsHelper.drawRect(sb, content.getLeft(), content.getBottom(), content.getWidth(), content.getHeight(), DebugWidget.DEBUG_COLOR_2);
+//        GraphicsHelper.drawRect(sb, content.getContentLeft(), content.getContentBottom(), content.getContentWidth(), content.getContentHeight(), DebugWidget.DEBUG_COLOR_3);
     }
 }
