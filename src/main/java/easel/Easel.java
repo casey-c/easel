@@ -4,15 +4,21 @@ import basemod.BaseMod;
 import basemod.interfaces.PostInitializeSubscriber;
 import basemod.interfaces.PostUpdateSubscriber;
 import basemod.interfaces.RenderSubscriber;
+import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.evacipated.cardcrawl.modthespire.lib.SpireInitializer;
 import easel.ui.AbstractWidget;
 import easel.ui.AnchorPosition;
 import easel.ui.containers.MoveContainer;
+import easel.ui.containers.StyledContainer;
+import easel.ui.debug.DebugWidget;
+import easel.ui.graphics.pie.PieChartWidget;
 import easel.ui.layouts.HorizontalLayout;
 import easel.ui.layouts.VerticalLayout;
 import easel.ui.text.Label;
 import easel.utils.EaselFonts;
+import easel.utils.SoundHelper;
+import easel.utils.colors.EaselColors;
 import easel.utils.textures.TextureLoader;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -40,15 +46,52 @@ public class Easel implements PostInitializeSubscriber, RenderSubscriber, PostUp
         TextureLoader.loadTextures();
         EaselFonts.loadFonts();
 
-        MoveContainer moveContainer =
-                new MoveContainer()
-                        .withChild(new Label("First").withMargins(20))
-                        .withChild(new Label("Second").withMargins(20))
-                        .withChild(new Label("Third").withMargins(20))
-                        .withChild(new Label("Fourth").withMargins(20));
+//        MoveContainer moveContainer =
+//                new MoveContainer()
+//                        .withChild(new Label("First").withMargins(20))
+//                        .withChild(new Label("Second").withMargins(20))
+//                        .withChild(new Label("Third").withMargins(20))
+//                        .withChild(new Label("Fourth").withMargins(20));
+//
+//        widgets.add(
+//                moveContainer
+//        );
 
         widgets.add(
-                moveContainer
+                new MoveContainer()
+                        .withChild(
+                                new StyledContainer(100, 100)
+                                        .withContent(new Label("No Header"), true)
+                                        .scaleToContent()
+                                        .anchoredCenteredOnScreen()
+                        )
+                        .withChild(
+                                new StyledContainer(100, 100)
+                                        .withHeader("Pie Chart")
+                                        .withContent(
+                                                new PieChartWidget(200, 200)
+                                                        .withColors(Color.WHITE, Color.BLACK)
+                                                        .withCounts(1, 2)
+                                                ,
+                                                true
+                                        )
+                                        .scaleToContent()
+                                        .anchoredCenteredOnScreen()
+                        )
+                        .withChild(
+                                new StyledContainer(100, 100)
+                                        .withHeader("Debug Widgets", "Right click for caw caw")
+                                        .withHeaderColor(EaselColors.HEADER_DEEP_BLUE())
+                                        .withContent(
+                                                new DebugWidget(300, 300),
+                                                true
+                                        )
+                                        .onRightClick(container -> {
+                                            SoundHelper.cawCaw();
+                                        })
+                                        .scaleToContent()
+                                        .anchoredCenteredOnScreen()
+                        )
         );
 
 //        widgets.add(

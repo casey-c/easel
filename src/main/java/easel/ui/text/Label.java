@@ -71,6 +71,6 @@ public class Label extends AbstractWidget<Label> {
                 getContentBottom() * Settings.yScale,
                 color);
 
-        GraphicsHelper.drawDebugRects(sb, this);
+//        GraphicsHelper.drawDebugRects(sb, this);
     }
 }

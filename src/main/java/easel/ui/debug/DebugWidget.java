@@ -5,6 +5,7 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.megacrit.cardcrawl.core.Settings;
 import com.megacrit.cardcrawl.helpers.ImageMaster;
 import easel.ui.AbstractWidget;
+import easel.utils.GraphicsHelper;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -46,18 +47,7 @@ public class DebugWidget extends AbstractWidget<DebugWidget> {
 
     @Override
     protected void renderWidget(SpriteBatch sb) {
-        sb.setColor(DEBUG_COLOR_3);
-        sb.draw(ImageMaster.WHITE_SQUARE_IMG,
-                getLeft() * Settings.xScale,
-                getBottom() * Settings.yScale,
-                getWidth() * Settings.xScale,
-                getHeight() * Settings.yScale);
-
-        sb.setColor(color);
-        sb.draw(ImageMaster.WHITE_SQUARE_IMG,
-                getContentLeft() * Settings.xScale,
-                getContentBottom() * Settings.yScale,
-                getContentWidth() * Settings.xScale,
-                getContentHeight() * Settings.yScale);
+//        GraphicsHelper.drawRect(sb, this, true, DEBUG_COLOR_3);
+        GraphicsHelper.drawRect(sb, this, false, color);
     }
 }

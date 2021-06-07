@@ -5,9 +5,8 @@ import com.megacrit.cardcrawl.core.Settings;
 import com.megacrit.cardcrawl.helpers.input.InputHelper;
 import easel.ui.AbstractWidget;
 import easel.ui.AnchorPosition;
-import easel.ui.InterpolationSpeed;
-import easel.ui.text.Label;
 import easel.utils.EaselInputHelper;
+import easel.utils.SoundHelper;
 
 import java.util.Map;
 import java.util.Optional;
@@ -25,11 +24,6 @@ public class MoveContainer extends AbstractWidget<MoveContainer> {
         this.width = Settings.WIDTH;
         this.height = Settings.HEIGHT;
         this.fullscreen = true;
-
-        initializeInteractivity();
-
-        // TODO: probably don't do this here
-        anchoredAt(0, 0, AnchorPosition.LEFT_BOTTOM);
     }
 
     // --------------------------------------------------------------------------------
@@ -40,9 +34,7 @@ public class MoveContainer extends AbstractWidget<MoveContainer> {
         }
         else {
             int top = map.lastKey();
-            System.out.println("Adding new child to top-most position " + (top + 1));
             map.put(top + 1, child);
-            printQueue();
         }
 
         return this;
@@ -130,6 +122,7 @@ public class MoveContainer extends AbstractWidget<MoveContainer> {
         // Handle releasing the mouse down
         if (InputHelper.justReleasedClickLeft) {
             this.moving = false;
+//            SoundHelper.uiClick2();
         }
     }
 
@@ -143,7 +136,7 @@ public class MoveContainer extends AbstractWidget<MoveContainer> {
             updateCurrentlyMoving();
         else {
             // Left click started (start moving)
-            if (isHovered && InputHelper.justClickedLeft) {
+            if (InputHelper.justClickedLeft) {
                 // Figure out the move target
                 Optional<Map.Entry<Integer, AbstractWidget>> target = findTopMostWidgetUnderMouse();
 
@@ -153,9 +146,8 @@ public class MoveContainer extends AbstractWidget<MoveContainer> {
                     this.moveTarget = valid.getValue();
                     bringIndexToTop(valid.getKey());
 
-                    System.out.println("MOVE TARGET FOUND: " + moveTarget);
-
                     // Start the move
+                    SoundHelper.uiClick1();
                     this.moving = true;
 
                     this.startingMouseX = EaselInputHelper.getMouseX();
@@ -180,24 +172,4 @@ public class MoveContainer extends AbstractWidget<MoveContainer> {
     }
 
     // --------------------------------------------------------------------------------
-
-    // DEBUG
-    public void printQueue() {
-        System.out.println("The map has " + map.size() + " tracked widgets.");
-        if (map.isEmpty())
-            return;
-
-        for (Map.Entry<Integer, AbstractWidget> entry : map.entrySet()) {
-            int index = entry.getKey();
-            AbstractWidget widget = entry.getValue();
-
-            System.out.println("\t" + index + ": " + ((Label)widget).getText());
-        }
-        System.out.println();
-
-        System.out.println("The bottom most widget is: " + ((Label)map.firstEntry().getValue()).getText());
-        System.out.println("The top most widget is: " + ((Label)map.lastEntry().getValue()).getText());
-
-        System.out.println();
-    }
 }
