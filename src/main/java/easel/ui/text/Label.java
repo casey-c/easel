@@ -55,6 +55,10 @@ public class Label extends AbstractWidget<Label> {
         return this;
     }
 
+    public String getText() {
+        return text;
+    }
+
     @Override public float getContentWidth() { return textWidth; }
     @Override public float getContentHeight() { return textHeight; }
 

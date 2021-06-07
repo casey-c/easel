@@ -5,7 +5,7 @@ plugins {
 }
 
 group = "io.github.casey-c"
-version = "0.0.1"
+version = "0.0.2"
 
 /*
 Setup environment variables
