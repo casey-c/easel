@@ -2,8 +2,10 @@ package easel.utils;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
+import com.megacrit.cardcrawl.core.Settings;
+import com.megacrit.cardcrawl.helpers.input.InputHelper;
 
-public class KeyHelper {
+public class EaselInputHelper {
     /**
      * @return true if either left shift or right shift is pressed
      */
@@ -23,5 +25,19 @@ public class KeyHelper {
      */
     public static boolean isControlPressed() {
         return Gdx.input.isKeyPressed(Input.Keys.CONTROL_LEFT) || Gdx.input.isKeyPressed(Input.Keys.CONTROL_RIGHT);
+    }
+
+    /**
+     * @return the X coordinate of the mouse, in 1080p space (scaled in a way to be used with widgets)
+     */
+    public static int getMouseX() {
+        return (int)((float) InputHelper.mX / Settings.xScale);
+    }
+
+    /**
+     * @return the Y coordinate of the mouse, in 1080p space (scaled in a way to be used with widgets)
+     */
+    public static int getMouseY() {
+        return (int)((float) InputHelper.mY / Settings.yScale);
     }
 }

@@ -7,6 +7,7 @@ import com.megacrit.cardcrawl.helpers.controller.CInputActionSet;
 import com.megacrit.cardcrawl.helpers.input.InputHelper;
 import easel.Easel;
 import easel.ui.interactive.MovableWidget;
+import easel.utils.EaselInputHelper;
 
 import java.util.function.Consumer;
 
@@ -794,6 +795,18 @@ public abstract class AbstractWidget<T extends AbstractWidget<T>> {
 
         return (T)this;
     }
+
+    // --------------------------------------------------------------------------------
+
+    public boolean isMouseInContentBounds() {
+        int mx = EaselInputHelper.getMouseX();
+        int my = EaselInputHelper.getMouseY();
+
+        return ((mx >= getContentLeft() && mx <= getContentRight()) &&
+                (my >= getContentBottom() && my <= getContentTop()));
+    }
+
+    // --------------------------------------------------------------------------------
 
     /**
      * Required for interactive components. For containers, make sure to call <code>update()</code> on all children. For widgets that require some sort of updates each frame, you can do so here.

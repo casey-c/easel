@@ -5,6 +5,7 @@ import com.megacrit.cardcrawl.core.Settings;
 import com.megacrit.cardcrawl.helpers.input.InputHelper;
 import easel.ui.AbstractWidget;
 import easel.ui.AnchorPosition;
+import easel.utils.EaselInputHelper;
 
 /**
  * A special interactive widget that helps make it easier to move widgets around with the mouse.
@@ -68,8 +69,8 @@ public class MovableWidget extends AbstractWidget<MovableWidget> {
 
     private void updateCurrentlyMoving() {
         // Update the widget position to the mouse
-        int currMouseX = (int)((float)InputHelper.mX / Settings.xScale);
-        int currMouseY = (int)((float)InputHelper.mY / Settings.yScale);
+        int currMouseX = EaselInputHelper.getMouseX();
+        int currMouseY = EaselInputHelper.getMouseY();
 
         int deltaX = startingMouseX - currMouseX;
         int deltaY = startingMouseY - currMouseY;
@@ -95,8 +96,9 @@ public class MovableWidget extends AbstractWidget<MovableWidget> {
             if (isHovered && InputHelper.justClickedLeft) {
                 moving = true;
 
-                this.startingMouseX = InputHelper.mX;
-                this.startingMouseY = InputHelper.mY;
+                this.startingMouseX = EaselInputHelper.getMouseX();
+                this.startingMouseY = EaselInputHelper.getMouseY();
+
                 this.startingWidgetLeft = moveTarget.getLeft();
                 this.startingWidgetBottom = moveTarget.getBottom();
             }
