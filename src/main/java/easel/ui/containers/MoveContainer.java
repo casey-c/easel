@@ -105,14 +105,11 @@ public class MoveContainer extends AbstractWidget<MoveContainer> {
     private int startingMouseX;
     private int startingMouseY;
 
-    private Optional<AbstractWidget> findTopMostWidgetUnderMouse() {
-        System.out.println("LOOKING FOR TOP MOST WIDGET UNDER MOUSE--------------");
-        for (AbstractWidget w : map.descendingMap().values()) {
-            if (w.isMouseInContentBounds())
-                return Optional.of(w);
+    private Optional<Map.Entry<Integer, AbstractWidget>> findTopMostWidgetUnderMouse() {
+        for (Map.Entry<Integer, AbstractWidget> entry : map.descendingMap().entrySet()) {
+            if (entry.getValue().isMouseInBounds())
+                return Optional.of(entry);
         }
-
-        System.out.println("NOT FOUND--------------");
 
         return Optional.empty();
     }
@@ -148,10 +145,14 @@ public class MoveContainer extends AbstractWidget<MoveContainer> {
             // Left click started (start moving)
             if (isHovered && InputHelper.justClickedLeft) {
                 // Figure out the move target
-                Optional<AbstractWidget> target = findTopMostWidgetUnderMouse();
+                Optional<Map.Entry<Integer, AbstractWidget>> target = findTopMostWidgetUnderMouse();
 
                 if (target.isPresent()) {
-                    this.moveTarget = target.get();
+                    Map.Entry<Integer, AbstractWidget> valid = target.get();
+
+                    this.moveTarget = valid.getValue();
+                    bringIndexToTop(valid.getKey());
+
                     System.out.println("MOVE TARGET FOUND: " + moveTarget);
 
                     // Start the move

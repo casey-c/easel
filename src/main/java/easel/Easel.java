@@ -42,25 +42,11 @@ public class Easel implements PostInitializeSubscriber, RenderSubscriber, PostUp
 
         MoveContainer moveContainer =
                 new MoveContainer()
-                        .withChild(new Label("First"))
-                        .withChild(new Label("Second"))
-                        .withChild(new Label("Third"))
-                        .withChild(new Label("Fourth"));
+                        .withChild(new Label("First").withMargins(20))
+                        .withChild(new Label("Second").withMargins(20))
+                        .withChild(new Label("Third").withMargins(20))
+                        .withChild(new Label("Fourth").withMargins(20));
 
-        System.out.println("------------------------");
-        System.out.println("The final move container:");
-        moveContainer.printQueue();
-        System.out.println("------------------------");
-
-//        System.out.println("Move index 2 to bottom: ");
-//        moveContainer.bringIndexToBottom(2);
-//        moveContainer.printQueue();
-//        System.out.println("------------------------");
-//        System.out.println("Move index 1 to top: ");
-//        moveContainer.bringIndexToTop(1);
-//        moveContainer.printQueue();
-//        System.out.println("------------------------");
-//
         widgets.add(
                 moveContainer
         );

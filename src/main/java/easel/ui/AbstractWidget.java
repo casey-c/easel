@@ -806,6 +806,14 @@ public abstract class AbstractWidget<T extends AbstractWidget<T>> {
                 (my >= getContentBottom() && my <= getContentTop()));
     }
 
+    public boolean isMouseInBounds() {
+        int mx = EaselInputHelper.getMouseX();
+        int my = EaselInputHelper.getMouseY();
+
+        return ((mx >= getLeft() && mx <= getRight()) &&
+                (my >= getBottom() && my <= getTop()));
+    }
+
     // --------------------------------------------------------------------------------
 
     /**
