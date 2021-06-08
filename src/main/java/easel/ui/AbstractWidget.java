@@ -686,13 +686,47 @@ public abstract class AbstractWidget<T extends AbstractWidget<T>> {
             movableWidget.hb.move(cx * Settings.xScale, cy * Settings.yScale);
     }
 
+    // --------------------------------------------------------------------------------
+
+    protected void mouseEnter() {
+        onMouseEnter.accept((T)this);
+        isHovered = true;
+
+        Easel.logger.info("Hover started: " + this);
+    }
+
+    protected void mouseLeave() {
+        onMouseLeave.accept((T)this);
+        isHovered = false;
+
+        Easel.logger.info("Hover finished: " + this);
+    }
+
+    protected void leftMouseClick() {
+        onLeftClick.accept((T)this);
+
+        Easel.logger.info("Left-Clicked: " + this);
+    }
+
+    protected void rightMouseClick() {
+        onRightClick.accept((T)this);
+
+        Easel.logger.info("Right-Clicked: " + this);
+    }
+
+
+    // --------------------------------------------------------------------------------
+
     protected void updateInteractivity() {
         // Update interactive pieces of this widget
         if (hasInteractivity) {
             hb.update();
 
             // Hover (mouse enter / leave)
-            updateHoverTransitions();
+            if (hb.hovered && !isHovered)
+                mouseEnter();
+            else if (!hb.hovered && isHovered)
+                mouseLeave();
 
             // Mouse button down / up
             updateLeftClicks();
@@ -704,24 +738,6 @@ public abstract class AbstractWidget<T extends AbstractWidget<T>> {
         }
     }
 
-    private void updateHoverTransitions() {
-        if (hb.hovered && !isHovered) {
-            onMouseEnter.accept((T)this);
-
-            Easel.logger.info("Hover started");
-            Easel.logger.info(this);
-
-            isHovered = true;
-        }
-        else if (!hb.hovered && isHovered){
-            onMouseLeave.accept((T)this);
-
-            Easel.logger.info("Hover finished");
-            Easel.logger.info(this);
-
-            isHovered = false;
-        }
-    }
 
     private void updateLeftClicks() {
         // Left click started
@@ -730,20 +746,17 @@ public abstract class AbstractWidget<T extends AbstractWidget<T>> {
         }
         else if (hb.hovered && CInputActionSet.select.isJustPressed()) {
             CInputActionSet.select.unpress();
-            onLeftClick.accept((T)this);
 
             Easel.logger.info("Clicked (using CInputActionSet)");
             Easel.logger.info(this);
+
+            leftMouseClick();
         }
 
         // Left click ended
         if (leftClickStarted && InputHelper.justReleasedClickLeft) {
-            if (isHovered) {
-                onLeftClick.accept((T)this);
-
-                Easel.logger.info("Clicked (regular)");
-                Easel.logger.info(this);
-            }
+            if (isHovered)
+                leftMouseClick();
 
             leftClickStarted = false;
         }
@@ -765,12 +778,8 @@ public abstract class AbstractWidget<T extends AbstractWidget<T>> {
 
         // Right click ended
         if (rightClickStarted && InputHelper.justReleasedClickRight) {
-            if (isHovered) {
-                onRightClick.accept((T)this);
-
-                Easel.logger.info("Right Clicked (regular)");
-                Easel.logger.info(this);
-            }
+            if (isHovered)
+                rightMouseClick();
 
             rightClickStarted = false;
         }
@@ -833,7 +842,7 @@ public abstract class AbstractWidget<T extends AbstractWidget<T>> {
 
     @Override
     public String toString() {
-        return "AbstractWidget{ " +
+        return getClass().getName() + "{ " +
                 "getContentLeft() = " + getContentLeft() + ", " +
                 "getContentBottom() = " + getContentBottom() + ", " +
                 "getContentRight() = " + getContentRight() + ", " +

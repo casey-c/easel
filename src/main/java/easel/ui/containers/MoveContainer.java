@@ -6,7 +6,9 @@ import com.megacrit.cardcrawl.helpers.input.InputHelper;
 import easel.ui.AbstractWidget;
 import easel.ui.AnchorPosition;
 import easel.utils.EaselInputHelper;
-import easel.utils.SoundHelper;
+import easel.utils.EaselMathHelper;
+import easel.utils.EaselSoundHelper;
+import easel.utils.UpdateSuppressor;
 
 import java.util.Map;
 import java.util.Optional;
@@ -29,14 +31,7 @@ public class MoveContainer extends AbstractWidget<MoveContainer> {
     // --------------------------------------------------------------------------------
 
     public MoveContainer withChild(AbstractWidget child) {
-        if (map.isEmpty()) {
-            map.put(1, child);
-        }
-        else {
-            int top = map.lastKey();
-            map.put(top + 1, child);
-        }
-
+        map.put(getTopMostIndex() + 1, child);
         return this;
     }
 
@@ -50,22 +45,16 @@ public class MoveContainer extends AbstractWidget<MoveContainer> {
         return map.isEmpty() ? 0 : map.lastKey();
     }
 
-    public void bringIndexToBottom(int index) {
-        if (map.containsKey(index)) {
-            AbstractWidget widget = map.get(index);
-            map.remove(index);
-            int bottom = getBottomMostIndex();
-            map.put(bottom - 1, widget);
-        }
+    private void bringIndexToBottom(int index) {
+        AbstractWidget widget = map.get(index);
+        map.remove(index);
+        map.put(getBottomMostIndex() - 1, widget);
     }
 
-    public void bringIndexToTop(int index) {
-        if (map.containsKey(index)) {
-            AbstractWidget widget = map.get(index);
-            map.remove(index);
-            int top = getTopMostIndex();
-            map.put(top + 1, widget);
-        }
+    private void bringIndexToTop(int index) {
+        AbstractWidget widget = map.get(index);
+        map.remove(index);
+        map.put(getTopMostIndex() + 1, widget);
     }
 
     // --------------------------------------------------------------------------------
@@ -117,11 +106,19 @@ public class MoveContainer extends AbstractWidget<MoveContainer> {
         float newWidgetLeft = startingWidgetLeft - deltaX;
         float newWidgetBottom = startingWidgetBottom - deltaY;
 
+        // Round to nearest multiple of 10
+        if (EaselInputHelper.isShiftPressed()) {
+            newWidgetLeft = EaselMathHelper.roundToMultipleOf(newWidgetLeft, 10);
+            newWidgetBottom = EaselMathHelper.roundToMultipleOf(newWidgetBottom, 10);
+        }
+
         moveTarget.anchoredAt(newWidgetLeft, newWidgetBottom, AnchorPosition.LEFT_BOTTOM, 20);
 
         // Handle releasing the mouse down
         if (InputHelper.justReleasedClickLeft) {
             this.moving = false;
+
+            UpdateSuppressor.releaseUpdateSuppression();
 //            SoundHelper.uiClick2();
         }
     }
@@ -135,27 +132,35 @@ public class MoveContainer extends AbstractWidget<MoveContainer> {
         if (moving)
             updateCurrentlyMoving();
         else {
+            // Figure out the move target
+            Optional<Map.Entry<Integer, AbstractWidget>> target = findTopMostWidgetUnderMouse();
+
+            // Nothing under mouse
+            if (!target.isPresent()) {
+                UpdateSuppressor.releaseAllSuppression();
+                return;
+            }
+
             // Left click started (start moving)
             if (InputHelper.justClickedLeft) {
-                // Figure out the move target
-                Optional<Map.Entry<Integer, AbstractWidget>> target = findTopMostWidgetUnderMouse();
+                UpdateSuppressor.suppressAll();
 
-                if (target.isPresent()) {
-                    Map.Entry<Integer, AbstractWidget> valid = target.get();
+                Map.Entry<Integer, AbstractWidget> validTarget = target.get();
+                this.moveTarget = validTarget.getValue();
+                bringIndexToTop(validTarget.getKey());
 
-                    this.moveTarget = valid.getValue();
-                    bringIndexToTop(valid.getKey());
+                // Start the move
+                EaselSoundHelper.uiClick1();
+                this.moving = true;
 
-                    // Start the move
-                    SoundHelper.uiClick1();
-                    this.moving = true;
+                this.startingMouseX = EaselInputHelper.getMouseX();
+                this.startingMouseY = EaselInputHelper.getMouseY();
 
-                    this.startingMouseX = EaselInputHelper.getMouseX();
-                    this.startingMouseY = EaselInputHelper.getMouseY();
-
-                    this.startingWidgetLeft = moveTarget.getLeft();
-                    this.startingWidgetBottom = moveTarget.getBottom();
-                }
+                this.startingWidgetLeft = moveTarget.getLeft();
+                this.startingWidgetBottom = moveTarget.getBottom();
+            }
+            else {
+                UpdateSuppressor.suppressTips();
             }
         }
 

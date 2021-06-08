@@ -5,7 +5,7 @@ import com.megacrit.cardcrawl.core.CardCrawlGame;
 /**
  * Provides more convenient access to various sounds in the game. No more needing to memorize the sound key strings, and allows the IDE to autocomplete suggestions.
  */
-public class SoundHelper {
+public class EaselSoundHelper {
     public static void cawCaw() {
         CardCrawlGame.sound.play("VO_CULTIST_1A");
     }

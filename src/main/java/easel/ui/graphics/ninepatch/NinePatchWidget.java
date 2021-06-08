@@ -34,8 +34,30 @@ public class NinePatchWidget extends AbstractWidget<NinePatchWidget> {
      * @see #NinePatchWidget(float, float, Texture)
      * @see #NinePatchWidget(float, float, int, int, int, int, TextureRegion)
      */
-    public NinePatchWidget( float width, float height, TextureRegion texRegion) {
+    public NinePatchWidget(float width, float height, TextureRegion texRegion) {
         this(width, height, 32, 32, 32, 32, texRegion);
+    }
+
+    /**
+     * Constructs a new NinePatch widget using a texture region. This convenience constructor assumes all corners are <code>patchOffset</code> in size.
+     * @param width the desired width of the final widget (what we render)
+     * @param height the desired height of the final widget (what we render)
+     * @param patchOffset the number of pixels from each edge defining the patch edge (assumes square)
+     * @param texRegion the texture region containing the entire nine patch
+     */
+    public NinePatchWidget(float width, float height, int patchOffset, TextureRegion texRegion) {
+        this(width, height, patchOffset, patchOffset, patchOffset, patchOffset, texRegion);
+    }
+
+    /**
+     * Constructs a new NinePatch widget using a texture. This convenience constructor assumes all corners are <code>patchOffset</code> in size.
+     * @param width the desired width of the final widget (what we render)
+     * @param height the desired height of the final widget (what we render)
+     * @param patchOffset the number of pixels from each edge defining the patch edge (assumes square)
+     * @param texture the texture containing the entire nine patch
+     */
+    public NinePatchWidget(float width, float height, int patchOffset, Texture texture) {
+        this(width, height, patchOffset, patchOffset, patchOffset, patchOffset, texture);
     }
 
     /**

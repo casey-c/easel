@@ -7,17 +7,16 @@ import basemod.interfaces.RenderSubscriber;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.evacipated.cardcrawl.modthespire.lib.SpireInitializer;
+import easel.config.ConfigTester;
 import easel.ui.AbstractWidget;
-import easel.ui.AnchorPosition;
 import easel.ui.containers.MoveContainer;
 import easel.ui.containers.StyledContainer;
 import easel.ui.debug.DebugWidget;
 import easel.ui.graphics.pie.PieChartWidget;
 import easel.ui.layouts.HorizontalLayout;
-import easel.ui.layouts.VerticalLayout;
 import easel.ui.text.Label;
 import easel.utils.EaselFonts;
-import easel.utils.SoundHelper;
+import easel.utils.EaselSoundHelper;
 import easel.utils.colors.EaselColors;
 import easel.utils.textures.TextureLoader;
 import org.apache.logging.log4j.LogManager;
@@ -45,6 +44,8 @@ public class Easel implements PostInitializeSubscriber, RenderSubscriber, PostUp
     public void receivePostInitialize() {
         TextureLoader.loadTextures();
         EaselFonts.loadFonts();
+
+        ConfigTester.test();
 
 //        MoveContainer moveContainer =
 //                new MoveContainer()
@@ -87,7 +88,7 @@ public class Easel implements PostInitializeSubscriber, RenderSubscriber, PostUp
                                                 true
                                         )
                                         .onRightClick(container -> {
-                                            SoundHelper.cawCaw();
+                                            EaselSoundHelper.cawCaw();
                                         })
                                         .scaleToContent()
                                         .anchoredCenteredOnScreen()

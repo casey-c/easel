@@ -2,13 +2,8 @@ package easel.ui.debug;
 
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
-import com.megacrit.cardcrawl.core.Settings;
-import com.megacrit.cardcrawl.helpers.ImageMaster;
 import easel.ui.AbstractWidget;
-import easel.utils.GraphicsHelper;
-
-import java.util.ArrayList;
-import java.util.Arrays;
+import easel.utils.EaselGraphicsHelper;
 
 public class DebugWidget extends AbstractWidget<DebugWidget> {
     public static final Color DEBUG_COLOR_0 = new Color(0.384f, 0.690f, 0.388f, 0.500f);
@@ -48,6 +43,6 @@ public class DebugWidget extends AbstractWidget<DebugWidget> {
     @Override
     protected void renderWidget(SpriteBatch sb) {
 //        GraphicsHelper.drawRect(sb, this, true, DEBUG_COLOR_3);
-        GraphicsHelper.drawRect(sb, this, false, color);
+        EaselGraphicsHelper.drawRect(sb, this, false, color);
     }
 }

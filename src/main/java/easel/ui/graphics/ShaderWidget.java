@@ -9,8 +9,6 @@ import com.megacrit.cardcrawl.core.Settings;
 import com.megacrit.cardcrawl.helpers.ImageMaster;
 import easel.Easel;
 import easel.ui.AbstractWidget;
-import easel.ui.debug.DebugWidget;
-import easel.utils.GraphicsHelper;
 
 /**
  * A base for widgets that use custom shaders to render graphics. This widget is potentially too niche for general use; its use case is primarily for leveraging GLSL code for letting a vertex shader and a fragment shader generate the graphics. By default, this widget attempts to render a white square onto the SpriteBatch, letting the provided shaders overwrite the rendering entirely if necessary. This process is designed for a specific style of customized 2D graphics and isn't set up for 3D. You may wish to look at the source code for this widget and use it as a starting point for more complicated applications, but really this ShaderWidget is simply the abstracted base for the {@link easel.ui.graphics.pie.PieChartWidget} and future as-of-yet unimplemented widgets that may use the same idea. (You probably won't find much use out of this widget as is).

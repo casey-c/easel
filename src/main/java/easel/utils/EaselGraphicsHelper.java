@@ -7,7 +7,7 @@ import com.megacrit.cardcrawl.helpers.ImageMaster;
 import easel.ui.AbstractWidget;
 import easel.ui.debug.DebugWidget;
 
-public class GraphicsHelper {
+public class EaselGraphicsHelper {
     /**
      * Draws a simple rectangle onto the SpriteBatch. Takes in unscaled position/dimension data (i.e. will scale by Settings.xScale and Settings.yScale in the render step).
      * @param sb the SpriteBatch to render on

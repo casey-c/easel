@@ -71,8 +71,8 @@ public class BitmapFontBuilder {
     }
 
     /**
-     * Use for large font sizes. Base game seems like it uses linear filtering for fonts of size 30 and above, so it's probably a good idea to copy that practice.
-     * @param linearFiltering
+     * Use for large font sizes. Base game seems like it uses linear filtering for fonts of size 30 and above, so it's probably a good idea to copy that practice. To be completely honest, I don't know what this does but you can try and change it and report back your results if you understand it.
+     * @param linearFiltering whether to use linear filtering
      * @return this builder
      */
     public BitmapFontBuilder withLinearFiltering(boolean linearFiltering) {

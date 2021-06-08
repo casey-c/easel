@@ -6,7 +6,6 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.megacrit.cardcrawl.core.Settings;
 import com.megacrit.cardcrawl.helpers.FontHelper;
 import easel.ui.AbstractWidget;
-import easel.utils.GraphicsHelper;
 
 /**
  * <p>
