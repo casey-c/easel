@@ -28,8 +28,11 @@ public class StyledContainer extends AbstractWidget<StyledContainer> {
 
     private static final TextureAtlas atlas = TextureAtlasDatabase.STYLED_CONTAINER.getAtlas();
 
+    private NinePatchWidget npFullShadow;
     private NinePatchWidget npFullBase;
     private NinePatchWidget npFullTrim;
+    private NinePatchWidget npFullTrimHighlight;
+
     private NinePatchWidget npHeaderBase;
     private NinePatchWidget npHeaderTrim;
 
@@ -39,9 +42,17 @@ public class StyledContainer extends AbstractWidget<StyledContainer> {
 
     private Color baseColor = EaselColors.TOOLTIP_BASE();
     private Color trimColor = EaselColors.TOOLTIP_TRIM();
+    private Color trimHighlightColor = EaselColors.TOOLTIP_TRIM_HIGHLIGHT();
     private Color headerColor = EaselColors.HEADER_PURPLE();
 
     // Shadows
+    private boolean renderFullShadows = false;
+
+//    private static final float SHADOW_OFFSET_X = 9;
+//    private static final float SHADOW_OFFSET_Y = 13;
+    private static final float SHADOW_OFFSET_X = 7;
+    private static final float SHADOW_OFFSET_Y = 7;
+
     private static final float OUTER_TRIM_SIZE = 4;
     private static final float SHADOW_SIZE = 4;
     private static final Texture SHADOW_TEXTURE = TextureDatabase.BLACK_GRADIENT_VERTICAL.getTexture();
@@ -49,11 +60,18 @@ public class StyledContainer extends AbstractWidget<StyledContainer> {
     // --------------------------------------------------------------------------------
 
     public StyledContainer(float width, float height) {
+        this.npFullShadow = new NinePatchWidget(width, height, atlas.findRegion("shadow"))
+                //.withColor(EaselColors.EIGHTH_TRANSPARENT_WHITE);
+                .withColor(Settings.QUARTER_TRANSPARENT_WHITE_COLOR);
+
         this.npFullBase = new NinePatchWidget(width, height, atlas.findRegion("base"))
                 .withColor(baseColor);
 
         this.npFullTrim = new NinePatchWidget(width, height, atlas.findRegion("trim"))
                 .withColor(trimColor);
+
+        this.npFullTrimHighlight = new NinePatchWidget(width, height, atlas.findRegion("trim_highlight"))
+                .withColor(trimHighlightColor);
 
         this.width = width;
         this.height = height;
@@ -79,7 +97,7 @@ public class StyledContainer extends AbstractWidget<StyledContainer> {
                 .withMargins(40, 20)
                 .withDefaultChildAnchorPosition(headerAnchor)
                 .withChild(new Label(title, EaselFonts.SMALLER_TIP_BODY, Settings.CREAM_COLOR))
-                .resizeWidthToWidestChild();
+                .scaleToWidestChild();
 
         constructHeaderNP();
 
@@ -95,7 +113,7 @@ public class StyledContainer extends AbstractWidget<StyledContainer> {
                 .withDefaultChildAnchorPosition(headerAnchor)
                 .withChild(new Label(title, EaselFonts.SMALLER_TIP_BODY, Settings.CREAM_COLOR))
                 .withChild(new Label(subtitle, EaselFonts.MEDIUM_ITALIC, Color.GRAY))
-                .resizeWidthToWidestChild();
+                .scaleToWidestChild();
 
         constructHeaderNP();
 
@@ -134,9 +152,12 @@ public class StyledContainer extends AbstractWidget<StyledContainer> {
         return this;
     }
 
-    public StyledContainer withTrimColor(Color trimColor) {
+    public StyledContainer withTrimColors(Color trimColor, Color trimHighlightColor) {
         this.trimColor = trimColor;
+        this.trimHighlightColor = trimHighlightColor;
+
         this.npFullTrim.withColor(trimColor);
+        this.npFullTrimHighlight.withColor(trimHighlightColor);
 
         if (hasHeader)
             this.npHeaderTrim.withColor(trimColor);
@@ -165,6 +186,11 @@ public class StyledContainer extends AbstractWidget<StyledContainer> {
         return this;
     }
 
+    public StyledContainer withShadows(boolean enabled) {
+        this.renderFullShadows = enabled;
+        return this;
+    }
+
     // --------------------------------------------------------------------------------
 
     public StyledContainer withContent(AbstractWidget content, boolean autoAddMargins) {
@@ -190,8 +216,10 @@ public class StyledContainer extends AbstractWidget<StyledContainer> {
                 newWidth = Math.max(newWidth, defaultHeader.getWidth());
         }
 
+        npFullShadow.withWidth(newWidth);
         npFullBase.withWidth(newWidth);
         npFullTrim.withWidth(newWidth);
+        npFullTrimHighlight.withWidth(newWidth);
 
         if (hasHeader) {
             npHeaderBase.withWidth(newWidth);
@@ -210,8 +238,10 @@ public class StyledContainer extends AbstractWidget<StyledContainer> {
 
         float newHeight = content.getHeight() + getHeaderHeight();
 
+        npFullShadow.withHeight(newHeight);
         npFullBase.withHeight(newHeight);
         npFullTrim.withHeight(newHeight);
+        npFullTrimHighlight.withHeight(newHeight);
 
         this.height = newHeight;
         scaleHitboxToContent();
@@ -245,8 +275,10 @@ public class StyledContainer extends AbstractWidget<StyledContainer> {
     public StyledContainer anchoredAt(float x, float y, AnchorPosition anchorPosition, InterpolationSpeed withDelay) {
         super.anchoredAt(x, y, anchorPosition, withDelay);
 
+        npFullShadow.anchoredAt(getContentLeft() + SHADOW_OFFSET_X, getContentTop() - SHADOW_OFFSET_Y, AnchorPosition.LEFT_TOP, withDelay);
         npFullBase.anchoredAt(getContentLeft(), getContentTop(), AnchorPosition.LEFT_TOP, withDelay);
         npFullTrim.anchoredAt(getContentLeft(), getContentTop(), AnchorPosition.LEFT_TOP, withDelay);
+        npFullTrimHighlight.anchoredAt(getContentLeft(), getContentTop(), AnchorPosition.LEFT_TOP, withDelay);
 
         // Header
         if (hasHeader) {
@@ -293,6 +325,9 @@ public class StyledContainer extends AbstractWidget<StyledContainer> {
 
     @Override
     protected void renderWidget(SpriteBatch sb) {
+        if (renderFullShadows)
+            npFullShadow.render(sb);
+
         npFullBase.render(sb);
 
         if (hasHeader) {
@@ -321,6 +356,7 @@ public class StyledContainer extends AbstractWidget<StyledContainer> {
         }
 
         npFullTrim.render(sb);
+        npFullTrimHighlight.render(sb);
 
 //        GraphicsHelper.drawRect(sb, getContentLeft(), getContentBottom(), getContentWidth(), getContentHeight(), DebugWidget.DEBUG_COLOR_0);
 //        GraphicsHelper.drawRect(sb, getContentLeft(), getContentBottom(), getContentWidth(), getMainContentAreaHeight(), DebugWidget.DEBUG_COLOR_1);

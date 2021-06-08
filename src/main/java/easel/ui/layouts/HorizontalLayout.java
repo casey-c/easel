@@ -64,7 +64,7 @@ public class HorizontalLayout extends AbstractOneDimensionalLayout<HorizontalLay
      * Replaces the <code>desiredHeight</code> set in the constructor ({@link #HorizontalLayout(float, float)}) with the height of the tallest child. Useful for dynamically scaling the height of this widget to fit the heights of its children. NOTE: should call this function AFTER adding all children and before anchoring.
      * @return this widget
      */
-    public HorizontalLayout resizeHeightToTallestChild() {
+    public HorizontalLayout scaleToTallestChild() {
         this.totalHeight = children.stream()
                 .map(item -> item.widget.getHeight())
                 .max(Float::compareTo)

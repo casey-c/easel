@@ -68,7 +68,7 @@ public class VerticalLayout extends AbstractOneDimensionalLayout<VerticalLayout>
      * Replaces the <code>desiredWidth</code> set in the constructor ({@link #VerticalLayout(float, float)}) with the width of the widest child. Useful for dynamically scaling the width of this widget to fit the widths of its children. NOTE: should call this function AFTER adding all children and before anchoring.
      * @return this widget
      */
-    public VerticalLayout resizeWidthToWidestChild() {
+    public VerticalLayout scaleToWidestChild() {
         this.totalWidth = children.stream()
                 .map(item -> item.widget.getWidth())
                 .max(Float::compareTo)

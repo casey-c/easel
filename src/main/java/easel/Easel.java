@@ -9,11 +9,13 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.evacipated.cardcrawl.modthespire.lib.SpireInitializer;
 import easel.config.ConfigTester;
 import easel.ui.AbstractWidget;
+import easel.ui.AnchorPosition;
 import easel.ui.containers.MoveContainer;
 import easel.ui.containers.StyledContainer;
 import easel.ui.debug.DebugWidget;
 import easel.ui.graphics.pie.PieChartWidget;
 import easel.ui.layouts.HorizontalLayout;
+import easel.ui.layouts.VerticalLayout;
 import easel.ui.text.Label;
 import easel.utils.EaselFonts;
 import easel.utils.EaselSoundHelper;
@@ -62,17 +64,28 @@ public class Easel implements PostInitializeSubscriber, RenderSubscriber, PostUp
                 new MoveContainer()
                         .withChild(
                                 new StyledContainer(100, 100)
-                                        .withContent(new Label("No Header"), true)
+                                        .withContent(
+                                                new VerticalLayout(100, 20)
+                                                        .withDefaultChildAnchorPosition(AnchorPosition.CENTER)
+                                                        .withChild(new Label("Row 1", EaselColors.QUAL_RED()))
+                                                        .withChild(new Label("Row 2", EaselColors.QUAL_GREEN()))
+                                                        .withChild(new Label("Row 3", EaselColors.QUAL_BLUE()))
+                                                        .withChild(new Label("Row 4", EaselColors.QUAL_PURPLE()))
+                                                        .withChild(new Label("Row 5", EaselColors.QUAL_YELLOW()))
+                                                        .scaleToWidestChild(),
+                                                true
+                                        )
                                         .scaleToContent()
                                         .anchoredCenteredOnScreen()
                         )
                         .withChild(
                                 new StyledContainer(100, 100)
                                         .withHeader("Pie Chart")
+                                        .withHeaderColor(EaselColors.HEADER_SEA_GLASS())
                                         .withContent(
                                                 new PieChartWidget(200, 200)
-                                                        .withColors(Color.WHITE, Color.BLACK)
-                                                        .withCounts(1, 2)
+                                                        .withColors(EaselColors.QUAL_RED(), EaselColors.QUAL_GREEN(), EaselColors.QUAL_BLUE(), EaselColors.QUAL_PURPLE())
+                                                        .withCounts(6, 5, 1, 1)
                                                 ,
                                                 true
                                         )
@@ -82,7 +95,7 @@ public class Easel implements PostInitializeSubscriber, RenderSubscriber, PostUp
                         .withChild(
                                 new StyledContainer(100, 100)
                                         .withHeader("Debug Widgets", "Right click for caw caw")
-                                        .withHeaderColor(EaselColors.HEADER_DEEP_BLUE())
+                                        .withHeaderColor(EaselColors.HEADER_RED())
                                         .withContent(
                                                 new DebugWidget(300, 300),
                                                 true

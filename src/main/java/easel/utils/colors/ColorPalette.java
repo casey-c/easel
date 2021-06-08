@@ -13,6 +13,11 @@ public interface ColorPalette {
      */
     Color TOOLTIP_TRIM();
 
+    /**
+     * @return the trim (border) highlight color of a standard tooltip
+     */
+    Color TOOLTIP_TRIM_HIGHLIGHT();
+
     // --------------------------------------------------------------------------------
     // Qualitative colors
     // --------------------------------------------------------------------------------

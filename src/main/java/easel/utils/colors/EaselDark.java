@@ -8,6 +8,7 @@ import com.badlogic.gdx.graphics.Color;
 public class EaselDark implements ColorPalette {
     private static final Color TOOLTIP_BASE = new Color(0.125f, 0.153f, 0.169f, 1.000f);
     private static final Color TOOLTIP_TRIM = new Color(0.318f, 0.341f, 0.365f, 1.000f);
+    private static final Color TOOLTIP_TRIM_HIGHLIGHT = new Color(0.435f, 0.518f, 0.537f, 0.400f);
 
     private static final Color QUAL_RED = new Color(0.839f, 0.400f, 0.443f, 1.000f);
     private static final Color QUAL_GREEN = new Color(0.329f, 0.451f, 0.349f, 1.000f);
@@ -36,6 +37,7 @@ public class EaselDark implements ColorPalette {
 
     @Override public Color TOOLTIP_BASE() { return TOOLTIP_BASE; }
     @Override public Color TOOLTIP_TRIM() { return TOOLTIP_TRIM; }
+    @Override public Color TOOLTIP_TRIM_HIGHLIGHT() { return TOOLTIP_TRIM_HIGHLIGHT; }
 
     // --------------------------------------------------------------------------------
 

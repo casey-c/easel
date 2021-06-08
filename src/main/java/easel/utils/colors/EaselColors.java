@@ -103,6 +103,7 @@ public class EaselColors {
 
     public static final Color ONE_TENTH_TRANSPARENT_BLACK = new Color(0.0f, 0.0f, 0.0f, 0.1f);
     public static final Color HALF_TRANSPARENT_WHITE = new Color(1.0f, 1.0f, 1.0f, 0.5f);
+    public static final Color EIGHTH_TRANSPARENT_WHITE = new Color(1.0f, 1.0f, 1.0f, 0.125f);
 
     private static ColorPalette activePalette = new EaselDark();
 
@@ -125,6 +126,8 @@ public class EaselColors {
      * @return the trim (border) color of a standard tooltip
      */
     public static Color TOOLTIP_TRIM() { return activePalette.TOOLTIP_TRIM(); }
+
+    public static Color TOOLTIP_TRIM_HIGHLIGHT() { return activePalette.TOOLTIP_TRIM_HIGHLIGHT(); }
 
     /**
      * @return a "qualitative"-palette friendly red color

@@ -118,6 +118,10 @@ public class MoveContainer extends AbstractWidget<MoveContainer> {
         if (InputHelper.justReleasedClickLeft) {
             this.moving = false;
 
+            if (moveTarget instanceof StyledContainer) {
+                ((StyledContainer)moveTarget).withShadows(false);
+            }
+
             UpdateSuppressor.releaseUpdateSuppression();
 //            SoundHelper.uiClick2();
         }
@@ -147,6 +151,11 @@ public class MoveContainer extends AbstractWidget<MoveContainer> {
 
                 Map.Entry<Integer, AbstractWidget> validTarget = target.get();
                 this.moveTarget = validTarget.getValue();
+
+                if (moveTarget instanceof StyledContainer) {
+                    ((StyledContainer)moveTarget).withShadows(true);
+                }
+
                 bringIndexToTop(validTarget.getKey());
 
                 // Start the move
