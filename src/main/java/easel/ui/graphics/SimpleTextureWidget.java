@@ -14,7 +14,7 @@ public class SimpleTextureWidget extends AbstractWidget<SimpleTextureWidget> {
     private float width;
     private float height;
 
-    private TextureRegion textureRegion;
+    private final TextureRegion textureRegion;
     private Color renderColor = Color.WHITE;
 
     // --------------------------------------------------------------------------------

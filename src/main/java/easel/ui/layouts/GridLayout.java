@@ -447,6 +447,16 @@ public final class GridLayout extends AbstractWidget<GridLayout> {
 
     // --------------------------------------------------------------------------------
 
+    /**
+     * The ordering of this stream is dependent on the underlying map (which does not have a predictable order).
+     * @return a stream of all children currently handled by this widget, in no particular order
+     */
+    public Stream<AbstractWidget> iterator() {
+        return this.children.values().stream().map(item -> item.widget);
+    }
+
+    // --------------------------------------------------------------------------------
+
     private void anchorChild(AbstractWidget child, int row, int col, AnchorPosition target, InterpolationSpeed withDelay) {
         // Ensure the child position is indeed tracked by this grid
         if (row >= rowHeights.size() || col >= colWidths.size()) {

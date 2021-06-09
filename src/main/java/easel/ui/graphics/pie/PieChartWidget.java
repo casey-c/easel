@@ -4,7 +4,6 @@ import com.badlogic.gdx.graphics.Color;
 import easel.ui.graphics.ShaderWidget;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 
 /**
  * Renders a circular pie chart using shaders given dynamically specified regions. There are two distinct ways to build the chart: in bulk, using the {@link #withCounts(int...)} and {@link #withColors(Color...)} methods, or region by region with repeated applications of {@link #withRegion(int, Color)}. The order the regions are rendered in the pie chart (counter-clockwise starting at the top right) is determined by the order they are inserted into this widget. You can update the count or color of a particular region if you know the index at which it was entered into the chart. When constructing the pie chart using the bulk methods, make sure you have the same number of colors as region counts (otherwise it is undefined behavior).
@@ -15,8 +14,8 @@ public class PieChartWidget extends ShaderWidget<PieChartWidget> {
     private boolean shouldRebuildThetas = true;
     private boolean shouldRebuildColors = true;
 
-    private ArrayList<Integer> countsList = new ArrayList<>();
-    private ArrayList<Float> colorsList = new ArrayList<>();
+    private final ArrayList<Integer> countsList = new ArrayList<>();
+    private final ArrayList<Float> colorsList = new ArrayList<>();
 
     private float[] thetasArray;
     private float[] colorsArray;
@@ -91,7 +90,7 @@ public class PieChartWidget extends ShaderWidget<PieChartWidget> {
 
     /**
      * Set the relative count and color of the next region in the pie chart. This function is intended to be repeatedly chained until all regions are defined, and serves as a way to individually add regions instead of doing them in bulk (e.g. {@link #withCounts(int...) etc.}. The first region constructed by this function will be the top right, with the remaining regions all relative to each other and proceeding counter-clockwise.
-     * @param count the relative size of this region (compared to any other use of {@link #withRegion(int, Color)})
+     * @param count the relative size of this region (compared to other uses of this function)
      * @param color the color for this region
      * @return this widget
      * @see #clear()

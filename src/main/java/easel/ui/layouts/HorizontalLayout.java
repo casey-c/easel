@@ -4,6 +4,8 @@ import easel.ui.AbstractWidget;
 import easel.ui.AnchorPosition;
 import easel.ui.InterpolationSpeed;
 
+import java.util.stream.Stream;
+
 /**
  * Layout widgets horizontally from left to right. Use the {@link #withChild(AbstractWidget)} family of methods to manage new widgets. The following example code constructs a new layout with a desired height of 100px and three widgets spaced 20px apart horizontally. From left to right: widget1, 20px spacing, widget2, 20px spacing, and widget3. The default child anchor is set to center, so all children added after this line will be centered vertically inside the 100px height, except for widget3 which specifies that it overrides this anchor and will be aligned to the top.
  * <pre>
@@ -58,6 +60,13 @@ public class HorizontalLayout extends AbstractOneDimensionalLayout<HorizontalLay
     public void clear() {
         super.clear();
         this.totalWidth = 0;
+    }
+
+    /**
+     * @return a stream of all children currently handled by this widget, from left to right
+     */
+    public Stream<AbstractWidget> iterator() {
+        return this.children.stream().map(item -> item.widget);
     }
 
     /**

@@ -14,6 +14,7 @@ import easel.ui.containers.MoveContainer;
 import easel.ui.containers.StyledContainer;
 import easel.ui.debug.DebugWidget;
 import easel.ui.graphics.pie.PieChartWidget;
+import easel.ui.layouts.GridLayout;
 import easel.ui.layouts.HorizontalLayout;
 import easel.ui.layouts.VerticalLayout;
 import easel.ui.text.Label;
@@ -62,74 +63,100 @@ public class Easel implements PostInitializeSubscriber, RenderSubscriber, PostUp
 //                moveContainer
 //        );
 
-        widgets.add(
-                new MoveContainer()
-                        .withChild(
-                                new StyledContainer(100, 100)
-                                        .withContent(
-                                                new VerticalLayout(100, 20)
-                                                        .withDefaultChildAnchorPosition(AnchorPosition.CENTER)
-                                                        .withChild(new Label("Row 1", EaselColors.SEQ_BLUE_0()))
-                                                        .withChild(new Label("Row 2", EaselColors.SEQ_BLUE_1()))
-                                                        .withChild(new Label("Row 3", EaselColors.SEQ_BLUE_2()))
-                                                        .withChild(new Label("Row 4", EaselColors.SEQ_BLUE_3()))
-                                                        .withChild(new Label("Row 5", EaselColors.SEQ_BLUE_4()))
-                                                        .scaleToWidestChild(),
-                                                true
-                                        )
-                                        .scaleToContent()
-                                        .anchoredCenteredOnScreen()
-                        )
-                        .withChild(
-                                new StyledContainer(100, 100)
-                                        .withHeader("Pie Chart", "Right click to randomize")
-                                        .withHeaderColor(EaselColors.HEADER_SEA_GLASS())
-                                        .withContent(
-                                                new PieChartWidget(200, 200)
-                                                        .withRegion(6, EaselColors.QUAL_RED())
-                                                        .withRegion(5, EaselColors.QUAL_GREEN())
-                                                        .withRegion(1, EaselColors.QUAL_BLUE())
-                                                        .withRegion(1, EaselColors.QUAL_PURPLE())
-                                                        .onRightClick( pie -> {
-                                                            if (EaselInputHelper.isShiftPressed()) {
-                                                                pie
-                                                                        .withCounts(6, 5, 1, 1)
-                                                                        .withColors(
-                                                                                EaselColors.QUAL_RED(),
-                                                                                EaselColors.QUAL_GREEN(),
-                                                                                EaselColors.QUAL_BLUE(),
-                                                                                EaselColors.QUAL_PURPLE());
-                                                            }
-                                                            else {
-                                                                Random r = new Random();
-                                                                int index = r.nextInt(4);
-                                                                pie.updateRegionCount(index, r.nextInt(6) + 1);
-                                                                pie.updateRegionColor(index, EaselColors.rainbow());
-                                                            }
-                                                        } )
-//                                                        .withColors(EaselColors.QUAL_RED(), EaselColors.QUAL_GREEN(), EaselColors.QUAL_BLUE(), EaselColors.QUAL_PURPLE())
-//                                                        .withCounts(6, 5, 1, 1)
-                                                ,
-                                                true
-                                        )
-                                        .scaleToContent()
-                                        .anchoredCenteredOnScreen()
-                        )
-                        .withChild(
-                                new StyledContainer(100, 100)
-                                        .withHeader("Debug Widgets", "Right click for caw caw")
-                                        .withHeaderColor(EaselColors.HEADER_RED())
-                                        .withContent(
-                                                new DebugWidget(300, 300),
-                                                true
-                                        )
-                                        .onRightClick(container -> {
-                                            EaselSoundHelper.cawCaw();
-                                        })
-                                        .scaleToContent()
-                                        .anchoredCenteredOnScreen()
-                        )
-        );
+//        HorizontalLayout layout = new HorizontalLayout(100, 20)
+//                .withChild(new StyledContainer(300, 200).withHeader("One").withContent(new Label("ONE"), true))
+//                .withChild(new StyledContainer(300, 200).withHeader("Two").withContent(new Label("TWO"), true))
+//                .withChild(new StyledContainer(300, 200).withHeader("Three").withContent(new Label("THREE"), true))
+//                .anchoredCenteredOnScreen();
+        GridLayout layout = new GridLayout()
+                .withNEvenlySizedCols(500, 2)
+                .withNEvenlySizedRows(500, 2)
+                .withChild(0, 0,
+                        new StyledContainer(300, 200).withHeader("One").withContent(new Label("ONE"), true)
+                )
+                .withChild(0, 1,
+                        new StyledContainer(300, 200).withHeader("Two").withContent(new Label("TWO"), true)
+                )
+                .withChild(1, 0,
+                        new StyledContainer(300, 200).withHeader("Three").withContent(new Label("THREE"), true)
+                )
+                .withChild(1, 1,
+                        new StyledContainer(300, 200).withHeader("Four").withContent(new Label("FOUR"), true)
+                )
+                .resizeColsToFitWidestChildren()
+                .resizeRowsToFitTallestChildren()
+                .anchoredCenteredOnScreen();
+
+        widgets.add(new MoveContainer().withAllChildrenOfLayout(layout));
+
+//        widgets.add(
+//                new MoveContainer()
+//                        .withChild(
+//                                new StyledContainer(100, 100)
+//                                        .withContent(
+//                                                new VerticalLayout(100, 20)
+//                                                        .withDefaultChildAnchorPosition(AnchorPosition.CENTER)
+//                                                        .withChild(new Label("Row 1", EaselColors.SEQ_BLUE_0()))
+//                                                        .withChild(new Label("Row 2", EaselColors.SEQ_BLUE_1()))
+//                                                        .withChild(new Label("Row 3", EaselColors.SEQ_BLUE_2()))
+//                                                        .withChild(new Label("Row 4", EaselColors.SEQ_BLUE_3()))
+//                                                        .withChild(new Label("Row 5", EaselColors.SEQ_BLUE_4()))
+//                                                        .scaleToWidestChild(),
+//                                                true
+//                                        )
+//                                        .scaleToContent()
+//                                        .anchoredCenteredOnScreen()
+//                        )
+//                        .withChild(
+//                                new StyledContainer(100, 100)
+//                                        .withHeader("Pie Chart", "Right click to randomize")
+//                                        .withHeaderColor(EaselColors.HEADER_SEA_GLASS())
+//                                        .withContent(
+//                                                new PieChartWidget(200, 200)
+//                                                        .withRegion(6, EaselColors.QUAL_RED())
+//                                                        .withRegion(5, EaselColors.QUAL_GREEN())
+//                                                        .withRegion(1, EaselColors.QUAL_BLUE())
+//                                                        .withRegion(1, EaselColors.QUAL_PURPLE())
+//                                                        .onRightClick( pie -> {
+//                                                            if (EaselInputHelper.isShiftPressed()) {
+//                                                                pie
+//                                                                        .withCounts(6, 5, 1, 1)
+//                                                                        .withColors(
+//                                                                                EaselColors.QUAL_RED(),
+//                                                                                EaselColors.QUAL_GREEN(),
+//                                                                                EaselColors.QUAL_BLUE(),
+//                                                                                EaselColors.QUAL_PURPLE());
+//                                                            }
+//                                                            else {
+//                                                                Random r = new Random();
+//                                                                int index = r.nextInt(4);
+//                                                                pie.updateRegionCount(index, r.nextInt(6) + 1);
+//                                                                pie.updateRegionColor(index, EaselColors.rainbow());
+//                                                            }
+//                                                        } )
+////                                                        .withColors(EaselColors.QUAL_RED(), EaselColors.QUAL_GREEN(), EaselColors.QUAL_BLUE(), EaselColors.QUAL_PURPLE())
+////                                                        .withCounts(6, 5, 1, 1)
+//                                                ,
+//                                                true
+//                                        )
+//                                        .scaleToContent()
+//                                        .anchoredCenteredOnScreen()
+//                        )
+//                        .withChild(
+//                                new StyledContainer(100, 100)
+//                                        .withHeader("Debug Widgets", "Right click for caw caw")
+//                                        .withHeaderColor(EaselColors.HEADER_RED())
+//                                        .withContent(
+//                                                new DebugWidget(300, 300),
+//                                                true
+//                                        )
+//                                        .onRightClick(container -> {
+//                                            EaselSoundHelper.cawCaw();
+//                                        })
+//                                        .scaleToContent()
+//                                        .anchoredCenteredOnScreen()
+//                        )
+//        );
 
 //        widgets.add(
 //                new StyledContainer(100, 100)
@@ -182,9 +209,9 @@ public class Easel implements PostInitializeSubscriber, RenderSubscriber, PostUp
 //        );
 //
         // Make a nice starting location for all these widgets
-        HorizontalLayout layout = new HorizontalLayout(100, 40);
-        widgets.forEach(layout::withChild);
-        layout.anchoredCenteredOnScreen();
+//        HorizontalLayout layout = new HorizontalLayout(100, 40);
+//        widgets.forEach(layout::withChild);
+//        layout.anchoredCenteredOnScreen();
     }
 
 

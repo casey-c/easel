@@ -5,6 +5,9 @@ import com.megacrit.cardcrawl.core.Settings;
 import com.megacrit.cardcrawl.helpers.input.InputHelper;
 import easel.ui.AbstractWidget;
 import easel.ui.AnchorPosition;
+import easel.ui.layouts.GridLayout;
+import easel.ui.layouts.HorizontalLayout;
+import easel.ui.layouts.VerticalLayout;
 import easel.utils.EaselInputHelper;
 import easel.utils.EaselMathHelper;
 import easel.utils.EaselSoundHelper;
@@ -14,24 +17,46 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.TreeMap;
 
-
+@SuppressWarnings("rawtypes")
 public class MoveContainer extends AbstractWidget<MoveContainer> {
-    private float width;
-    private float height;
-    private boolean fullscreen;
+    private final float width;
+    private final float height;
 
-    private TreeMap<Integer, AbstractWidget> map = new TreeMap<>();
+    private final TreeMap<Integer, AbstractWidget> map = new TreeMap<>();
 
     public MoveContainer() {
         this.width = Settings.WIDTH;
         this.height = Settings.HEIGHT;
-        this.fullscreen = true;
     }
 
     // --------------------------------------------------------------------------------
 
     public MoveContainer withChild(AbstractWidget child) {
         map.put(getTopMostIndex() + 1, child);
+        return this;
+    }
+
+    public MoveContainer withAllChildrenOfLayout(VerticalLayout layout) {
+        layout.iterator().forEach( child -> {
+            map.put(getTopMostIndex() + 1, child);
+        });
+
+        return this;
+    }
+
+    public MoveContainer withAllChildrenOfLayout(HorizontalLayout layout) {
+        layout.iterator().forEach( child -> {
+            map.put(getTopMostIndex() + 1, child);
+        });
+
+        return this;
+    }
+
+    public MoveContainer withAllChildrenOfLayout(GridLayout layout) {
+        layout.iterator().forEach( child -> {
+            map.put(getTopMostIndex() + 1, child);
+        });
+
         return this;
     }
 

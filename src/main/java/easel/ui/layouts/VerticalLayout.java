@@ -4,6 +4,8 @@ import easel.ui.AbstractWidget;
 import easel.ui.AnchorPosition;
 import easel.ui.InterpolationSpeed;
 
+import java.util.stream.Stream;
+
 /**
  * Layout widgets vertically from top to bottom. Use the {@link #withChild(AbstractWidget)} family of methods to manage new widgets. The following example code constructs a new layout with a desired width of 100px and three widgets spaced 20px apart vertically. From top to bottom: widget1, 20px spacing, widget2, 20px spacing, and widget3. The default child anchor is set to center, so all children added after this line will be centered horizontally inside the 100px width, except for widget3 which specifies that it overrides this anchor and will be aligned to the right most side.
  * <pre>
@@ -42,6 +44,13 @@ public class VerticalLayout extends AbstractOneDimensionalLayout<VerticalLayout>
     public void clear() {
         super.clear();
         this.totalHeight = 0;
+    }
+
+    /**
+     * @return a stream of all children currently handled by this widget, from top to bottom
+     */
+    public Stream<AbstractWidget> iterator() {
+        return this.children.stream().map(item -> item.widget);
     }
 
     @Override
