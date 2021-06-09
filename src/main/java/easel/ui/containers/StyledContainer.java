@@ -48,8 +48,6 @@ public class StyledContainer extends AbstractWidget<StyledContainer> {
     // Shadows
     private boolean renderFullShadows = false;
 
-//    private static final float SHADOW_OFFSET_X = 9;
-//    private static final float SHADOW_OFFSET_Y = 13;
     private static final float SHADOW_OFFSET_X = 7;
     private static final float SHADOW_OFFSET_Y = 7;
 
@@ -61,7 +59,6 @@ public class StyledContainer extends AbstractWidget<StyledContainer> {
 
     public StyledContainer(float width, float height) {
         this.npFullShadow = new NinePatchWidget(width, height, atlas.findRegion("shadow"))
-                //.withColor(EaselColors.EIGHTH_TRANSPARENT_WHITE);
                 .withColor(Settings.QUARTER_TRANSPARENT_WHITE_COLOR);
 
         this.npFullBase = new NinePatchWidget(width, height, atlas.findRegion("base"))
@@ -167,16 +164,13 @@ public class StyledContainer extends AbstractWidget<StyledContainer> {
 
     // --------------------------------------------------------------------------------
 
+    // TODO remember to talk about the need to refreshAnchor() afterwards
     public StyledContainer withHeaderAnchor(AnchorPosition headerAnchor) {
         this.headerAnchor = headerAnchor;
 
         if (hasHeader && !hasCustomHeader) {
             defaultHeader.forceChildAnchors(headerAnchor);
         }
-
-        // TODO: is this really necessary here? Will users ever call withHeaderAnchor() after already anchored?
-        //   Cause if not, then this is potentially anchoring twice. Should document this in the javadoc!
-//        refreshAnchor();
 
         return this;
     }
@@ -357,11 +351,5 @@ public class StyledContainer extends AbstractWidget<StyledContainer> {
 
         npFullTrim.render(sb);
         npFullTrimHighlight.render(sb);
-
-//        GraphicsHelper.drawRect(sb, getContentLeft(), getContentBottom(), getContentWidth(), getContentHeight(), DebugWidget.DEBUG_COLOR_0);
-//        GraphicsHelper.drawRect(sb, getContentLeft(), getContentBottom(), getContentWidth(), getMainContentAreaHeight(), DebugWidget.DEBUG_COLOR_1);
-//
-//        GraphicsHelper.drawRect(sb, content.getLeft(), content.getBottom(), content.getWidth(), content.getHeight(), DebugWidget.DEBUG_COLOR_2);
-//        GraphicsHelper.drawRect(sb, content.getContentLeft(), content.getContentBottom(), content.getContentWidth(), content.getContentHeight(), DebugWidget.DEBUG_COLOR_3);
     }
 }

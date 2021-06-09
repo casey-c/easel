@@ -18,6 +18,7 @@ import easel.ui.layouts.HorizontalLayout;
 import easel.ui.layouts.VerticalLayout;
 import easel.ui.text.Label;
 import easel.utils.EaselFonts;
+import easel.utils.EaselInputHelper;
 import easel.utils.EaselSoundHelper;
 import easel.utils.colors.EaselColors;
 import easel.utils.textures.TextureLoader;
@@ -25,6 +26,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import java.util.ArrayList;
+import java.util.Random;
 
 @SpireInitializer
 public class Easel implements PostInitializeSubscriber, RenderSubscriber, PostUpdateSubscriber {
@@ -80,12 +82,33 @@ public class Easel implements PostInitializeSubscriber, RenderSubscriber, PostUp
                         )
                         .withChild(
                                 new StyledContainer(100, 100)
-                                        .withHeader("Pie Chart")
+                                        .withHeader("Pie Chart", "Right click to randomize")
                                         .withHeaderColor(EaselColors.HEADER_SEA_GLASS())
                                         .withContent(
                                                 new PieChartWidget(200, 200)
-                                                        .withColors(EaselColors.QUAL_RED(), EaselColors.QUAL_GREEN(), EaselColors.QUAL_BLUE(), EaselColors.QUAL_PURPLE())
-                                                        .withCounts(6, 5, 1, 1)
+                                                        .withRegion(6, EaselColors.QUAL_RED())
+                                                        .withRegion(5, EaselColors.QUAL_GREEN())
+                                                        .withRegion(1, EaselColors.QUAL_BLUE())
+                                                        .withRegion(1, EaselColors.QUAL_PURPLE())
+                                                        .onRightClick( pie -> {
+                                                            if (EaselInputHelper.isShiftPressed()) {
+                                                                pie
+                                                                        .withCounts(6, 5, 1, 1)
+                                                                        .withColors(
+                                                                                EaselColors.QUAL_RED(),
+                                                                                EaselColors.QUAL_GREEN(),
+                                                                                EaselColors.QUAL_BLUE(),
+                                                                                EaselColors.QUAL_PURPLE());
+                                                            }
+                                                            else {
+                                                                Random r = new Random();
+                                                                int index = r.nextInt(4);
+                                                                pie.updateRegionCount(index, r.nextInt(6) + 1);
+                                                                pie.updateRegionColor(index, EaselColors.rainbow());
+                                                            }
+                                                        } )
+//                                                        .withColors(EaselColors.QUAL_RED(), EaselColors.QUAL_GREEN(), EaselColors.QUAL_BLUE(), EaselColors.QUAL_PURPLE())
+//                                                        .withCounts(6, 5, 1, 1)
                                                 ,
                                                 true
                                         )

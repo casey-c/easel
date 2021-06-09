@@ -41,6 +41,50 @@ public abstract class ShaderWidget<T extends ShaderWidget<T>> extends AbstractWi
     @Override public float getContentWidth() { return width; }
     @Override public float getContentHeight() { return height; }
 
+    // --------------------------------------------------------------------------------
+
+    /**
+     * Update the horizontal width post-constructor. May require re-anchoring afterwards.
+     * @param newWidth the new width of the widget
+     * @return this widget
+     * @see #withHeight(float)
+     * @see #withDimensions(float, float)
+     */
+    public T withWidth(float newWidth) {
+        this.width = newWidth;
+        scaleHitboxToContent();
+        return (T)this;
+    }
+
+    /**
+     * Update the vertical height post-constructor. May require re-anchoring afterwards.
+     * @param newHeight the new height of the widget
+     * @return this widget
+     * @see #withWidth(float)
+     * @see #withDimensions(float, float)
+     */
+    public T withHeight(float newHeight) {
+        this.height = newHeight;
+        scaleHitboxToContent();
+        return (T)this;
+    }
+
+    /**
+     * Update the size post-constructor. May require re-anchoring afterwards.
+     * @param newWidth the desired new content width
+     * @param newHeight the desired new content height
+     * @return this widget
+     * @see #withWidth(float)
+     * @see #withHeight(float)
+     */
+    public T withDimensions(float newWidth, float newHeight) {
+        this.width = newWidth;
+        this.height = newHeight;
+        return (T)this;
+    }
+
+    // --------------------------------------------------------------------------------
+
     protected void setUniforms() { }
 
     protected void renderTexture(SpriteBatch sb) {

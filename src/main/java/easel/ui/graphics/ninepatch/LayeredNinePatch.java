@@ -12,7 +12,7 @@ import java.util.ArrayList;
 
 /**
  * <p>
- * A collection of {@link NinePatchWidget}s stacked on top of one another. Each {@link NinePatchWidget} managed by this widget shares the same nine patch parameters (e.g. how far to the right the leftmost edge goes for the patch, etc.) and the same dimensions (width, height). This widget makes it easy to synchronize several {@link NinePatchWidget} together, such as when multiple textures combine to make a dynamically colored, multi-part whole. An example usage of this widget is in the {@link easel.ui.graphics.ninepatch.headered.HeaderedNinePatch}, which constructs a triplet of {@link NinePatchWidget}s consisting of a base layer, a header layer, and a trim layer.
+ * A collection of {@link NinePatchWidget}s stacked on top of one another. Each {@link NinePatchWidget} managed by this widget shares the same nine patch parameters (e.g. how far to the right the leftmost edge goes for the patch, etc.) and the same dimensions (width, height). This widget makes it easy to synchronize several {@link NinePatchWidget} together, such as when multiple textures combine to make a dynamically colored, multi-part whole.
  * </p>
  * <p>
  * This widget includes a couple helper functions to push layers onto the structure (see {@link #withLayer(Texture)} etc., which add a layer above any existing layers), and to manipulate the dimensions of the overall group, along with some basic methods to tweak the layer colors based on the index of when they were added.
