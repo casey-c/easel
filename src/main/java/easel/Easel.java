@@ -69,11 +69,11 @@ public class Easel implements PostInitializeSubscriber, RenderSubscriber, PostUp
                                         .withContent(
                                                 new VerticalLayout(100, 20)
                                                         .withDefaultChildAnchorPosition(AnchorPosition.CENTER)
-                                                        .withChild(new Label("Row 1", EaselColors.QUAL_RED()))
-                                                        .withChild(new Label("Row 2", EaselColors.QUAL_GREEN()))
-                                                        .withChild(new Label("Row 3", EaselColors.QUAL_BLUE()))
-                                                        .withChild(new Label("Row 4", EaselColors.QUAL_PURPLE()))
-                                                        .withChild(new Label("Row 5", EaselColors.QUAL_YELLOW()))
+                                                        .withChild(new Label("Row 1", EaselColors.SEQ_BLUE_0()))
+                                                        .withChild(new Label("Row 2", EaselColors.SEQ_BLUE_1()))
+                                                        .withChild(new Label("Row 3", EaselColors.SEQ_BLUE_2()))
+                                                        .withChild(new Label("Row 4", EaselColors.SEQ_BLUE_3()))
+                                                        .withChild(new Label("Row 5", EaselColors.SEQ_BLUE_4()))
                                                         .scaleToWidestChild(),
                                                 true
                                         )

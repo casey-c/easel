@@ -6,10 +6,19 @@ import easel.ui.InterpolationSpeed;
 
 /**
  * <p>
- * Contains various color-related helper functions and a collection of pre-chosen colors. Choosing a color from the provided sets (e.g. the <code>QUAL_</code> series) should be determined by various concerns regarding readability and purpose - don't just choose your colors randomly based on what you think might look nice! Included colors are designed to be readable against a specific background color, {@link #TOOLTIP_BASE}, and may NOT be as readable if you have something different. Accessibility concerns involving colorblindness are left to you to determine as there are a lot of different approaches to take.
+ * Contains various color-related helper functions and a collection of pre-chosen colors. Choosing a color from the provided sets (e.g. the <code>QUAL_</code> series) should be determined by various concerns regarding readability and purpose - don't just choose your colors randomly based on what you think might look nice! Included colors are designed to be readable against a specific background color, {@link #TOOLTIP_BASE}, and may NOT be as readable if you have something different. Accessibility concerns involving colorblindness are left for you to handle.
  * </p>
  * <p>
  * The "qualitative" <code>QUAL_</code> series of colors are intended to be used to differentiate elements of distinct categories. Use this set when you have multiple, unrelated items needing to be visually distinct from each other without sacrificing readability.
+ * </p>
+ * <p>
+ * The "sequential" <code>SEQ_</code> series of colors are intended to be used to indicate a progression of elements from the same category. Use elements of these sets (e.g. {@link #SEQ_BLUE_0()}, {@link #SEQ_BLUE_1()}, {@link #SEQ_BLUE_2()}) to indicate ordered values, with the lighter more desaturated colors (close to 0) typically depicting something smaller in magnitude, with the darker more saturated colors (close to 4) depicting something larger. You may not need all colors inside a set and can skip intermediate ramps if it aids visual clarity (though make sure the order is increasing in the proper way). You typically don't want to mix and match colors from different sequential sets (i.e. don't use {@link #SEQ_BLUE_0()} followed by {@link #SEQ_RED_1()}: use only blue or only red), as that conveys different meaning (you may want a qualitative set instead).
+ * </p>
+ * <p>
+ * A third, but less common, series of color ramps ("diverging" palettes) can be used to indicate a progression of values as they blend between two distinct categories. As this set isn't as applicable to the vast majority of mods as the other sets, Easel does not include any colors for this type. You may simulate it by taking the pieces of one sequential set (e.g. {@link #SEQ_BLUE_4()}, {@link #SEQ_BLUE_2()}), passing it through a neutral white color ({@link Color#WHITE}, and then taking pieces of a second sequential set (e.g. {@link #SEQ_RED_2}, {@link #SEQ_RED_4()} for the other side. If you use this approach, the darker, more saturated colors are for the extremes and they fade to desaturated white in the middle. E.g.: [dark blue → light blue → white → light red → dark red].
+ * </p>
+ * <p>
+ * More details about these types of color palettes and their intended use can be found by searching for "Color Brewer palettes" on your search engine, or by reading over the original paper (Harrower, Mark, and Cynthia A. Brewer. "ColorBrewer.org: an online tool for selecting colour schemes for maps." The Cartographic Journal 40.1 (2003))
  * </p>
  */
 public class EaselColors {
@@ -137,6 +146,9 @@ public class EaselColors {
 
     public static Color TOOLTIP_TRIM_HIGHLIGHT() { return activePalette.TOOLTIP_TRIM_HIGHLIGHT(); }
 
+    // --------------------------------------------------------------------------------
+    // Qualitative colors
+
     /**
      * @return a "qualitative"-palette friendly red color
      */
@@ -162,7 +174,7 @@ public class EaselColors {
      */
     public static Color QUAL_YELLOW() { return activePalette.QUAL_YELLOW(); }
 
-    // ----------------------------------------------------------------------------------------------------------------------------------------------------------------
+    // --------------------------------------------------------------------------------
     // More saturated header colors (shouldn't be used with excessive colors around, as they tend to dominate)
 
     /**
@@ -242,4 +254,119 @@ public class EaselColors {
      */
     public static Color HEADER_DARK_ALGAE() { return activePalette.HEADER_DARK_ALGAE(); }
 
+    // --------------------------------------------------------------------------------
+    // Sequential palettes
+
+    /**
+     * @return the first (lightest/desaturated) color in the red sequential palette
+     */
+    public static Color SEQ_RED_0() { return activePalette.SEQ_RED_0(); }
+    /**
+     * @return the second (lightest/desaturated) color in the red sequential palette
+     */
+    public static Color SEQ_RED_1() { return activePalette.SEQ_RED_1(); }
+    /**
+     * @return the third (lightest/desaturated) color in the red sequential palette
+     */
+    public static Color SEQ_RED_2() { return activePalette.SEQ_RED_2(); }
+    /**
+     * @return the fourth (lightest/desaturated) color in the red sequential palette
+     */
+    public static Color SEQ_RED_3() { return activePalette.SEQ_RED_3(); }
+    /**
+     * @return the final (darkest/most saturated) color in the red sequential palette
+     */
+    public static Color SEQ_RED_4() { return activePalette.SEQ_RED_4(); }
+
+    // --------------------------------------------------------------------------------
+
+    /**
+     * @return the first (lightest/desaturated) color in the blue sequential palette
+     */
+    public static Color SEQ_BLUE_0() { return activePalette.SEQ_BLUE_0(); }
+    /**
+     * @return the second (lightest/desaturated) color in the blue sequential palette
+     */
+    public static Color SEQ_BLUE_1() { return activePalette.SEQ_BLUE_1(); }
+    /**
+     * @return the third (lightest/desaturated) color in the blue sequential palette
+     */
+    public static Color SEQ_BLUE_2() { return activePalette.SEQ_BLUE_2(); }
+    /**
+     * @return the fourth (lightest/desaturated) color in the blue sequential palette
+     */
+    public static Color SEQ_BLUE_3() { return activePalette.SEQ_BLUE_3(); }
+    /**
+     * @return the final (darkest/most saturated) color in the blue sequential palette
+     */
+    public static Color SEQ_BLUE_4() { return activePalette.SEQ_BLUE_4(); }
+
+    // --------------------------------------------------------------------------------
+
+    /**
+     * @return the first (lightest/desaturated) color in the green sequential palette
+     */
+    public static Color SEQ_GREEN_0() { return activePalette.SEQ_GREEN_0(); }
+    /**
+     * @return the second (lightest/desaturated) color in the green sequential palette
+     */
+    public static Color SEQ_GREEN_1() { return activePalette.SEQ_GREEN_1(); }
+    /**
+     * @return the third (lightest/desaturated) color in the green sequential palette
+     */
+    public static Color SEQ_GREEN_2() { return activePalette.SEQ_GREEN_2(); }
+    /**
+     * @return the fourth (lightest/desaturated) color in the green sequential palette
+     */
+    public static Color SEQ_GREEN_3() { return activePalette.SEQ_GREEN_3(); }
+    /**
+     * @return the final (darkest/most saturated) color in the green sequential palette
+     */
+    public static Color SEQ_GREEN_4() { return activePalette.SEQ_GREEN_4(); }
+
+    // --------------------------------------------------------------------------------
+
+    /**
+     * @return the first (lightest/desaturated) color in the purple sequential palette
+     */
+    public static Color SEQ_PURPLE_0() { return activePalette.SEQ_PURPLE_0(); }
+    /**
+     * @return the second (lightest/desaturated) color in the purple sequential palette
+     */
+    public static Color SEQ_PURPLE_1() { return activePalette.SEQ_PURPLE_1(); }
+    /**
+     * @return the third (lightest/desaturated) color in the purple sequential palette
+     */
+    public static Color SEQ_PURPLE_2() { return activePalette.SEQ_PURPLE_2(); }
+    /**
+     * @return the fourth (lightest/desaturated) color in the purple sequential palette
+     */
+    public static Color SEQ_PURPLE_3() { return activePalette.SEQ_PURPLE_3(); }
+    /**
+     * @return the final (darkest/most saturated) color in the purple sequential palette
+     */
+    public static Color SEQ_PURPLE_4() { return activePalette.SEQ_PURPLE_4(); }
+
+    // --------------------------------------------------------------------------------
+
+    /**
+     * @return the first (lightest/desaturated) color in the yellow sequential palette
+     */
+    public static Color SEQ_YELLOW_0() { return activePalette.SEQ_YELLOW_0(); }
+    /**
+     * @return the second (lightest/desaturated) color in the yellow sequential palette
+     */
+    public static Color SEQ_YELLOW_1() { return activePalette.SEQ_YELLOW_1(); }
+    /**
+     * @return the third (lightest/desaturated) color in the yellow sequential palette
+     */
+    public static Color SEQ_YELLOW_2() { return activePalette.SEQ_YELLOW_2(); }
+    /**
+     * @return the fourth (lightest/desaturated) color in the yellow sequential palette
+     */
+    public static Color SEQ_YELLOW_3() { return activePalette.SEQ_YELLOW_3(); }
+    /**
+     * @return the final (darkest/most saturated) color in the yellow sequential palette
+     */
+    public static Color SEQ_YELLOW_4() { return activePalette.SEQ_YELLOW_4(); }
 }

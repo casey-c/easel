@@ -48,6 +48,123 @@ public interface ColorPalette {
     Color QUAL_YELLOW();
 
     // --------------------------------------------------------------------------------
+    // Sequential colors
+    // --------------------------------------------------------------------------------
+
+    /**
+     * @return the first (lightest/desaturated) color in the blue sequential palette
+     */
+    Color SEQ_BLUE_0();
+    /**
+     * @return the second (lightest/desaturated) color in the blue sequential palette
+     */
+    Color SEQ_BLUE_1();
+    /**
+     * @return the third (lightest/desaturated) color in the blue sequential palette
+     */
+    Color SEQ_BLUE_2();
+    /**
+     * @return the fourth (lightest / desaturated) color in the blue sequential palette
+     */
+    Color SEQ_BLUE_3();
+    /**
+     * @return the final (darkest / most saturated) color in the blue sequential palette
+     */
+    Color SEQ_BLUE_4();
+
+    // --------------------------------------------------------------------------------
+
+    /**
+     * @return the first (lightest/desaturated) color in the red sequential palette
+     */
+    Color SEQ_RED_0();
+    /**
+     * @return the second (lightest/desaturated) color in the red sequential palette
+     */
+    Color SEQ_RED_1();
+    /**
+     * @return the third (lightest/desaturated) color in the red sequential palette
+     */
+    Color SEQ_RED_2();
+    /**
+     * @return the fourth (lightest / desaturated) color in the red sequential palette
+     */
+    Color SEQ_RED_3();
+    /**
+     * @return the final (darkest / most saturated) color in the red sequential palette
+     */
+    Color SEQ_RED_4();
+
+    // --------------------------------------------------------------------------------
+
+    /**
+     * @return the first (lightest/desaturated) color in the purple sequential palette
+     */
+    Color SEQ_PURPLE_0();
+    /**
+     * @return the second (lightest/desaturated) color in the purple sequential palette
+     */
+    Color SEQ_PURPLE_1();
+    /**
+     * @return the third (lightest/desaturated) color in the purple sequential palette
+     */
+    Color SEQ_PURPLE_2();
+    /**
+     * @return the fourth (lightest / desaturated) color in the purple sequential palette
+     */
+    Color SEQ_PURPLE_3();
+    /**
+     * @return the final (darkest / most saturated) color in the purple sequential palette
+     */
+    Color SEQ_PURPLE_4();
+
+    // --------------------------------------------------------------------------------
+
+    /**
+     * @return the first (lightest/desaturated) color in the yellow sequential palette
+     */
+    Color SEQ_YELLOW_0();
+    /**
+     * @return the second (lightest/desaturated) color in the yellow sequential palette
+     */
+    Color SEQ_YELLOW_1();
+    /**
+     * @return the third (lightest/desaturated) color in the yellow sequential palette
+     */
+    Color SEQ_YELLOW_2();
+    /**
+     * @return the fourth (lightest / desaturated) color in the yellow sequential palette
+     */
+    Color SEQ_YELLOW_3();
+    /**
+     * @return the final (darkest / most saturated) color in the yellow sequential palette
+     */
+    Color SEQ_YELLOW_4();
+
+    // --------------------------------------------------------------------------------
+
+    /**
+     * @return the first (lightest/desaturated) color in the green sequential palette
+     */
+    Color SEQ_GREEN_0();
+    /**
+     * @return the second (lightest/desaturated) color in the green sequential palette
+     */
+    Color SEQ_GREEN_1();
+    /**
+     * @return the third (lightest/desaturated) color in the green sequential palette
+     */
+    Color SEQ_GREEN_2();
+    /**
+     * @return the fourth (lightest / desaturated) color in the green sequential palette
+     */
+    Color SEQ_GREEN_3();
+    /**
+     * @return the final (darkest / most saturated) color in the green sequential palette
+     */
+    Color SEQ_GREEN_4();
+
+    // --------------------------------------------------------------------------------
     // Header colors
     // --------------------------------------------------------------------------------
 
