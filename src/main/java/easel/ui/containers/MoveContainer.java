@@ -81,7 +81,7 @@ public class MoveContainer extends AbstractWidget<MoveContainer> {
     private AbstractWidget moveTarget;
 
     private float startingWidgetLeft;
-    private float startingWidgetBottom;
+    private float startingWidgetTop;
 
     private int startingMouseX;
     private int startingMouseY;
@@ -104,15 +104,15 @@ public class MoveContainer extends AbstractWidget<MoveContainer> {
         int deltaY = startingMouseY - currMouseY;
 
         float newWidgetLeft = startingWidgetLeft - deltaX;
-        float newWidgetBottom = startingWidgetBottom - deltaY;
+        float newWidgetTop = startingWidgetTop - deltaY;
 
         // Round to nearest multiple of 10
         if (EaselInputHelper.isShiftPressed()) {
             newWidgetLeft = EaselMathHelper.roundToMultipleOf(newWidgetLeft, 10);
-            newWidgetBottom = EaselMathHelper.roundToMultipleOf(newWidgetBottom, 10);
+            newWidgetTop = EaselMathHelper.roundToMultipleOf(newWidgetTop, 10);
         }
 
-        moveTarget.anchoredAt(newWidgetLeft, newWidgetBottom, AnchorPosition.LEFT_BOTTOM, 20);
+        moveTarget.anchoredAt(newWidgetLeft, newWidgetTop, AnchorPosition.LEFT_TOP, 20);
 
         // Handle releasing the mouse down
         if (InputHelper.justReleasedClickLeft) {
@@ -166,7 +166,7 @@ public class MoveContainer extends AbstractWidget<MoveContainer> {
                 this.startingMouseY = EaselInputHelper.getMouseY();
 
                 this.startingWidgetLeft = moveTarget.getLeft();
-                this.startingWidgetBottom = moveTarget.getBottom();
+                this.startingWidgetTop = moveTarget.getTop();
             }
             else {
                 UpdateSuppressor.suppressTips();
