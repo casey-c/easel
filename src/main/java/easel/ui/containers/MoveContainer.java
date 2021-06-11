@@ -1,6 +1,7 @@
 package easel.ui.containers;
 
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.google.gson.Gson;
 import com.megacrit.cardcrawl.core.Settings;
 import com.megacrit.cardcrawl.helpers.input.InputHelper;
 import easel.ui.AbstractWidget;
@@ -13,9 +14,7 @@ import easel.utils.EaselMathHelper;
 import easel.utils.EaselSoundHelper;
 import easel.utils.UpdateSuppressor;
 
-import java.util.Map;
-import java.util.Optional;
-import java.util.TreeMap;
+import java.util.*;
 import java.util.stream.Stream;
 
 @SuppressWarnings("rawtypes")
@@ -23,7 +22,20 @@ public class MoveContainer extends AbstractWidget<MoveContainer> {
     private final float width;
     private final float height;
 
-    private final TreeMap<Integer, AbstractWidget> map = new TreeMap<>();
+    //private final TreeMap<Integer, AbstractWidget> map = new TreeMap<>();
+    private final TreeMap<Integer, MapItem> map = new TreeMap<>();
+
+    private int addOrder = 0;
+
+    private static class MapItem {
+        AbstractWidget widget;
+        int addOrder;
+
+        public MapItem(AbstractWidget widget, int addOrder) {
+            this.widget = widget;
+            this.addOrder = addOrder;
+        }
+    }
 
     public MoveContainer() {
         this.width = Settings.WIDTH;
@@ -33,13 +45,13 @@ public class MoveContainer extends AbstractWidget<MoveContainer> {
     // --------------------------------------------------------------------------------
 
     public MoveContainer withChild(AbstractWidget child) {
-        map.put(getTopMostIndex() + 1, child);
+        map.put(getTopMostIndex() + 1, new MapItem(child, addOrder++));
         return this;
     }
 
     public MoveContainer withAllChildrenOfLayout(VerticalLayout layout) {
         layout.iterator().forEach( child -> {
-            map.put(getTopMostIndex() + 1, child);
+            map.put(getTopMostIndex() + 1, new MapItem(child, addOrder++));
         });
 
         return this;
@@ -47,7 +59,7 @@ public class MoveContainer extends AbstractWidget<MoveContainer> {
 
     public MoveContainer withAllChildrenOfLayout(HorizontalLayout layout) {
         layout.iterator().forEach( child -> {
-            map.put(getTopMostIndex() + 1, child);
+            map.put(getTopMostIndex() + 1, new MapItem(child, addOrder++));
         });
 
         return this;
@@ -55,7 +67,7 @@ public class MoveContainer extends AbstractWidget<MoveContainer> {
 
     public MoveContainer withAllChildrenOfLayout(GridLayout layout) {
         layout.iterator().forEach( child -> {
-            map.put(getTopMostIndex() + 1, child);
+            map.put(getTopMostIndex() + 1, new MapItem(child, addOrder++));
         });
 
         return this;
@@ -72,15 +84,15 @@ public class MoveContainer extends AbstractWidget<MoveContainer> {
     }
 
     private void bringIndexToBottom(int index) {
-        AbstractWidget widget = map.get(index);
+        MapItem item = map.get(index);
         map.remove(index);
-        map.put(getBottomMostIndex() - 1, widget);
+        map.put(getBottomMostIndex() - 1, item);
     }
 
     private void bringIndexToTop(int index) {
-        AbstractWidget widget = map.get(index);
+        MapItem item = map.get(index);
         map.remove(index);
-        map.put(getTopMostIndex() + 1, widget);
+        map.put(getTopMostIndex() + 1, item);
     }
 
     // --------------------------------------------------------------------------------
@@ -106,7 +118,7 @@ public class MoveContainer extends AbstractWidget<MoveContainer> {
      * @return a stream containing all children managed by this widget, in their render order from bottom to top
      */
     public Stream<AbstractWidget> iterator() {
-        return map.values().stream();
+        return map.values().stream().map(item -> item.widget);
     }
 
     // --------------------------------------------------------------------------------
@@ -121,10 +133,10 @@ public class MoveContainer extends AbstractWidget<MoveContainer> {
     private int startingMouseX;
     private int startingMouseY;
 
-    private Optional<Map.Entry<Integer, AbstractWidget>> findTopMostWidgetUnderMouse() {
-        for (Map.Entry<Integer, AbstractWidget> entry : map.descendingMap().entrySet()) {
-            if (entry.getValue().isMouseInBounds())
-                return Optional.of(entry);
+    private Optional<Map.Entry<Integer, MapItem>> findTopMostWidgetUnderMouse() {
+        for (Map.Entry<Integer, MapItem> item : map.descendingMap().entrySet()) {
+            if (item.getValue().widget.isMouseInBounds())
+                return Optional.of(item);
         }
 
         return Optional.empty();
@@ -165,14 +177,15 @@ public class MoveContainer extends AbstractWidget<MoveContainer> {
     @Override
     protected void updateWidget() {
         // Update all children
-        map.values().forEach(AbstractWidget::update);
+//        map.values().forEach(AbstractWidget::update);
+        iterator().forEach(AbstractWidget::update);
 
         // Test for click and drag moves
         if (moving)
             updateCurrentlyMoving();
         else {
             // Figure out the move target
-            Optional<Map.Entry<Integer, AbstractWidget>> target = findTopMostWidgetUnderMouse();
+            Optional<Map.Entry<Integer, MapItem>> target = findTopMostWidgetUnderMouse();
 
             // Nothing under mouse
             if (!target.isPresent()) {
@@ -184,8 +197,8 @@ public class MoveContainer extends AbstractWidget<MoveContainer> {
             if (InputHelper.justClickedLeft) {
                 UpdateSuppressor.suppressAll();
 
-                Map.Entry<Integer, AbstractWidget> validTarget = target.get();
-                this.moveTarget = validTarget.getValue();
+                Map.Entry<Integer, MapItem> validTarget = target.get();
+                this.moveTarget = validTarget.getValue().widget;
 
                 moveTarget.cancelMovementQueue(true);
 
@@ -219,8 +232,105 @@ public class MoveContainer extends AbstractWidget<MoveContainer> {
 
     @Override
     protected void renderWidget(SpriteBatch sb) {
-        map.values().forEach(w -> w.render(sb));
+        iterator().forEach(w -> w.render(sb));
     }
 
     // --------------------------------------------------------------------------------
+
+//    public JsonObject serialize() {
+//        JsonObject obj = new JsonObject();
+//
+////        JsonArray left = new JsonArray(map.size());
+////        JsonArray bottom = new JsonArray(map.size());
+////        JsonArray addOrders = new JsonArray(map.size());
+//
+//        JsonArray left = new JsonArray();
+//        JsonArray bottom = new JsonArray();
+//        JsonArray addOrders = new JsonArray();
+//
+//        map.values().forEach(item -> {
+//            left.add(item.widget.getLeft());
+//            bottom.add(item.widget.getBottom());
+//            addOrders.add(item.addOrder);
+//        });
+//
+//        obj.add("left", left);
+//        obj.add("bottom", bottom);
+//        obj.add("addOrders", addOrders);
+//
+//        return obj;
+//    }
+
+    private boolean updatePosition(int orderedPosition, float newLeft, float newBottom) {
+        for (MapItem item : map.values()) {
+            if (item.addOrder == orderedPosition) {
+                item.widget.anchoredAt(newLeft, newBottom, AnchorPosition.LEFT_BOTTOM);
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    private static class SerializationHelperWidget {
+        int addOrder;
+        float left;
+        float bottom;
+
+        public SerializationHelperWidget(int addOrder, AbstractWidget widget) {
+            this.addOrder = addOrder;
+            this.left = widget.getLeft();
+            this.bottom = widget.getBottom();
+        }
+    }
+
+    private static class SerializationHelperContainer {
+        List<SerializationHelperWidget> widgets;
+    }
+
+//    public boolean deserialize(JsonObject obj) {
+//        int numberValuesProperlyUpdated = 0;
+//
+//        JsonArray left = obj.get("left").getAsJsonArray();
+//        JsonArray bottom = obj.get("bottom").getAsJsonArray();
+//        JsonArray addOrders = obj.get("addOrders").getAsJsonArray();
+//
+//        for (int i = 0; i < left.size() && i < bottom.size() && i < addOrders.size(); ++i) {
+//            float l = left.get(i).getAsFloat();
+//            float b = bottom.get(i).getAsFloat();
+//            int order = addOrders.get(i).getAsInt();
+//
+//            if (updatePosition(order, l, b))
+//                ++numberValuesProperlyUpdated;
+//        }
+//
+//        return (numberValuesProperlyUpdated == map.size());
+//    }
+
+    public boolean deserialize(String jsonString) {
+        int numValuesUpdated = 0;
+
+        Gson gson = new Gson();
+        SerializationHelperContainer container = gson.fromJson(jsonString, SerializationHelperContainer.class);
+
+        if (container != null && container.widgets != null) {
+            for (SerializationHelperWidget w : container.widgets) {
+                if (updatePosition(w.addOrder, w.left, w.bottom))
+                    ++numValuesUpdated;
+            }
+        }
+
+        return (numValuesUpdated == map.size());
+    }
+
+    public String serialize() {
+        SerializationHelperContainer container = new SerializationHelperContainer();
+        container.widgets = new ArrayList<>(map.size());
+
+        for (MapItem item : map.values()) {
+            container.widgets.add(new SerializationHelperWidget(item.addOrder, item.widget));
+        }
+
+        return new Gson().toJson(container);
+    }
 }

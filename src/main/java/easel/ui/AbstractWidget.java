@@ -767,32 +767,12 @@ public abstract class AbstractWidget<T extends AbstractWidget<T>> {
      * Moves the widget to the target anchor position. This occurs when an <code>anchorAt</code> is called with an <code>InterpolationSpeed</code> other than <code>InterpolationSpeed.INSTANT</code>.
      */
     protected void resolveMovementQueue() {
-//        if (x != targetX || y != targetY) {
-//            this.x = interpolationSpeed.interpolate(x, targetX);
-//            this.y = interpolationSpeed.interpolate(y, targetY);
-//        }
-
-        // If we still have interpolated movement to do, don't apply the delayed queue stuff!
-        // TODO: still not working; i think the solution might be just to make EVERY anchor move and interpolation rely on a queue
-        //   (i.e. targetX,targetY needs to be in the movement queue with a time of 0)
-//        if (x != targetX || y != targetY)
-//            return;
-
-//        boolean hasDeltasToMove = false;
-//        float dx = 0;
-//        float dy = 0;
-//        InterpolationSpeed moveSpeed = InterpolationSpeed.INSTANT;
-//        if (delayedMovementQueue.size() >= 2) {
-//            System.out.println("QUEUE 2");
-//        }
-
         while (!delayedMovementQueue.isEmpty()) {
             Pair<Long, DelayedMovement> queueEntry = delayedMovementQueue.first();
 
             long startTime = queueEntry.getLeft();
 
             if (System.currentTimeMillis() >= startTime) {
-                //delayedMovementQueue.pollFirst();
                 DelayedMovement movement = queueEntry.getRight();
 
                 if (!movement.isStarted()) {
@@ -811,65 +791,12 @@ public abstract class AbstractWidget<T extends AbstractWidget<T>> {
                     break;
                 }
 
-//                InterpolationSpeed speed = movement.delayedSpeed;
-//                float tx = movement.x;
-//                float ty = movement.y;
-//
-//                // Make relative moves act as regular ones using the current position
-//                //   TODO: i think the bug is still here
-//                if (movement.relative) {
-//                    tx += x;
-//                    ty += y;
-//                }
-//
-//                if (x != tx || y != ty) {
-//                    this.x = speed.interpolate(x, tx);
-//                    this.y = speed.interpolate(y, ty);
-//                }
-//
-//                // Still more to move, so we need to do it next update frame
-//                if (x != tx || y != ty) {
-//                    break;
-//                }
-//                else {
-//                    // Finished this particular movement, so we can remove it from the queue
-//                    delayedMovementQueue.pollFirst();
-//                }
-
-//                translate(movement.dx, movement.dy, movement.delayedSpeed);
-//                hasDeltasToMove = true;
-
-//                dx += movement.dx;
-//                dy += movement.dy;
-
-//                moveSpeed = movement.delayedSpeed;
             }
             else {
                 // Not time for this movement yet and all later movements in the queue come after it so we can ignore them too
                 break;
             }
         }
-
-//        if (hasDeltasToMove) {
-//            translate(dx, dy, moveSpeed);
-//        }
-
-//        for (Pair<Long, DelayedMovement> movementDelay : delayedMovementQueue) {
-//
-//        }
-//
-//        // Don't start moves until we hit the movement delay start time, and once we do, clear the movement time
-//        if (hasMovementDelay) {
-//            if (System.currentTimeMillis() >= movementDelayStartTime) {
-//                hasMovementDelay = false;
-//                translate(delayedDeltaX, delayedDeltaY, delayedSpeed);
-//                //anchoredAt(getLeft() + delayedDeltaX, getBottom() + delayedDeltaY, AnchorPosition.LEFT_BOTTOM, delayedSpeed);
-//                //anchoredAt(delayedDeltaX, delayedDeltaY, delayedAnchor, delayedSpeed);
-//            } else {
-//                return;
-//            }
-//        }
-
     }
 
     /**

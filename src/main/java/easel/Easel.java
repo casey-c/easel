@@ -6,6 +6,8 @@ import basemod.interfaces.PostUpdateSubscriber;
 import basemod.interfaces.RenderSubscriber;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.evacipated.cardcrawl.modthespire.lib.SpireInitializer;
+import com.google.gson.Gson;
+import com.google.gson.JsonObject;
 import easel.config.ConfigTester;
 import easel.ui.AbstractWidget;
 import easel.ui.AnchorPosition;
@@ -17,6 +19,7 @@ import easel.ui.layouts.GridLayout;
 import easel.ui.layouts.HorizontalLayout;
 import easel.ui.text.Label;
 import easel.utils.EaselFonts;
+import easel.utils.EaselInputHelper;
 import easel.utils.textures.TextureLoader;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -113,22 +116,24 @@ public class Easel implements PostInitializeSubscriber, RenderSubscriber, PostUp
         widgets.add(
                 new MoveContainer()
                         .withAllChildrenOfLayout(layout)
-//                        .withChild(layout)
-//                        .withChild(a.anchoredCenteredOnScreen())
                         .onRightClick(container -> {
-                            delta = -delta;
+                            System.out.println("SERIALIZED------------------");
+                            System.out.println( container.serialize() );
+                            System.out.println("----------------------------");
 
-                            a.delayedTranslate(0, delta, InterpolationSpeed.MEDIUM, 100);
-                            a.delayedTranslate(0, -delta, InterpolationSpeed.MEDIUM, 200);
+                            String startingHorz = "{\"widgets\":[{\"addOrder\":0,\"left\":330.0,\"bottom\":440.0},{\"addOrder\":1,\"left\":650.0,\"bottom\":440.0},{\"addOrder\":2,\"left\":970.0,\"bottom\":440.0},{\"addOrder\":3,\"left\":1290.0,\"bottom\":440.0}]}";
 
-                            b.delayedTranslate(0, delta, InterpolationSpeed.MEDIUM, 150);
-                            b.delayedTranslate(0, -delta, InterpolationSpeed.MEDIUM, 250);
+                            String vertical1 = "{\"widgets\":[{\"addOrder\":1,\"left\":1580.0,\"bottom\":590.0},{\"addOrder\":0,\"left\":1580.0,\"bottom\":800.0},{\"addOrder\":2,\"left\":1580.0,\"bottom\":380.0},{\"addOrder\":3,\"left\":1580.0,\"bottom\":170.0}]}";
 
-                            c.delayedTranslate(0, delta, InterpolationSpeed.MEDIUM, 200);
-                            c.delayedTranslate(0, -delta, InterpolationSpeed.MEDIUM, 300);
+                            if (EaselInputHelper.isShiftPressed()) {
+                                container.deserialize(startingHorz);
+                            }
+                            else if (EaselInputHelper.isAltPressed()) {
+                                container.deserialize(vertical1);
+                            }
 
-                            d.delayedTranslate(0, delta, InterpolationSpeed.MEDIUM, 250);
-                            d.delayedTranslate(0, -delta, InterpolationSpeed.MEDIUM, 350);
+//                            String vertical = "{\"left\":[1510.0,1510.0,1510.0,1510.0],\"bottom\":[800.0,590.0,380.0,170.0],\"addOrders\":[0,1,2,3]}";
+//                            container.deserialize(new Gson().fromJson(vertical));
                         })
                         .anchoredCenteredOnScreen()
         );
