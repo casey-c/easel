@@ -309,6 +309,23 @@ public class StyledContainer extends AbstractWidget<StyledContainer> {
 
     // --------------------------------------------------------------------------------
 
+    @Override
+    protected void cancelMovementQueueForAllChildren(boolean shouldTryAndResolveOneLastTime) {
+        Stream.of(npFullBase, npFullShadow, npFullTrim, npFullTrimHighlight)
+                .forEach(elt -> elt.cancelMovementQueue(shouldTryAndResolveOneLastTime));
+        if (hasHeader) {
+            npHeaderBase.cancelMovementQueue(shouldTryAndResolveOneLastTime);
+            npHeaderTrim.cancelMovementQueue(shouldTryAndResolveOneLastTime);
+
+            if (hasCustomHeader)
+                customHeader.cancelMovementQueue(shouldTryAndResolveOneLastTime);
+            else
+                defaultHeader.cancelMovementQueue(shouldTryAndResolveOneLastTime);
+        }
+
+        if (content != null)
+            content.cancelMovementQueue(shouldTryAndResolveOneLastTime);
+    }
 
     @Override
     protected void setChildrenDelayedMovement(float deltaX, float deltaY, InterpolationSpeed movementSpeed, long startingTimeMillis) {

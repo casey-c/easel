@@ -493,6 +493,11 @@ public final class GridLayout extends AbstractWidget<GridLayout> {
         }
     }
 
+    @Override
+    protected void cancelMovementQueueForAllChildren(boolean shouldTryAndResolveOneLastTime) {
+        iterator().forEach(child -> child.cancelMovementQueue(shouldTryAndResolveOneLastTime));
+    }
+
     // --------------------------------------------------------------------------------
 
     @Override

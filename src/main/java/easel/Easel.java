@@ -67,23 +67,24 @@ public class Easel implements PostInitializeSubscriber, RenderSubscriber, PostUp
 //                .withChild(new StyledContainer(300, 200).withHeader("Two").withContent(new Label("TWO"), true))
 //                .withChild(new StyledContainer(300, 200).withHeader("Three").withContent(new Label("THREE"), true))
 //                .anchoredCenteredOnScreen();
-//        StyledContainer a = new StyledContainer(300, 200)
-//                .withHeader("One")
-//                .withContent(new Label("ONE"), true);
-//        StyledContainer b = new StyledContainer(300, 200)
-//                .withHeader("Two")
-//                .withContent(new Label("TWO"), true);
-//        StyledContainer c = new StyledContainer(300, 200)
-//                .withHeader("Three")
-//                .withContent(new Label("THREE"), true);
-//        StyledContainer d = new StyledContainer(300, 200)
-//                .withHeader("Four")
-//                .withContent(new Label("FOUR"), true);
+        StyledContainer a = new StyledContainer(300, 200)
+                .withHeader("One")
+                .withContent(new Label("ONE"), true);
+        StyledContainer b = new StyledContainer(300, 200)
+                .withHeader("Two")
+                .withContent(new Label("TWO"), true);
+        StyledContainer c = new StyledContainer(300, 200)
+                .withHeader("Three")
+                .withContent(new Label("THREE"), true);
+        StyledContainer d = new StyledContainer(300, 200)
+                .withHeader("Four")
+                .withContent(new Label("FOUR"), true);
 
-        DebugWidget a = new DebugWidget(100, 100, DebugWidget.DEBUG_COLOR_0);
-        DebugWidget b = new DebugWidget(100, 100, DebugWidget.DEBUG_COLOR_1);
-        DebugWidget c = new DebugWidget(100, 100, DebugWidget.DEBUG_COLOR_2);
-        DebugWidget d = new DebugWidget(100, 100, DebugWidget.DEBUG_COLOR_3);
+//        DebugWidget a = new DebugWidget(100, 100, DebugWidget.DEBUG_COLOR_0);
+//        DebugWidget b = new DebugWidget(100, 100, DebugWidget.DEBUG_COLOR_1);
+//        DebugWidget c = new DebugWidget(100, 100, DebugWidget.DEBUG_COLOR_2);
+//        DebugWidget d = new DebugWidget(100, 100, DebugWidget.DEBUG_COLOR_3);
+
 
         //containers.addAll(Arrays.asList(a, b, c, d));
 
@@ -95,6 +96,8 @@ public class Easel implements PostInitializeSubscriber, RenderSubscriber, PostUp
                 .withChild(d)
                 .scaleToTallestChild()
                 .anchoredCenteredOnScreen();
+
+//        widgets.add(layout);
 
 //        GridLayout layout = new GridLayout()
 //                .withNEvenlySizedCols(500, 2)
@@ -110,13 +113,22 @@ public class Easel implements PostInitializeSubscriber, RenderSubscriber, PostUp
         widgets.add(
                 new MoveContainer()
                         .withAllChildrenOfLayout(layout)
+//                        .withChild(layout)
+//                        .withChild(a.anchoredCenteredOnScreen())
                         .onRightClick(container -> {
                             delta = -delta;
 
-                            a.delayedTranslate(0, delta, InterpolationSpeed.SLOW, 100);
+                            a.delayedTranslate(0, delta, InterpolationSpeed.MEDIUM, 100);
+                            a.delayedTranslate(0, -delta, InterpolationSpeed.MEDIUM, 200);
+
                             b.delayedTranslate(0, delta, InterpolationSpeed.MEDIUM, 150);
-                            c.delayedTranslate(0, delta, InterpolationSpeed.FAST, 200);
-                            d.delayedTranslate(0, delta, InterpolationSpeed.INSTANT, 250);
+                            b.delayedTranslate(0, -delta, InterpolationSpeed.MEDIUM, 250);
+
+                            c.delayedTranslate(0, delta, InterpolationSpeed.MEDIUM, 200);
+                            c.delayedTranslate(0, -delta, InterpolationSpeed.MEDIUM, 300);
+
+                            d.delayedTranslate(0, delta, InterpolationSpeed.MEDIUM, 250);
+                            d.delayedTranslate(0, -delta, InterpolationSpeed.MEDIUM, 350);
                         })
                         .anchoredCenteredOnScreen()
         );

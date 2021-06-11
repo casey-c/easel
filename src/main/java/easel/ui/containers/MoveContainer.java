@@ -187,6 +187,8 @@ public class MoveContainer extends AbstractWidget<MoveContainer> {
                 Map.Entry<Integer, AbstractWidget> validTarget = target.get();
                 this.moveTarget = validTarget.getValue();
 
+                moveTarget.cancelMovementQueue(true);
+
                 if (moveTarget instanceof StyledContainer) {
                     ((StyledContainer)moveTarget).withShadows(true);
                 }

@@ -106,8 +106,8 @@ public abstract class AbstractWidget<T extends AbstractWidget<T>> {
     private float marginLeft, marginRight, marginTop, marginBottom;
 
     private float x, y;
-    private float targetX, targetY;
-    private InterpolationSpeed interpolationSpeed = InterpolationSpeed.INSTANT;
+//    private float targetX, targetY;
+//    private InterpolationSpeed interpolationSpeed = InterpolationSpeed.INSTANT;
 
     // --------------------------------------------------------------------------------
 
@@ -129,14 +129,82 @@ public abstract class AbstractWidget<T extends AbstractWidget<T>> {
 //    private MovableWidget movableWidget;
 
     private static final class DelayedMovement {
-        float dx;
-        float dy;
-        InterpolationSpeed delayedSpeed;
+        private boolean relative;
+        private boolean started = false;
 
-        public DelayedMovement(float dx, float dy, InterpolationSpeed delayedSpeed) {
-            this.dx = dx;
-            this.dy = dy;
+        private float x, y;
+        private float destX, destY;
+        private float currX, currY;
+
+        private InterpolationSpeed delayedSpeed;
+
+        // --------------------------------------------------------------------------------
+
+        private DelayedMovement(float x, float y, InterpolationSpeed delayedSpeed, boolean isRelative) {
+            this.x = x;
+            this.y = y;
             this.delayedSpeed = delayedSpeed;
+            this.relative = isRelative;
+        }
+
+        public static DelayedMovement absolute(float destinationX, float destinationY, InterpolationSpeed delayedSpeed) {
+            return new DelayedMovement(destinationX, destinationY, delayedSpeed, false);
+        }
+
+        public static DelayedMovement relative(float deltaX, float deltaY, InterpolationSpeed delayedSpeed) {
+            return new DelayedMovement(deltaX, deltaY, delayedSpeed, true);
+        }
+
+        // --------------------------------------------------------------------------------
+
+        public float getX() {
+            return x;
+        }
+
+        public float getY() {
+            return y;
+        }
+
+        // --------------------------------------------------------------------------------
+
+        public boolean isRelative() {
+            return relative;
+        }
+
+        public boolean isStarted() {
+            return started;
+        }
+
+        public boolean isFinished() {
+            return (currX == destX) && (currY == destY);
+        }
+
+        // --------------------------------------------------------------------------------
+
+        public void start(float currX, float currY) {
+            started = true;
+
+            this.currX = currX;
+            this.currY = currY;
+
+            if (relative) {
+                destX = currX + x;
+                destY = currY + y;
+            }
+            else {
+                destX = x;
+                destY = y;
+            }
+        }
+
+        public float interpolatedX() {
+            currX = delayedSpeed.interpolate(currX, destX);
+            return currX;
+        }
+
+        public float interpolatedY() {
+            currY = delayedSpeed.interpolate(currY, destY);
+            return currY;
         }
     }
 
@@ -260,15 +328,34 @@ public abstract class AbstractWidget<T extends AbstractWidget<T>> {
      * @see #anchoredAtClamped(float, float, AnchorPosition, InterpolationSpeed, float)
      */
     public T anchoredAt(float x, float y, AnchorPosition anchorPosition, InterpolationSpeed movementSpeed) {
-        this.targetX = anchorPosition.isLeft() ? x : (anchorPosition.isCenterX() ? x - 0.5f * getWidth() : x - getWidth());
-        this.targetY = anchorPosition.isBottom() ? y : (anchorPosition.isCenterY() ? y - 0.5f * getHeight() : y - getHeight());
+        // TODO: the target destination might need to be modified by the actual "final" target, e.g. after all the queue has been used
+        //  i think just raw using this here is probably still bad?
+//        delayedMovementQueue.add(Pair.of(System.currentTimeMillis(), new DelayedMovement(
+//                anchorPosition.getLeft(x, getWidth()),
+//                anchorPosition.getBottom(y, getHeight()),
+//                movementSpeed,
+//                false
+//        )));
 
-        this.interpolationSpeed = movementSpeed;
+        delayedMovementQueue.add(Pair.of(System.currentTimeMillis() - 10, DelayedMovement.absolute(
+                anchorPosition.getLeft(x, getWidth()),
+                anchorPosition.getBottom(y, getHeight()),
+                movementSpeed
+        )));
 
-        if (movementSpeed == InterpolationSpeed.INSTANT) {
-            this.x = targetX;
-            this.y = targetY;
-        }
+        // Attempt to resolve this move instantly
+//        if (movementSpeed == InterpolationSpeed.INSTANT)
+        resolveMovementQueue();
+
+//        this.targetX = anchorPosition.getLeft(x, getWidth());
+//        this.targetY = anchorPosition.getBottom(y, getHeight());
+//
+//        this.interpolationSpeed = movementSpeed;
+//
+//        if (movementSpeed == InterpolationSpeed.INSTANT) {
+//            this.x = targetX;
+//            this.y = targetY;
+//        }
 
         anchorHitboxOnTarget();
 
@@ -335,23 +422,41 @@ public abstract class AbstractWidget<T extends AbstractWidget<T>> {
      * @see #anchoredAt(float, float, AnchorPosition)
      */
     public final T anchoredAtClamped(float x, float y, AnchorPosition anchorPosition, InterpolationSpeed movementSpeed, float clampedBorder) {
-        this.targetX = anchorPosition.isLeft() ? x : (anchorPosition.isCenterX() ? x - 0.5f * getWidth() : x - getWidth());
-        this.targetY = anchorPosition.isBottom() ? y : (anchorPosition.isCenterY() ? y - 0.5f * getHeight() : y - getHeight());
+        float tx = anchorPosition.getLeft(x, getWidth());
+        float ty = anchorPosition.getBottom(y, getHeight());
 
         // Clamp bottom left
-        if (targetX < clampedBorder)
-            this.targetX = clampedBorder;
-        if (targetY < clampedBorder)
-            this.targetY = clampedBorder;
+        if (tx < clampedBorder)
+            tx = clampedBorder;
+        if (ty < clampedBorder)
+            ty = clampedBorder;
 
         // Clamp top right
-        if (targetX + getWidth() > (Settings.WIDTH - clampedBorder))
-            this.targetX = Settings.WIDTH - clampedBorder - getWidth();
-        if (targetY + getHeight() > (Settings.HEIGHT - clampedBorder))
-            this.targetY = Settings.HEIGHT - clampedBorder - getHeight();
+        if (tx + getWidth() > (Settings.WIDTH - clampedBorder))
+            tx = Settings.WIDTH - clampedBorder - getWidth();
+        if (ty + getHeight() > (Settings.HEIGHT - clampedBorder))
+            ty = Settings.HEIGHT - clampedBorder - getHeight();
 
         // Do the anchoring
-        return anchoredAt(targetX, targetY, AnchorPosition.LEFT_BOTTOM, movementSpeed);
+        return anchoredAt(tx, ty, AnchorPosition.LEFT_BOTTOM, movementSpeed);
+
+//        this.targetX = anchorPosition.isLeft() ? x : (anchorPosition.isCenterX() ? x - 0.5f * getWidth() : x - getWidth());
+//        this.targetY = anchorPosition.isBottom() ? y : (anchorPosition.isCenterY() ? y - 0.5f * getHeight() : y - getHeight());
+//
+//        // Clamp bottom left
+//        if (targetX < clampedBorder)
+//            this.targetX = clampedBorder;
+//        if (targetY < clampedBorder)
+//            this.targetY = clampedBorder;
+//
+//        // Clamp top right
+//        if (targetX + getWidth() > (Settings.WIDTH - clampedBorder))
+//            this.targetX = Settings.WIDTH - clampedBorder - getWidth();
+//        if (targetY + getHeight() > (Settings.HEIGHT - clampedBorder))
+//            this.targetY = Settings.HEIGHT - clampedBorder - getHeight();
+
+        // Do the anchoring
+//        return anchoredAt(targetX, targetY, AnchorPosition.LEFT_BOTTOM, movementSpeed);
     }
 
     /**
@@ -477,10 +582,10 @@ public abstract class AbstractWidget<T extends AbstractWidget<T>> {
      * @param startingTimeMillis a time generated by an offset of {@link System#currentTimeMillis()}, determined by the original {@link #delayedTranslate(float, float, InterpolationSpeed, long)} function that starts this chain
      */
     private final void setPersonalDelayedMovement(float deltaX, float deltaY, InterpolationSpeed movementSpeed, long startingTimeMillis) {
-        // TODO: bug fix the drift that occurs when chaining too quickly
-        //  --- this cop-out doesn't even work!
-        if (delayedMovementQueue.isEmpty())
-            delayedMovementQueue.add(Pair.of(startingTimeMillis, new DelayedMovement(deltaX, deltaY, movementSpeed)));
+        delayedMovementQueue.add(
+                Pair.of(startingTimeMillis, DelayedMovement.relative(deltaX, deltaY, movementSpeed))
+        );
+
     }
 
     /**
@@ -503,7 +608,29 @@ public abstract class AbstractWidget<T extends AbstractWidget<T>> {
      */
     public final void setAllDelayedMovement(float deltaX, float deltaY, InterpolationSpeed movementSpeed, long startingTimeMillis) {
         setPersonalDelayedMovement(deltaX, deltaY, movementSpeed, startingTimeMillis);
+
+        // Attempt to resolve this move instantly
+//        if (movementSpeed == InterpolationSpeed.INSTANT)
+            resolveMovementQueue();
+
         setChildrenDelayedMovement(deltaX, deltaY, movementSpeed, startingTimeMillis);
+    }
+
+    /**
+     * Cancels ALL queued movements (queued from anchoredAt calls with delays or slower interpolation speeds than INSTANT)
+     * @param shouldTryAndResolveOneLastTime if true, attempts to resolve the queue one last time (this will execute INSTANT movements that happen to be on the top of the queue, and any other move types that happen to be close enough to the finish to snap in)
+     */
+    public final void cancelMovementQueue(boolean shouldTryAndResolveOneLastTime) {
+        if (shouldTryAndResolveOneLastTime)
+            resolveMovementQueue();
+
+        delayedMovementQueue.clear();
+
+        cancelMovementQueueForAllChildren(shouldTryAndResolveOneLastTime);
+    }
+
+    protected void cancelMovementQueueForAllChildren(boolean shouldTryAndResolveOneLastTime) {
+
     }
 
     /**
@@ -639,15 +766,25 @@ public abstract class AbstractWidget<T extends AbstractWidget<T>> {
     /**
      * Moves the widget to the target anchor position. This occurs when an <code>anchorAt</code> is called with an <code>InterpolationSpeed</code> other than <code>InterpolationSpeed.INSTANT</code>.
      */
-    protected void moveTowardsTarget() {
+    protected void resolveMovementQueue() {
+//        if (x != targetX || y != targetY) {
+//            this.x = interpolationSpeed.interpolate(x, targetX);
+//            this.y = interpolationSpeed.interpolate(y, targetY);
+//        }
+
+        // If we still have interpolated movement to do, don't apply the delayed queue stuff!
+        // TODO: still not working; i think the solution might be just to make EVERY anchor move and interpolation rely on a queue
+        //   (i.e. targetX,targetY needs to be in the movement queue with a time of 0)
+//        if (x != targetX || y != targetY)
+//            return;
+
 //        boolean hasDeltasToMove = false;
 //        float dx = 0;
 //        float dy = 0;
 //        InterpolationSpeed moveSpeed = InterpolationSpeed.INSTANT;
-
-        if (delayedMovementQueue.size() >= 2) {
-            System.out.println("QUEUE 2");
-        }
+//        if (delayedMovementQueue.size() >= 2) {
+//            System.out.println("QUEUE 2");
+//        }
 
         while (!delayedMovementQueue.isEmpty()) {
             Pair<Long, DelayedMovement> queueEntry = delayedMovementQueue.first();
@@ -655,10 +792,51 @@ public abstract class AbstractWidget<T extends AbstractWidget<T>> {
             long startTime = queueEntry.getLeft();
 
             if (System.currentTimeMillis() >= startTime) {
-                delayedMovementQueue.pollFirst();
+                //delayedMovementQueue.pollFirst();
                 DelayedMovement movement = queueEntry.getRight();
 
-                translate(movement.dx, movement.dy, movement.delayedSpeed);
+                if (!movement.isStarted()) {
+                    movement.start(x, y);
+                }
+
+                this.x = movement.interpolatedX();
+                this.y = movement.interpolatedY();
+
+                if (movement.isFinished()) {
+                    // Remove this from the queue
+                    delayedMovementQueue.pollFirst();
+                }
+                else {
+                    // Don't update anything else on the queue this update frame, as we're not done with this one yet
+                    break;
+                }
+
+//                InterpolationSpeed speed = movement.delayedSpeed;
+//                float tx = movement.x;
+//                float ty = movement.y;
+//
+//                // Make relative moves act as regular ones using the current position
+//                //   TODO: i think the bug is still here
+//                if (movement.relative) {
+//                    tx += x;
+//                    ty += y;
+//                }
+//
+//                if (x != tx || y != ty) {
+//                    this.x = speed.interpolate(x, tx);
+//                    this.y = speed.interpolate(y, ty);
+//                }
+//
+//                // Still more to move, so we need to do it next update frame
+//                if (x != tx || y != ty) {
+//                    break;
+//                }
+//                else {
+//                    // Finished this particular movement, so we can remove it from the queue
+//                    delayedMovementQueue.pollFirst();
+//                }
+
+//                translate(movement.dx, movement.dy, movement.delayedSpeed);
 //                hasDeltasToMove = true;
 
 //                dx += movement.dx;
@@ -692,10 +870,6 @@ public abstract class AbstractWidget<T extends AbstractWidget<T>> {
 //            }
 //        }
 
-        if (x != targetX || y != targetY) {
-            this.x = interpolationSpeed.interpolate(x, targetX);
-            this.y = interpolationSpeed.interpolate(y, targetY);
-        }
     }
 
     /**
@@ -703,7 +877,7 @@ public abstract class AbstractWidget<T extends AbstractWidget<T>> {
      * @param sb the SpriteBatch to render this widget upon
      */
     public final void render(SpriteBatch sb) {
-        moveTowardsTarget();
+        resolveMovementQueue();
         renderWidget(sb);
 
         if (hasInteractivity)
@@ -816,15 +990,33 @@ public abstract class AbstractWidget<T extends AbstractWidget<T>> {
 //                    centerY * Settings.yScale);
 //    }
     private void anchorHitboxOnTarget() {
-        float cx = targetX + marginLeft + 0.5f * getContentWidth();
-        float cy = targetY + marginBottom + 0.5f * getContentHeight();
+        if (!hasInteractivity)
+            return;
+
+        // Figure out the final destination (after all queued moves complete)
+        float tx = x;
+        float ty = y;
+
+        for (Pair<Long, DelayedMovement> pair : delayedMovementQueue) {
+            DelayedMovement movement = pair.getRight();
+            if (movement.isRelative()) {
+                tx += movement.getX();
+                ty += movement.getY();
+            }
+            else {
+                tx = movement.getX();
+                ty = movement.getY();
+            }
+        }
+
+        float cx = tx + marginLeft + 0.5f * getContentWidth();
+        float cy = ty + marginBottom + 0.5f * getContentHeight();
 
         //public float getContentCenterX() { return x + marginLeft + 0.5f * getContentWidth(); }
         //float cx = getContentCenterX();
         //float cy = getContentCenterY();
 
-        if (hasInteractivity)
-            hb.move(cx * Settings.xScale, cy * Settings.yScale);
+        hb.move(cx * Settings.xScale, cy * Settings.yScale);
     }
 
     // --------------------------------------------------------------------------------

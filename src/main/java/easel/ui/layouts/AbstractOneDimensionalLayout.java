@@ -94,6 +94,11 @@ abstract class AbstractOneDimensionalLayout<T extends AbstractOneDimensionalLayo
         iterator().forEach(child -> child.setAllDelayedMovement(deltaX, deltaY, movementSpeed, startingTimeMillis));
     }
 
+    @Override
+    protected void cancelMovementQueueForAllChildren(boolean shouldTryAndResolveOneLastTime) {
+        iterator().forEach(child -> child.cancelMovementQueue(shouldTryAndResolveOneLastTime));
+    }
+
     /**
      * @return a stream of all children currently handled by this widget, from top to bottom
      */
