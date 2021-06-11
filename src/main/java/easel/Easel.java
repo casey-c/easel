@@ -47,6 +47,8 @@ public class Easel implements PostInitializeSubscriber, RenderSubscriber, PostUp
 
     private float delta = 80;
 
+    private String lastSerialization = "{\"widgets\":[{\"addOrder\":0,\"left\":812.0,\"bottom\":254.0},{\"addOrder\":2,\"left\":697.0,\"bottom\":189.0},{\"addOrder\":1,\"left\":779.0,\"bottom\":115.0},{\"addOrder\":3,\"left\":996.0,\"bottom\":193.0}]}";
+
     @Override
     public void receivePostInitialize() {
         TextureLoader.loadTextures();
@@ -91,7 +93,7 @@ public class Easel implements PostInitializeSubscriber, RenderSubscriber, PostUp
 
         //containers.addAll(Arrays.asList(a, b, c, d));
 
-        HorizontalLayout layout = new HorizontalLayout(100, 20)
+        HorizontalLayout layout = new HorizontalLayout(100, -40)
                 .withDefaultChildAnchorPosition(AnchorPosition.CENTER)
                 .withChild(a)
                 .withChild(b)
@@ -121,15 +123,13 @@ public class Easel implements PostInitializeSubscriber, RenderSubscriber, PostUp
                             System.out.println( container.serialize() );
                             System.out.println("----------------------------");
 
-                            String startingHorz = "{\"widgets\":[{\"addOrder\":0,\"left\":330.0,\"bottom\":440.0},{\"addOrder\":1,\"left\":650.0,\"bottom\":440.0},{\"addOrder\":2,\"left\":970.0,\"bottom\":440.0},{\"addOrder\":3,\"left\":1290.0,\"bottom\":440.0}]}";
-
-                            String vertical1 = "{\"widgets\":[{\"addOrder\":1,\"left\":1580.0,\"bottom\":590.0},{\"addOrder\":0,\"left\":1580.0,\"bottom\":800.0},{\"addOrder\":2,\"left\":1580.0,\"bottom\":380.0},{\"addOrder\":3,\"left\":1580.0,\"bottom\":170.0}]}";
-
                             if (EaselInputHelper.isShiftPressed()) {
-                                container.deserialize(startingHorz);
+                                System.out.println("STORED");
+                                lastSerialization = container.serialize();
                             }
                             else if (EaselInputHelper.isAltPressed()) {
-                                container.deserialize(vertical1);
+                                System.out.println("RESTORED");
+                                container.deserialize(lastSerialization);
                             }
 
 //                            String vertical = "{\"left\":[1510.0,1510.0,1510.0,1510.0],\"bottom\":[800.0,590.0,380.0,170.0],\"addOrders\":[0,1,2,3]}";
