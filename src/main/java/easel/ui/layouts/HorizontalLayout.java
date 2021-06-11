@@ -63,13 +63,6 @@ public class HorizontalLayout extends AbstractOneDimensionalLayout<HorizontalLay
     }
 
     /**
-     * @return a stream of all children currently handled by this widget, from left to right
-     */
-    public Stream<AbstractWidget> iterator() {
-        return this.children.stream().map(item -> item.widget);
-    }
-
-    /**
      * Replaces the <code>desiredHeight</code> set in the constructor ({@link #HorizontalLayout(float, float)}) with the height of the tallest child. Useful for dynamically scaling the height of this widget to fit the heights of its children. NOTE: should call this function AFTER adding all children and before anchoring.
      * @return this widget
      */

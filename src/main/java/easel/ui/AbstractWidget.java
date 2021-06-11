@@ -6,9 +6,11 @@ import com.megacrit.cardcrawl.helpers.Hitbox;
 import com.megacrit.cardcrawl.helpers.controller.CInputActionSet;
 import com.megacrit.cardcrawl.helpers.input.InputHelper;
 import easel.Easel;
-import easel.ui.interactive.MovableWidget;
 import easel.utils.EaselInputHelper;
+import org.apache.commons.lang3.tuple.Pair;
 
+import java.util.Comparator;
+import java.util.TreeSet;
 import java.util.function.Consumer;
 
 /**
@@ -90,7 +92,7 @@ import java.util.function.Consumer;
  * }
  * </pre>
  * <p>
- * Now when we run this sample code, the labels will still be arranged nicely (aligned along the bottom with 20px spacing in between each) but the whole thing will follow the mouse cursor. We've even used the {@link #anchoredAt(float, float, AnchorPosition, float)} override that ensures that nothing will render off-screen!
+ * Now when we run this sample code, the labels will still be arranged nicely (aligned along the bottom with 20px spacing in between each) but the whole thing will follow the mouse cursor. We've even used the {@link #anchoredAtClamped(float, float, AnchorPosition, float)} override that ensures that nothing will render off-screen!
  * </p>
  * <p>
  * Building more complicated widget hierarchies never really gets more complex than this as long as you follow the 3 step process. Often it is convenient to make your own classes extend <code>AbstractWidget</code> in order to take advantage of the various automatic layout managers; this approach is recommended once you find yourself having to deal with excessive manual placement of widgets, since the layouts were originally designed to make handling many widgets as painless as possible. As long as you stick to convention, it is pretty easy to add new functionality and compose widgets together in new and exciting ways.
@@ -123,8 +125,35 @@ public abstract class AbstractWidget<T extends AbstractWidget<T>> {
     protected Consumer<T> onMouseEnter = NOOP;
     protected Consumer<T> onMouseLeave = NOOP;
 
-    private boolean hasMovable;
-    private MovableWidget movableWidget;
+//    private boolean hasMovable;
+//    private MovableWidget movableWidget;
+
+    private static final class DelayedMovement {
+        float dx;
+        float dy;
+        InterpolationSpeed delayedSpeed;
+
+        public DelayedMovement(float dx, float dy, InterpolationSpeed delayedSpeed) {
+            this.dx = dx;
+            this.dy = dy;
+            this.delayedSpeed = delayedSpeed;
+        }
+    }
+
+    private final TreeSet<Pair<Long, DelayedMovement>> delayedMovementQueue = new TreeSet<>(new Comparator<Pair<Long, DelayedMovement>>() {
+        @Override
+        public int compare(Pair<Long, DelayedMovement> a, Pair<Long, DelayedMovement> b) {
+//            return b.getKey().compareTo(a.getKey());
+            return a.getKey().compareTo(b.getKey());
+        }
+    });
+
+//    private boolean hasMovementDelay;
+//    private long movementDelayStartTime;
+//
+//    private float delayedDeltaX;
+//    private float delayedDeltaY;
+//    private InterpolationSpeed delayedSpeed;
 
     // --------------------------------------------------------------------------------
 
@@ -210,7 +239,7 @@ public abstract class AbstractWidget<T extends AbstractWidget<T>> {
      * For example, <code>anchoredAt(100, 200, AnchorPosition.LEFT_BOTTOM, InterpolationSpeed.FAST)</code> will set the bottom-left corner of the widget to 100 pixels from the left side of the screen and 200 pixels from the bottom of the screen. The widget then renders up and to the right of this point since we anchored at an <code>AnchorPosition.LEFT_BOTTOM</code>. As a second example, using <code>AnchorPosition.CENTER</code> ensures that <code>(x, y)</code> will be the center of the widget.
      * </p>
      * <p>
-     * The interpolation speed <code>withDelay</code> determines how quickly the widget moves to the target location. Using a speed other than <code>InterpolationSpeed.INSTANT</code> makes the widget move towards the desired position over the next few frames in a smoothly animated manner. For convenience since instant moving is often the desired effect, see {@link #anchoredAt(float, float, AnchorPosition)}.
+     * The interpolation speed <code>movementSpeed</code> determines how quickly the widget moves to the target location. Using a speed other than <code>InterpolationSpeed.INSTANT</code> makes the widget move towards the desired position over the next few frames in a smoothly animated manner. For convenience since instant moving is often the desired effect, see {@link #anchoredAt(float, float, AnchorPosition)}.
      * </p>
      * <p>
      * Note: you should always anchor at least once before rendering. For more dynamic widgets that move a lot (e.g. a tooltip dependent on the mouse cursor location using <code>InputHelper.mX</code> and <code>InputHelper.mY</code>), a general pattern is to call <code>anchoredAt</code> right before rendering in your main render function, e.g.:
@@ -224,24 +253,23 @@ public abstract class AbstractWidget<T extends AbstractWidget<T>> {
      * @param x the x position in pixels from the left edge of the screen
      * @param y the y position in pixels from the bottom edge of the screen
      * @param anchorPosition what piece of the widget will be moved to <code>(x, y)</code>
-     * @param withDelay how quickly the widget will move towards the desired position
+     * @param movementSpeed how quickly the widget will move towards the desired position
      * @return this widget
      * @see #anchoredAt(float, float, AnchorPosition)
-     * @see #anchoredAt(float, float, AnchorPosition, float)
-     * @see #anchoredAt(float, float, AnchorPosition, InterpolationSpeed, float)
+     * @see #anchoredAtClamped(float, float, AnchorPosition, float)
+     * @see #anchoredAtClamped(float, float, AnchorPosition, InterpolationSpeed, float)
      */
-    public T anchoredAt(float x, float y, AnchorPosition anchorPosition, InterpolationSpeed withDelay) {
+    public T anchoredAt(float x, float y, AnchorPosition anchorPosition, InterpolationSpeed movementSpeed) {
         this.targetX = anchorPosition.isLeft() ? x : (anchorPosition.isCenterX() ? x - 0.5f * getWidth() : x - getWidth());
         this.targetY = anchorPosition.isBottom() ? y : (anchorPosition.isCenterY() ? y - 0.5f * getHeight() : y - getHeight());
 
-        this.interpolationSpeed = withDelay;
+        this.interpolationSpeed = movementSpeed;
 
-        if (withDelay == InterpolationSpeed.INSTANT) {
+        if (movementSpeed == InterpolationSpeed.INSTANT) {
             this.x = targetX;
             this.y = targetY;
         }
 
-        //moveHitboxToTarget(targetX + marginLeft, targetY + marginBottom);
         anchorHitboxOnTarget();
 
         return (T)this;
@@ -268,8 +296,8 @@ public abstract class AbstractWidget<T extends AbstractWidget<T>> {
      * @param anchorPosition what piece of the widget will be moved to <code>(x, y)</code>
      * @return this widget
      * @see #anchoredAt(float, float, AnchorPosition, InterpolationSpeed)
-     * @see #anchoredAt(float, float, AnchorPosition, float)
-     * @see #anchoredAt(float, float, AnchorPosition, InterpolationSpeed, float)
+     * @see #anchoredAtClamped(float, float, AnchorPosition, float)
+     * @see #anchoredAtClamped(float, float, AnchorPosition, InterpolationSpeed, float)
      */
     public final T anchoredAt(float x, float y, AnchorPosition anchorPosition) {
         return anchoredAt(x, y, anchorPosition, InterpolationSpeed.INSTANT);
@@ -286,7 +314,7 @@ public abstract class AbstractWidget<T extends AbstractWidget<T>> {
      * If the widget is larger than the screen in some dimension, (e.g. the widget is wider than the total width of the screen minus twice how much border spacing is allocated with <code>clampedBorder</code>), the behavior of this method should be considered undefined.
      * </p>
      * <p>
-     * The interpolation speed <code>withDelay</code> determines how quickly the widget moves to the target location. Using a speed other than <code>InterpolationSpeed.INSTANT</code> makes the widget move towards the desired position over the next few frames in a smoothly animated manner. For convenience since instant moving is often the desired effect, see {@link #anchoredAt(float, float, AnchorPosition, float)}.
+     * The interpolation speed <code>movementSpeed</code> determines how quickly the widget moves to the target location. Using a speed other than <code>InterpolationSpeed.INSTANT</code> makes the widget move towards the desired position over the next few frames in a smoothly animated manner. For convenience since instant moving is often the desired effect, see {@link #anchoredAtClamped(float, float, AnchorPosition, float)}.
      * </p>
      * <p>
      * Note: you should always anchor at least once before rendering. For more dynamic widgets that move a lot (e.g. a tooltip dependent on the mouse cursor location using <code>InputHelper.mX</code> and <code>InputHelper.mY</code>), a general pattern is to call <code>anchoredAt</code> right before rendering in your main render function, e.g.:
@@ -300,13 +328,13 @@ public abstract class AbstractWidget<T extends AbstractWidget<T>> {
      * @param x the x position in pixels from the left edge of the screen
      * @param y the y position in pixels from the bottom edge of the screen
      * @param anchorPosition what piece of the widget will be moved to <code>(x, y)</code>
-     * @param withDelay how quickly the widget will move towards the desired position
+     * @param movementSpeed how quickly the widget will move towards the desired position
      * @param clampedBorder how close this widget is allowed to get to the outer edge of the screen
      * @return this widget
-     * @see #anchoredAt(float, float, AnchorPosition, float)
+     * @see #anchoredAtClamped(float, float, AnchorPosition, float)
      * @see #anchoredAt(float, float, AnchorPosition)
      */
-    public final T anchoredAt(float x, float y, AnchorPosition anchorPosition, InterpolationSpeed withDelay, float clampedBorder) {
+    public final T anchoredAtClamped(float x, float y, AnchorPosition anchorPosition, InterpolationSpeed movementSpeed, float clampedBorder) {
         this.targetX = anchorPosition.isLeft() ? x : (anchorPosition.isCenterX() ? x - 0.5f * getWidth() : x - getWidth());
         this.targetY = anchorPosition.isBottom() ? y : (anchorPosition.isCenterY() ? y - 0.5f * getHeight() : y - getHeight());
 
@@ -323,7 +351,7 @@ public abstract class AbstractWidget<T extends AbstractWidget<T>> {
             this.targetY = Settings.HEIGHT - clampedBorder - getHeight();
 
         // Do the anchoring
-        return anchoredAt(targetX, targetY, AnchorPosition.LEFT_BOTTOM, withDelay);
+        return anchoredAt(targetX, targetY, AnchorPosition.LEFT_BOTTOM, movementSpeed);
     }
 
     /**
@@ -350,11 +378,11 @@ public abstract class AbstractWidget<T extends AbstractWidget<T>> {
      * @param anchorPosition what piece of the widget will be moved to <code>(x, y)</code>
      * @param clampedBorder how close an edge of the widget is allowed to get to an edge of the screen (in pixels)
      * @return this widget
-     * @see #anchoredAt(float, float, AnchorPosition, float)
+     * @see #anchoredAtClamped(float, float, AnchorPosition, float)
      * @see #anchoredAt(float, float, AnchorPosition)
      */
-    public final T anchoredAt(float x, float y, AnchorPosition anchorPosition, float clampedBorder) {
-        return anchoredAt(x, y, anchorPosition, InterpolationSpeed.INSTANT, clampedBorder);
+    public final T anchoredAtClamped(float x, float y, AnchorPosition anchorPosition, float clampedBorder) {
+        return anchoredAtClamped(x, y, anchorPosition, InterpolationSpeed.INSTANT, clampedBorder);
     }
 
     /**
@@ -368,17 +396,17 @@ public abstract class AbstractWidget<T extends AbstractWidget<T>> {
     }
 
     /**
-     * Moves the widget such that the widget's center point is centered on the screen's center point. The interpolation speed <code>withDelay</code> determines how quickly the move happens; if it is not <code>InterpolationSpeed.INSTANT</code>, the move will smoothly animate over the next few frames.
-     * @param withDelay how quickly to move the widget
+     * Moves the widget such that the widget's center point is centered on the screen's center point. The interpolation speed <code>movementSpeed</code> determines how quickly the move happens; if it is not <code>InterpolationSpeed.INSTANT</code>, the move will smoothly animate over the next few frames.
+     * @param movementSpeed how quickly to move the widget
      * @return this widget
      * @see #anchoredCenteredOnScreen()
      * @see #anchoredAt(float, float, AnchorPosition, InterpolationSpeed)
      */
-    public final T anchoredCenteredOnScreen(InterpolationSpeed withDelay) {
+    public final T anchoredCenteredOnScreen(InterpolationSpeed movementSpeed) {
         float screenCenterX = (Settings.WIDTH / 2.0f) / Settings.xScale;
         float screenCenterY = (Settings.HEIGHT / 2.0f) / Settings.yScale;
 
-        return anchoredAt(screenCenterX, screenCenterY, AnchorPosition.CENTER, withDelay);
+        return anchoredAt(screenCenterX, screenCenterY, AnchorPosition.CENTER, movementSpeed);
     }
 
     /**
@@ -390,13 +418,13 @@ public abstract class AbstractWidget<T extends AbstractWidget<T>> {
     }
 
     /**
-     * Instantly moves the widget such that the center of the widget is centered on the mouse position, but with an attempt to stay in bounds. Convenience function for {@link #anchoredCenteredOnMouse(float, float, AnchorPosition, float)} with no offset and {@link AnchorPosition#CENTER} as the anchor.
-     * @see #anchoredAt(float, float, AnchorPosition, float)
+     * Instantly moves the widget such that the center of the widget is centered on the mouse position, but with an attempt to stay in bounds. Convenience function for {@link #anchoredCenteredOnMouseClamped(float, float, AnchorPosition, float)} with no offset and {@link AnchorPosition#CENTER} as the anchor.
+     * @see #anchoredAtClamped(float, float, AnchorPosition, float)
      * @param clampedBorder how close the widget is allowed to get to the sides of the screen
      * @return this widget
      */
-    public final T anchoredCenteredOnMouse(float clampedBorder) {
-        return anchoredCenteredOnMouse(0, 0, AnchorPosition.CENTER,clampedBorder);
+    public final T anchoredCenteredOnMouseClamped(float clampedBorder) {
+        return anchoredCenteredOnMouseClamped(0, 0, AnchorPosition.CENTER,clampedBorder);
     }
 
     /**
@@ -421,11 +449,11 @@ public abstract class AbstractWidget<T extends AbstractWidget<T>> {
      * @param clampedBorder how close the widget is allowed to get to the sides of the screen
      * @return this widget
      */
-    public final T anchoredCenteredOnMouse(float offsetX, float offsetY, AnchorPosition anchorPosition, float clampedBorder) {
+    public final T anchoredCenteredOnMouseClamped(float offsetX, float offsetY, AnchorPosition anchorPosition, float clampedBorder) {
         float scaledX = InputHelper.mX / Settings.xScale;
         float scaledY = InputHelper.mY / Settings.yScale;
 
-        return anchoredAt(scaledX + offsetX, scaledY + offsetY, anchorPosition, clampedBorder);
+        return anchoredAtClamped(scaledX + offsetX, scaledY + offsetY, anchorPosition, clampedBorder);
     }
 
     /**
@@ -440,6 +468,77 @@ public abstract class AbstractWidget<T extends AbstractWidget<T>> {
     public final T refreshAnchor() {
         return anchoredAt(getLeft(), getBottom(), AnchorPosition.LEFT_BOTTOM);
     }
+
+    /**
+     * Sets up the necessary pieces in order to move to the target location after a delay. Called by {@link #setAllDelayedMovement(float, float, InterpolationSpeed, long)} which in turn is called whenever you {@link #delayedTranslate(float, float, InterpolationSpeed, long)} (the real, public facing access for delayed movement).
+     * @param deltaX how much movement horizontally
+     * @param deltaY how much movement vertically
+     * @param movementSpeed how fast the widget will move towards the target, once startingTimeMillis is reached (i.e. {@link System#currentTimeMillis()} is greater than or equal to this starting time)
+     * @param startingTimeMillis a time generated by an offset of {@link System#currentTimeMillis()}, determined by the original {@link #delayedTranslate(float, float, InterpolationSpeed, long)} function that starts this chain
+     */
+    private final void setPersonalDelayedMovement(float deltaX, float deltaY, InterpolationSpeed movementSpeed, long startingTimeMillis) {
+        // TODO: bug fix the drift that occurs when chaining too quickly
+        //  --- this cop-out doesn't even work!
+        if (delayedMovementQueue.isEmpty())
+            delayedMovementQueue.add(Pair.of(startingTimeMillis, new DelayedMovement(deltaX, deltaY, movementSpeed)));
+    }
+
+    /**
+     * For use with {@link #delayedTranslate(float, float, InterpolationSpeed, long)}. Make sure any widget with children (e.g. containers, layouts, etc.) overrides this function and calls {@link #setAllDelayedMovement(float, float, InterpolationSpeed, long)} using the input to this function on all direct descendants. This is required if you want to be able to use a delayed anchoredAt command on custom widgets.
+     * @param deltaX how much movement horizontally
+     * @param deltaY how much movement vertically
+     * @param movementSpeed how fast the widget will move towards the target, once startingTimeMillis is reached (i.e. {@link System#currentTimeMillis()} is greater than or equal to this starting time)
+     * @param startingTimeMillis a time generated by an offset of {@link System#currentTimeMillis()}, determined by the original {@link #delayedTranslate(float, float, InterpolationSpeed, long)} function that starts this chain
+     */
+    protected void setChildrenDelayedMovement(float deltaX, float deltaY, InterpolationSpeed movementSpeed, long startingTimeMillis) {
+        // should be overridden by containers, layouts, or any widget managing children etc.
+    }
+
+    /**
+     * Don't call directly. Used inside {@link #setChildrenDelayedMovement(float, float, InterpolationSpeed, long)} as the operation called on all a widget's children in order to percolate the results of {@link #delayedTranslate(float, float, InterpolationSpeed, long)} down the widget hierarchy. Use {@link #delayedTranslate(float, float, InterpolationSpeed, long)} if you want to use the delayed movement functionality (this function is public to make it slightly easier for widgets with children to use stream iterators, but should be considered as if it was protected and not used directly).
+     * @param deltaX how much movement horizontally
+     * @param deltaY how much movement vertically
+     * @param movementSpeed how fast the widget will move towards the target, once startingTimeMillis is reached (i.e. {@link System#currentTimeMillis()} is greater than or equal to this starting time)
+     * @param startingTimeMillis a time generated by an offset of {@link System#currentTimeMillis()}, determined by the original {@link #delayedTranslate(float, float, InterpolationSpeed, long)} function that starts this chain
+     */
+    public final void setAllDelayedMovement(float deltaX, float deltaY, InterpolationSpeed movementSpeed, long startingTimeMillis) {
+        setPersonalDelayedMovement(deltaX, deltaY, movementSpeed, startingTimeMillis);
+        setChildrenDelayedMovement(deltaX, deltaY, movementSpeed, startingTimeMillis);
+    }
+
+    /**
+     * <p>
+     * Translate the widget but delay the movement until a certain number of milliseconds have passed. Note that this is a more "advanced" anchoring function which lets you set a simple timer to aid in making more aesthetic movements (e.g. synchronizing widgets to move one after the other). This function will override any previous calls of itself if they're not completed by the time the timer expires (i.e you can only have one of these working at once, and the one that finishes first will clear the others). Custom widgets that have descendants of their own will need to override {@link #setChildrenDelayedMovement(float, float, InterpolationSpeed, long)} and call {@link #setAllDelayedMovement(float, float, InterpolationSpeed, long)} on all children in order for this function to work. By default, any widget included in this library that has descendants (e.g. layouts, containers, etc.) will already have this implemented and should be usable out of the box.
+     * </p>
+     * <p>
+     * See {@link #anchoredAt(float, float, AnchorPosition, InterpolationSpeed)} for more details about anchoring.
+     * </p>
+     * @param deltaX how much to translate horizontally (positive values are to the right)
+     * @param deltaY how much to translate vertically (positive values are towards the top)
+     * @param movementSpeed how fast the widget will move towards the target, once startingTimeMillis is reached (i.e. {@link System#currentTimeMillis()} is greater than or equal to this starting time)
+     * @param delayTimeMillis the number of milliseconds necessary to pass in the game loop before the move is started
+     * @return this widget
+     * @see #translate(float, float, InterpolationSpeed)
+     * @see #anchoredAt(float, float, AnchorPosition, InterpolationSpeed)
+     */
+    public final T delayedTranslate(float deltaX, float deltaY, InterpolationSpeed movementSpeed, long delayTimeMillis) {
+        setAllDelayedMovement(deltaX, deltaY, movementSpeed, System.currentTimeMillis() + delayTimeMillis);
+        return (T) this;
+    }
+
+    /**
+     * Translate the widget by a given amount. Translations are performed by shifting the bottom left ({@link #getLeft()}, {@link #getBottom()}) point to the right (or left if negative) a distance of <code>deltaX</code> and up (or down) a distance of <code>deltaY</code>. Translations depend on having anchored previously and are mostly included as convenience.
+     * @param deltaX how much to translate horizontally (positive values are to the right)
+     * @param deltaY how much to translate vertically (positive values are towards the top)
+     * @param movementSpeed how fast the widget will move towards the target
+     * @return this widget
+     * @see #delayedTranslate(float, float, InterpolationSpeed, long)
+     * @see #anchoredAt(float, float, AnchorPosition, InterpolationSpeed)
+     */
+    public final T translate(float deltaX, float deltaY, InterpolationSpeed movementSpeed) {
+        return anchoredAt(getLeft() + deltaX, getBottom() + deltaY, AnchorPosition.LEFT_BOTTOM, movementSpeed);
+    }
+
 
     // --------------------------------------------------------------------------------
     // These can be obtained before (x,y) are set by the anchor
@@ -541,6 +640,58 @@ public abstract class AbstractWidget<T extends AbstractWidget<T>> {
      * Moves the widget to the target anchor position. This occurs when an <code>anchorAt</code> is called with an <code>InterpolationSpeed</code> other than <code>InterpolationSpeed.INSTANT</code>.
      */
     protected void moveTowardsTarget() {
+//        boolean hasDeltasToMove = false;
+//        float dx = 0;
+//        float dy = 0;
+//        InterpolationSpeed moveSpeed = InterpolationSpeed.INSTANT;
+
+        if (delayedMovementQueue.size() >= 2) {
+            System.out.println("QUEUE 2");
+        }
+
+        while (!delayedMovementQueue.isEmpty()) {
+            Pair<Long, DelayedMovement> queueEntry = delayedMovementQueue.first();
+
+            long startTime = queueEntry.getLeft();
+
+            if (System.currentTimeMillis() >= startTime) {
+                delayedMovementQueue.pollFirst();
+                DelayedMovement movement = queueEntry.getRight();
+
+                translate(movement.dx, movement.dy, movement.delayedSpeed);
+//                hasDeltasToMove = true;
+
+//                dx += movement.dx;
+//                dy += movement.dy;
+
+//                moveSpeed = movement.delayedSpeed;
+            }
+            else {
+                // Not time for this movement yet and all later movements in the queue come after it so we can ignore them too
+                break;
+            }
+        }
+
+//        if (hasDeltasToMove) {
+//            translate(dx, dy, moveSpeed);
+//        }
+
+//        for (Pair<Long, DelayedMovement> movementDelay : delayedMovementQueue) {
+//
+//        }
+//
+//        // Don't start moves until we hit the movement delay start time, and once we do, clear the movement time
+//        if (hasMovementDelay) {
+//            if (System.currentTimeMillis() >= movementDelayStartTime) {
+//                hasMovementDelay = false;
+//                translate(delayedDeltaX, delayedDeltaY, delayedSpeed);
+//                //anchoredAt(getLeft() + delayedDeltaX, getBottom() + delayedDeltaY, AnchorPosition.LEFT_BOTTOM, delayedSpeed);
+//                //anchoredAt(delayedDeltaX, delayedDeltaY, delayedAnchor, delayedSpeed);
+//            } else {
+//                return;
+//            }
+//        }
+
         if (x != targetX || y != targetY) {
             this.x = interpolationSpeed.interpolate(x, targetX);
             this.y = interpolationSpeed.interpolate(y, targetY);
@@ -557,9 +708,6 @@ public abstract class AbstractWidget<T extends AbstractWidget<T>> {
 
         if (hasInteractivity)
             hb.render(sb);
-
-        if (hasMovable)
-            movableWidget.render(sb);
     }
 
     /**
@@ -614,11 +762,6 @@ public abstract class AbstractWidget<T extends AbstractWidget<T>> {
             else
                 this.hb.resize(getContentWidth() * Settings.xScale, getContentHeight() * Settings.yScale);
         }
-
-        if (hasMovable) {
-            this.movableWidget.hb.resize(getContentWidth() * Settings.xScale, getContentHeight() * Settings.yScale);
-        }
-
     }
 
     protected void initializeInteractivity() {
@@ -682,8 +825,6 @@ public abstract class AbstractWidget<T extends AbstractWidget<T>> {
 
         if (hasInteractivity)
             hb.move(cx * Settings.xScale, cy * Settings.yScale);
-        if (hasMovable)
-            movableWidget.hb.move(cx * Settings.xScale, cy * Settings.yScale);
     }
 
     // --------------------------------------------------------------------------------
@@ -731,10 +872,6 @@ public abstract class AbstractWidget<T extends AbstractWidget<T>> {
             // Mouse button down / up
             updateLeftClicks();
             updateRightClicks();
-        }
-
-        if (hasMovable) {
-            movableWidget.update();
         }
     }
 
@@ -785,25 +922,25 @@ public abstract class AbstractWidget<T extends AbstractWidget<T>> {
         }
     }
 
-    /**
-     * <p>
-     * Makes this widget click-and-drag-able. Left+Click and hold anywhere inside this widget's inner content bounds (e.g. in between <code>getContentLeft()</code> and <code>getContentRight()</code> etc.) to make the widget (and all its descendants) move along with the mouse. Release left click to stop moving.
-     * </p>
-     * <p>
-     * The hitbox used for this movement is created with the current dimensions of this widget (inner content width/height), and will move along with any updates to the anchor position (e.g. {@link #anchoredAt(float, float, AnchorPosition)}). Note that if you resize the widget later on (adjusting either <code>getContentWidth()</code> or <code>getContentHeight()</code> after the initial constructor / initialization phase), you may need to manually call {@link #scaleHitboxToContent()}, or this moveable hitbox won't correspond to the proper area.
-     * </p>
-     * <p>
-     * This is provided as a convenience function to easily make a widget moveable. For more complex move semantics and more flexibility, the recommended approach is to attach an external hitbox widget using {@link MovableWidget} and attach it to the highest level widget you're trying to move (making sure the attached hitbox widget moves along with the desired target widget). More details can be found on that widget's documentation page.
-     * </p>
-     * @return this widget
-     * @see MovableWidget
-     */
-    public T makeMovable() {
-        this.hasMovable = true;
-        this.movableWidget = new MovableWidget(this);
-
-        return (T)this;
-    }
+//    /**
+//     * <p>
+//     * Makes this widget click-and-drag-able. Left+Click and hold anywhere inside this widget's inner content bounds (e.g. in between <code>getContentLeft()</code> and <code>getContentRight()</code> etc.) to make the widget (and all its descendants) move along with the mouse. Release left click to stop moving.
+//     * </p>
+//     * <p>
+//     * The hitbox used for this movement is created with the current dimensions of this widget (inner content width/height), and will move along with any updates to the anchor position (e.g. {@link #anchoredAt(float, float, AnchorPosition)}). Note that if you resize the widget later on (adjusting either <code>getContentWidth()</code> or <code>getContentHeight()</code> after the initial constructor / initialization phase), you may need to manually call {@link #scaleHitboxToContent()}, or this moveable hitbox won't correspond to the proper area.
+//     * </p>
+//     * <p>
+//     * This is provided as a convenience function to easily make a widget moveable. For more complex move semantics and more flexibility, the recommended approach is to attach an external hitbox widget using {@link MovableWidget} and attach it to the highest level widget you're trying to move (making sure the attached hitbox widget moves along with the desired target widget). More details can be found on that widget's documentation page.
+//     * </p>
+//     * @return this widget
+//     * @see MovableWidget
+//     */
+//    public T makeMovable() {
+//        this.hasMovable = true;
+//        this.movableWidget = new MovableWidget(this);
+//
+//        return (T)this;
+//    }
 
     // --------------------------------------------------------------------------------
 

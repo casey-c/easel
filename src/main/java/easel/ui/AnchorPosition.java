@@ -101,6 +101,58 @@ public enum AnchorPosition {
     }
 
     /**
+     * Return the left-most point of a region with the given width where x is a point inside that region determined by this anchor. Implementation wise, this is: returns x if this anchor is left, x minus half the width if this anchor is centered, or x minus the full width if this anchor is on the right. If this doesn't make sense, you can ignore this function as it is just convenience for internal use (and it's surprisingly difficult to describe concisely).
+     * @param x a point placed inside the region according to this anchor
+     * @param width the width of the region
+     * @return the left-most point of the region
+     */
+    public float getLeft(float x, float width) {
+        return isLeft() ? x : (isCenterX() ? x - 0.5f * width : x - width);
+    }
+
+    /**
+     * Return the bottom-most point of a region with the given height where y is a point inside that region determined by this anchor. Implementation wise, this is: returns y if this anchor is bottom, y minus half the height if this anchor is centered, or y minus the full height if this anchor is on the top. If this doesn't make sense, you can ignore this function as it is just convenience for internal use (and it's surprisingly difficult to describe concisely).
+     * @param y a point placed inside the region according to this anchor
+     * @param height the height of the region
+     * @return the bottom-most point of the region
+     */
+    public float getBottom(float y, float height) {
+        return isBottom() ? y : (isCenterY() ? y - 0.5f * height : y - height);
+    }
+
+    /**
+     * Determines how much the coordinates move horizontally from a starting point to the ending point. This function allows computations to occur when the two x values are not the same anchor (if they were, you'd just be able to do <code>newX - startX</code>). This lets you quickly find the horizontal delta between ALL points in the region, given any anchored point in the original position compared to any anchored point in the new position. This assumes the width of the region stays constant, and the move is a strict translation.
+     * @param startX a point placed inside the starting region with its local position determined by startAnchor
+     * @param startAnchor the position of startX inside the starting region (is it on the left side of the region, the center, or the right)
+     * @param newX a point placed inside the ending region with its local position determined by newAnchor
+     * @param newAnchor the position of newX inside the ending region (is it on the left side of the region, the center, or the right)
+     * @param width the width of the region being translated (assumed constant)
+     * @return the horizontal delta between any same anchor position points in the region (e.g. how much the LEFT_BOTTOM point moves horizontally to become the new LEFT_BOTTOM, or the CENTER_TOP moves to become the new CENTER_TOP, etc.)
+     * @see #deltaY(float, AnchorPosition, float, AnchorPosition, float)
+     */
+    public static float deltaX(float startX, AnchorPosition startAnchor, float newX, AnchorPosition newAnchor, float width) {
+        float oldLeft = startAnchor.getLeft(startX, width);
+        float newLeft = newAnchor.getLeft(newX, width);
+        return newLeft - oldLeft;
+    }
+
+    /**
+     * Determines how much the coordinates move vertically from a starting point to the ending point. This function allows computations to occur when the two y values are not the same anchor (if they were, you'd just be able to do <code>newY - startY</code>). This lets you quickly find the vertical delta between ALL points in the region, given any anchored point in the original position compared to any anchored point in the new position. This assumes the height of the region stays constant, and the move is a strict translation.
+     * @param startY a point placed inside the starting region with its local position determined by startAnchor
+     * @param startAnchor the position of startY inside the starting region (is it on the bottom of the region, the center, or the top)
+     * @param newY a point placed inside the ending region with its local position determined by newAnchor
+     * @param newAnchor the position of newY inside the ending region (is it on the bottom of the region, the center, or the top)
+     * @param height the height of the region being translated (assumed constant)
+     * @return the vertical delta between any same anchor position points in the region (e.g. how much the LEFT_BOTTOM point moves vertically to become the new LEFT_BOTTOM, or the CENTER_TOP moves to become the new CENTER_TOP, etc.)
+     * @see #deltaX(float, AnchorPosition, float, AnchorPosition, float)
+     */
+    public static float deltaY(float startY, AnchorPosition startAnchor, float newY, AnchorPosition newAnchor, float height) {
+        float oldBottom = startAnchor.getBottom(startY, height);
+        float newBottom = newAnchor.getBottom(newY, height);
+        return newBottom - oldBottom;
+    }
+
+    /**
      * Produces a new anchor position which takes the horizontal position from <code>horizontal</code> and the vertical position from <code>vertical</code>.
      * @param horizontal determines if the output anchor is <code>LEFT_</code>, <code>CENTER_</code>, or <code>RIGHT_</code>.
      * @param vertical determines if the output anchor is <code>_BOTTOM</code>, <code>_CENTER</code>, or <code>_TOP</code>.

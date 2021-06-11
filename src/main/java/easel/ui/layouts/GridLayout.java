@@ -496,13 +496,18 @@ public final class GridLayout extends AbstractWidget<GridLayout> {
     // --------------------------------------------------------------------------------
 
     @Override
-    public GridLayout anchoredAt(float x, float y, AnchorPosition anchorPosition, InterpolationSpeed withDelay) {
-        super.anchoredAt(x, y, anchorPosition, withDelay);
-        anchorAllChildren(withDelay);
+    public GridLayout anchoredAt(float x, float y, AnchorPosition anchorPosition, InterpolationSpeed movementSpeed) {
+        super.anchoredAt(x, y, anchorPosition, movementSpeed);
+        anchorAllChildren(movementSpeed);
         return this;
     }
 
-//    @Override
+    @Override
+    protected void setChildrenDelayedMovement(float deltaX, float deltaY, InterpolationSpeed movementSpeed, long startingTimeMillis) {
+        iterator().forEach(child -> child.setAllDelayedMovement(deltaX, deltaY, movementSpeed, startingTimeMillis));
+    }
+
+    //    @Override
 //    public GridLayout anchoredAt(float x, float y, AnchorPosition anchorPosition) {
 //        return anchoredAt(x, y, anchorPosition, InterpolationSpeed.INSTANT);
 //    }

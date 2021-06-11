@@ -6,6 +6,7 @@ import easel.ui.AnchorPosition;
 import easel.ui.InterpolationSpeed;
 
 import java.util.ArrayList;
+import java.util.stream.Stream;
 
 abstract class AbstractOneDimensionalLayout<T extends AbstractOneDimensionalLayout<T>> extends AbstractWidget<T> {
     protected ArrayList<LayoutItem> children = new ArrayList<>();
@@ -82,12 +83,23 @@ abstract class AbstractOneDimensionalLayout<T extends AbstractOneDimensionalLayo
     // --------------------------------------------------------------------------------
 
     @Override
-    public T anchoredAt(float x, float y, AnchorPosition anchorPosition, InterpolationSpeed withDelay) {
-        super.anchoredAt(x, y, anchorPosition, withDelay);
-        anchorChildren(withDelay);
+    public T anchoredAt(float x, float y, AnchorPosition anchorPosition, InterpolationSpeed movementSpeed) {
+        super.anchoredAt(x, y, anchorPosition, movementSpeed);
+        anchorChildren(movementSpeed);
         return (T)this;
     }
 
+    @Override
+    protected void setChildrenDelayedMovement(float deltaX, float deltaY, InterpolationSpeed movementSpeed, long startingTimeMillis) {
+        iterator().forEach(child -> child.setAllDelayedMovement(deltaX, deltaY, movementSpeed, startingTimeMillis));
+    }
+
+    /**
+     * @return a stream of all children currently handled by this widget, from top to bottom
+     */
+    public Stream<AbstractWidget> iterator() {
+        return this.children.stream().map(item -> item.widget);
+    }
 
     // --------------------------------------------------------------------------------
 

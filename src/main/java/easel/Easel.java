@@ -4,30 +4,25 @@ import basemod.BaseMod;
 import basemod.interfaces.PostInitializeSubscriber;
 import basemod.interfaces.PostUpdateSubscriber;
 import basemod.interfaces.RenderSubscriber;
-import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.evacipated.cardcrawl.modthespire.lib.SpireInitializer;
 import easel.config.ConfigTester;
 import easel.ui.AbstractWidget;
 import easel.ui.AnchorPosition;
+import easel.ui.InterpolationSpeed;
 import easel.ui.containers.MoveContainer;
 import easel.ui.containers.StyledContainer;
 import easel.ui.debug.DebugWidget;
-import easel.ui.graphics.pie.PieChartWidget;
 import easel.ui.layouts.GridLayout;
 import easel.ui.layouts.HorizontalLayout;
-import easel.ui.layouts.VerticalLayout;
 import easel.ui.text.Label;
 import easel.utils.EaselFonts;
-import easel.utils.EaselInputHelper;
-import easel.utils.EaselSoundHelper;
-import easel.utils.colors.EaselColors;
 import easel.utils.textures.TextureLoader;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import java.util.ArrayList;
-import java.util.Random;
+import java.util.Arrays;
 
 @SpireInitializer
 public class Easel implements PostInitializeSubscriber, RenderSubscriber, PostUpdateSubscriber {
@@ -44,6 +39,10 @@ public class Easel implements PostInitializeSubscriber, RenderSubscriber, PostUp
     private ArrayList<AbstractWidget> widgets = new ArrayList<>();
 //    private AnchorPosition ap = AnchorPosition.LEFT_TOP;
 //    private enum SwapWindows { MAIN, SECONDARY };
+
+    private ArrayList<StyledContainer> containers = new ArrayList<>();
+
+    private float delta = 80;
 
     @Override
     public void receivePostInitialize() {
@@ -68,26 +67,59 @@ public class Easel implements PostInitializeSubscriber, RenderSubscriber, PostUp
 //                .withChild(new StyledContainer(300, 200).withHeader("Two").withContent(new Label("TWO"), true))
 //                .withChild(new StyledContainer(300, 200).withHeader("Three").withContent(new Label("THREE"), true))
 //                .anchoredCenteredOnScreen();
-        GridLayout layout = new GridLayout()
-                .withNEvenlySizedCols(500, 2)
-                .withNEvenlySizedRows(500, 2)
-                .withChild(0, 0,
-                        new StyledContainer(300, 200).withHeader("One").withContent(new Label("ONE"), true)
-                )
-                .withChild(0, 1,
-                        new StyledContainer(300, 200).withHeader("Two").withContent(new Label("TWO"), true)
-                )
-                .withChild(1, 0,
-                        new StyledContainer(300, 200).withHeader("Three").withContent(new Label("THREE"), true)
-                )
-                .withChild(1, 1,
-                        new StyledContainer(300, 200).withHeader("Four").withContent(new Label("FOUR"), true)
-                )
-                .resizeColsToFitWidestChildren()
-                .resizeRowsToFitTallestChildren()
+//        StyledContainer a = new StyledContainer(300, 200)
+//                .withHeader("One")
+//                .withContent(new Label("ONE"), true);
+//        StyledContainer b = new StyledContainer(300, 200)
+//                .withHeader("Two")
+//                .withContent(new Label("TWO"), true);
+//        StyledContainer c = new StyledContainer(300, 200)
+//                .withHeader("Three")
+//                .withContent(new Label("THREE"), true);
+//        StyledContainer d = new StyledContainer(300, 200)
+//                .withHeader("Four")
+//                .withContent(new Label("FOUR"), true);
+
+        DebugWidget a = new DebugWidget(100, 100, DebugWidget.DEBUG_COLOR_0);
+        DebugWidget b = new DebugWidget(100, 100, DebugWidget.DEBUG_COLOR_1);
+        DebugWidget c = new DebugWidget(100, 100, DebugWidget.DEBUG_COLOR_2);
+        DebugWidget d = new DebugWidget(100, 100, DebugWidget.DEBUG_COLOR_3);
+
+        //containers.addAll(Arrays.asList(a, b, c, d));
+
+        HorizontalLayout layout = new HorizontalLayout(100, 20)
+                .withDefaultChildAnchorPosition(AnchorPosition.CENTER)
+                .withChild(a)
+                .withChild(b)
+                .withChild(c)
+                .withChild(d)
+                .scaleToTallestChild()
                 .anchoredCenteredOnScreen();
 
-        widgets.add(new MoveContainer().withAllChildrenOfLayout(layout));
+//        GridLayout layout = new GridLayout()
+//                .withNEvenlySizedCols(500, 2)
+//                .withNEvenlySizedRows(500, 2)
+//                .withChild(0, 0, a )
+//                .withChild(0, 1, b )
+//                .withChild(1, 0, c )
+//                .withChild(1, 1, d )
+//                .resizeColsToFitWidestChildren()
+//                .resizeRowsToFitTallestChildren()
+//                .anchoredCenteredOnScreen();
+
+        widgets.add(
+                new MoveContainer()
+                        .withAllChildrenOfLayout(layout)
+                        .onRightClick(container -> {
+                            delta = -delta;
+
+                            a.delayedTranslate(0, delta, InterpolationSpeed.SLOW, 100);
+                            b.delayedTranslate(0, delta, InterpolationSpeed.MEDIUM, 150);
+                            c.delayedTranslate(0, delta, InterpolationSpeed.FAST, 200);
+                            d.delayedTranslate(0, delta, InterpolationSpeed.INSTANT, 250);
+                        })
+                        .anchoredCenteredOnScreen()
+        );
 
 //        widgets.add(
 //                new MoveContainer()
@@ -226,8 +258,22 @@ public class Easel implements PostInitializeSubscriber, RenderSubscriber, PostUp
         });
     }
 
+    private long nextUpdateTime;
+    private int numShifts;
+
     @Override
     public void receivePostUpdate() {
         widgets.forEach(AbstractWidget::update);
+//
+//
+//        if (System.currentTimeMillis() > nextUpdateTime) {
+//            float delta = (numShifts++ % 2 == 0) ? 20 : -20;
+//
+//            AtomicLong time = new AtomicLong(200);
+//            for (StyledContainer c : containers)
+//                c.delayedAnchoredAt(c.getLeft(), c.getBottom() + delta, AnchorPosition.LEFT_BOTTOM, InterpolationSpeed.FAST, time.addAndGet(100));
+//
+//            nextUpdateTime = System.currentTimeMillis() + 600;
+//        }
     }
 }

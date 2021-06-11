@@ -108,8 +108,8 @@ public class SwapContainer<T extends Enum<T>> extends AbstractWidget<SwapContain
     // --------------------------------------------------------------------------------
 
     @Override
-    public SwapContainer<T> anchoredAt(float x, float y, AnchorPosition anchorPosition, InterpolationSpeed withDelay) {
-        super.anchoredAt(x, y, anchorPosition, withDelay);
+    public SwapContainer<T> anchoredAt(float x, float y, AnchorPosition anchorPosition, InterpolationSpeed movementSpeed) {
+        super.anchoredAt(x, y, anchorPosition, movementSpeed);
 
         for (int i = 0; i < widgets.length; ++i) {
             AbstractWidget w = widgets[i];
@@ -123,7 +123,7 @@ public class SwapContainer<T extends Enum<T>> extends AbstractWidget<SwapContain
                 float wx = anchor.getXFromLeft(getContentLeft(), getContentWidth());
                 float wy = anchor.getYFromBottom(getContentBottom(), getContentHeight());
 
-                w.anchoredAt(wx, wy, anchor, withDelay);
+                w.anchoredAt(wx, wy, anchor, movementSpeed);
             }
         }
 

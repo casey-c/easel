@@ -171,8 +171,8 @@ public class NinePatchWidget extends AbstractWidget<NinePatchWidget> {
     @Override public float getContentHeight() { return prefHeight; }
 
     @Override
-    public NinePatchWidget anchoredAt(float x, float y, AnchorPosition anchorPosition, InterpolationSpeed withDelay) {
-        return super.anchoredAt(Math.round(x), Math.round(y), anchorPosition, withDelay);
+    public NinePatchWidget anchoredAt(float x, float y, AnchorPosition anchorPosition, InterpolationSpeed movementSpeed) {
+        return super.anchoredAt(Math.round(x), Math.round(y), anchorPosition, movementSpeed);
     }
 
     @Override

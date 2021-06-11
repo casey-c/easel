@@ -1,7 +1,6 @@
 package easel.ui.interactive;
 
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
-import com.megacrit.cardcrawl.core.Settings;
 import com.megacrit.cardcrawl.helpers.input.InputHelper;
 import easel.ui.AbstractWidget;
 import easel.ui.AnchorPosition;
@@ -78,7 +77,7 @@ public class MovableWidget extends AbstractWidget<MovableWidget> {
         float newWidgetLeft = startingWidgetLeft - deltaX;
         float newWidgetBottom = startingWidgetBottom - deltaY;
 
-        moveTarget.anchoredAt(newWidgetLeft, newWidgetBottom, AnchorPosition.LEFT_BOTTOM, 20);
+        moveTarget.anchoredAtClamped(newWidgetLeft, newWidgetBottom, AnchorPosition.LEFT_BOTTOM, 20);
 
         // Handle releasing the mouse down
         if (InputHelper.justReleasedClickLeft) {

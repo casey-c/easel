@@ -16,6 +16,7 @@ import easel.utils.UpdateSuppressor;
 import java.util.Map;
 import java.util.Optional;
 import java.util.TreeMap;
+import java.util.stream.Stream;
 
 @SuppressWarnings("rawtypes")
 public class MoveContainer extends AbstractWidget<MoveContainer> {
@@ -101,6 +102,15 @@ public class MoveContainer extends AbstractWidget<MoveContainer> {
 
     // --------------------------------------------------------------------------------
 
+    /**
+     * @return a stream containing all children managed by this widget, in their render order from bottom to top
+     */
+    public Stream<AbstractWidget> iterator() {
+        return map.values().stream();
+    }
+
+    // --------------------------------------------------------------------------------
+
     private boolean moving;
 
     private AbstractWidget moveTarget;
@@ -137,7 +147,7 @@ public class MoveContainer extends AbstractWidget<MoveContainer> {
             newWidgetTop = EaselMathHelper.roundToMultipleOf(newWidgetTop, 10);
         }
 
-        moveTarget.anchoredAt(newWidgetLeft, newWidgetTop, AnchorPosition.LEFT_TOP, 20);
+        moveTarget.anchoredAtClamped(newWidgetLeft, newWidgetTop, AnchorPosition.LEFT_TOP, 20);
 
         // Handle releasing the mouse down
         if (InputHelper.justReleasedClickLeft) {

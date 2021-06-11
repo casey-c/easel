@@ -16,6 +16,9 @@ import easel.utils.colors.EaselColors;
 import easel.utils.textures.TextureAtlasDatabase;
 import easel.utils.textures.TextureDatabase;
 
+import java.util.Arrays;
+import java.util.stream.Stream;
+
 public class StyledContainer extends AbstractWidget<StyledContainer> {
     private float width;
     private float height;
@@ -266,26 +269,26 @@ public class StyledContainer extends AbstractWidget<StyledContainer> {
     // --------------------------------------------------------------------------------
 
     @Override
-    public StyledContainer anchoredAt(float x, float y, AnchorPosition anchorPosition, InterpolationSpeed withDelay) {
-        super.anchoredAt(x, y, anchorPosition, withDelay);
+    public StyledContainer anchoredAt(float x, float y, AnchorPosition anchorPosition, InterpolationSpeed movementSpeed) {
+        super.anchoredAt(x, y, anchorPosition, movementSpeed);
 
-        npFullShadow.anchoredAt(getContentLeft() + SHADOW_OFFSET_X, getContentTop() - SHADOW_OFFSET_Y, AnchorPosition.LEFT_TOP, withDelay);
-        npFullBase.anchoredAt(getContentLeft(), getContentTop(), AnchorPosition.LEFT_TOP, withDelay);
-        npFullTrim.anchoredAt(getContentLeft(), getContentTop(), AnchorPosition.LEFT_TOP, withDelay);
-        npFullTrimHighlight.anchoredAt(getContentLeft(), getContentTop(), AnchorPosition.LEFT_TOP, withDelay);
+        npFullShadow.anchoredAt(getContentLeft() + SHADOW_OFFSET_X, getContentTop() - SHADOW_OFFSET_Y, AnchorPosition.LEFT_TOP, movementSpeed);
+        npFullBase.anchoredAt(getContentLeft(), getContentTop(), AnchorPosition.LEFT_TOP, movementSpeed);
+        npFullTrim.anchoredAt(getContentLeft(), getContentTop(), AnchorPosition.LEFT_TOP, movementSpeed);
+        npFullTrimHighlight.anchoredAt(getContentLeft(), getContentTop(), AnchorPosition.LEFT_TOP, movementSpeed);
 
         // Header
         if (hasHeader) {
-            npHeaderBase.anchoredAt(getContentLeft(), getContentTop(), AnchorPosition.LEFT_TOP, withDelay);
-            npHeaderTrim.anchoredAt(getContentLeft(), getContentTop(), AnchorPosition.LEFT_TOP, withDelay);
+            npHeaderBase.anchoredAt(getContentLeft(), getContentTop(), AnchorPosition.LEFT_TOP, movementSpeed);
+            npHeaderTrim.anchoredAt(getContentLeft(), getContentTop(), AnchorPosition.LEFT_TOP, movementSpeed);
 
             float hx = headerAnchor.getXFromLeft(getContentLeft(), getContentWidth());
             float hy = headerAnchor.getYFromTop(getContentTop(), getHeaderHeight());
 
             if (hasCustomHeader)
-                customHeader.anchoredAt(hx, hy, headerAnchor, withDelay);
+                customHeader.anchoredAt(hx, hy, headerAnchor, movementSpeed);
             else
-                defaultHeader.anchoredAt(hx, hy, headerAnchor, withDelay);
+                defaultHeader.anchoredAt(hx, hy, headerAnchor, movementSpeed);
         }
 
         // Content
@@ -297,12 +300,34 @@ public class StyledContainer extends AbstractWidget<StyledContainer> {
             //   the content anchoring may shift off a few pixels to the left and right and because of this
             //   scaleToContent() WILL no longer make the contentAnchor obsolete
 
-            content.anchoredAt(cx, cy, contentAnchor, withDelay);
+            content.anchoredAt(cx, cy, contentAnchor, movementSpeed);
         }
 
         return this;
     }
 
+
+    // --------------------------------------------------------------------------------
+
+
+    @Override
+    protected void setChildrenDelayedMovement(float deltaX, float deltaY, InterpolationSpeed movementSpeed, long startingTimeMillis) {
+        Stream.of(npFullBase, npFullShadow, npFullTrim, npFullTrimHighlight)
+                .forEach(elt -> elt.setAllDelayedMovement(deltaX, deltaY, movementSpeed, startingTimeMillis));
+
+        if (hasHeader) {
+            npHeaderBase.setAllDelayedMovement(deltaX, deltaY, movementSpeed, startingTimeMillis);
+            npHeaderTrim.setAllDelayedMovement(deltaX, deltaY, movementSpeed, startingTimeMillis);
+
+            if (hasCustomHeader)
+                customHeader.setAllDelayedMovement(deltaX, deltaY, movementSpeed, startingTimeMillis);
+            else
+                defaultHeader.setAllDelayedMovement(deltaX, deltaY, movementSpeed, startingTimeMillis);
+        }
+
+        if (content != null)
+            content.setAllDelayedMovement(deltaX, deltaY, movementSpeed, startingTimeMillis);
+    }
 
     // --------------------------------------------------------------------------------
 

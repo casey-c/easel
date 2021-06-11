@@ -189,9 +189,9 @@ public class LayeredNinePatch extends AbstractWidget<LayeredNinePatch> {
     }
 
     @Override
-    public LayeredNinePatch anchoredAt(float x, float y, AnchorPosition anchorPosition, InterpolationSpeed withDelay) {
-        super.anchoredAt(x, y, anchorPosition, withDelay);
-        layers.forEach(layer -> layer.anchoredAt(x, y, anchorPosition, withDelay));
+    public LayeredNinePatch anchoredAt(float x, float y, AnchorPosition anchorPosition, InterpolationSpeed movementSpeed) {
+        super.anchoredAt(x, y, anchorPosition, movementSpeed);
+        layers.forEach(layer -> layer.anchoredAt(x, y, anchorPosition, movementSpeed));
         return this;
     }
 

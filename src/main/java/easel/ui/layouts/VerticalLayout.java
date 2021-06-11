@@ -46,12 +46,6 @@ public class VerticalLayout extends AbstractOneDimensionalLayout<VerticalLayout>
         this.totalHeight = 0;
     }
 
-    /**
-     * @return a stream of all children currently handled by this widget, from top to bottom
-     */
-    public Stream<AbstractWidget> iterator() {
-        return this.children.stream().map(item -> item.widget);
-    }
 
     @Override
     protected void anchorChildren(InterpolationSpeed withDelay) {
@@ -72,6 +66,7 @@ public class VerticalLayout extends AbstractOneDimensionalLayout<VerticalLayout>
             currY -= (widgetHeight + spacing);
         }
     }
+
 
     /**
      * Replaces the <code>desiredWidth</code> set in the constructor ({@link #VerticalLayout(float, float)}) with the width of the widest child. Useful for dynamically scaling the width of this widget to fit the widths of its children. NOTE: should call this function AFTER adding all children and before anchoring.
