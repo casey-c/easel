@@ -6,16 +6,10 @@ import basemod.interfaces.PostUpdateSubscriber;
 import basemod.interfaces.RenderSubscriber;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.evacipated.cardcrawl.modthespire.lib.SpireInitializer;
-import com.google.gson.Gson;
-import com.google.gson.JsonObject;
-import easel.config.ConfigTester;
 import easel.ui.AbstractWidget;
 import easel.ui.AnchorPosition;
-import easel.ui.InterpolationSpeed;
 import easel.ui.containers.MoveContainer;
 import easel.ui.containers.StyledContainer;
-import easel.ui.debug.DebugWidget;
-import easel.ui.layouts.GridLayout;
 import easel.ui.layouts.HorizontalLayout;
 import easel.ui.text.Label;
 import easel.utils.EaselFonts;
@@ -25,7 +19,6 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 
 @SpireInitializer
 public class Easel implements PostInitializeSubscriber, RenderSubscriber, PostUpdateSubscriber {
@@ -53,8 +46,6 @@ public class Easel implements PostInitializeSubscriber, RenderSubscriber, PostUp
     public void receivePostInitialize() {
         TextureLoader.loadTextures();
         EaselFonts.loadFonts();
-
-        ConfigTester.test();
 
 //        MoveContainer moveContainer =
 //                new MoveContainer()
