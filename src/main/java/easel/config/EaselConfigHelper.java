@@ -1,11 +1,14 @@
 package easel.config;
 
+import com.evacipated.cardcrawl.modthespire.lib.SpireConfig;
 import com.google.gson.*;
 import com.google.gson.annotations.SerializedName;
 import easel.Easel;
 import easel.config.enums.ConfigBooleanEnum;
 import easel.config.enums.ConfigIntegerEnum;
 import easel.config.enums.ConfigStringEnum;
+
+import java.io.IOException;
 
 /**
  * <p>
@@ -81,7 +84,7 @@ import easel.config.enums.ConfigStringEnum;
  * As stated previously, as your project evolves and begins to require more config options, all you need to do is to go into your custom enum with the choices and add rows to it. Make sure that rows are only appended to the end (and not placed inside the middle somewhere), due to the ConfigHelper's dependence on <code>.ordinal()</code> for figuring out which element is which; if you fail to follow this pattern, a user of your mod who loads up a previously saved config into a version where the enum rows are re-arranged or come in a different order will have their choices re-arranged as well, and will no longer correspond to the same enum option they originally were created from (causing confusion). Now, this isn't a catastrophic error (it won't crash), but it is certainly not user-friendly. So just remember to append new options and not place them into the middle.
  * </p>
  * <p>
- * The ConfigHelper itself can easily serialize/deserialize its settings to be saved and loaded between game boots. See {@link #serialize()} and {@link #deserialize(JsonObject)} for more details.
+ * The ConfigHelper itself can easily serialize/deserialize its settings to be saved and loaded between game boots. See {@link #asJsonObject()} and {@link #fromJsonObject(JsonObject)} for more details.
  * </p>
  * <p>
  * For general design suggestions: you'd typically want to make your ConfigHelper a public static from inside your main class and initialize (and potentially deserialize saved previous versions) within a "postInitialize" subscription hook inside BaseMod. Then, other classes that need access to config options can just call <code>MyMod.configHelper.getBoolean(...)</code> etc. as they see fit. As a fair warning, this config helper is not thread safe, so if you're trying to set config options from various threads you may run into race conditions.
@@ -90,7 +93,7 @@ import easel.config.enums.ConfigStringEnum;
  * @param <I>
  * @param <S>
  */
-public class ConfigHelper<B extends ConfigBooleanEnum, I extends ConfigIntegerEnum, S extends ConfigStringEnum> {
+public class EaselConfigHelper<B extends ConfigBooleanEnum, I extends ConfigIntegerEnum, S extends ConfigStringEnum> {
     @SerializedName("booleans")
     private boolean[] booleanOptions;
 
@@ -100,56 +103,64 @@ public class ConfigHelper<B extends ConfigBooleanEnum, I extends ConfigIntegerEn
     @SerializedName("strings")
     private String[] stringOptions;
 
+    private String modName;
+    private String configName;
+
     // --------------------------------------------------------------------------------
 
-    private ConfigHelper(Class<? extends B> booleans, Class<? extends I> integers, Class<? extends S> strings) {
+    private EaselConfigHelper(String modName, String configName, Class<? extends B> booleans, Class<? extends I> integers, Class<? extends S> strings) {
         initializeBooleans(booleans);
         initializeIntegers(integers);
         initializeStrings(strings);
+
+        this.modName = modName;
+        this.configName = configName;
+
+        load();
     }
 
     // Convenience functions from here on down
 
     // BOOLEANS
     public static <B extends ConfigBooleanEnum>
-    ConfigHelper<B, ConfigIntegerEnum, ConfigStringEnum>
-    fromBooleansOnly(Class<? extends B> booleanClz) {
-        return new ConfigHelper<>(booleanClz, ConfigIntegerEnum.class, ConfigStringEnum.class);
+    EaselConfigHelper<B, ConfigIntegerEnum, ConfigStringEnum>
+    fromBooleansOnly(String modName, String configName, Class<? extends B> booleanClz) {
+        return new EaselConfigHelper<>(modName, configName, booleanClz, ConfigIntegerEnum.class, ConfigStringEnum.class);
     }
 
     // INTEGERS
     public static <I extends ConfigIntegerEnum>
-    ConfigHelper<ConfigBooleanEnum, I, ConfigStringEnum>
-    fromIntegersOnly(Class<? extends I> integerClz) {
-        return new ConfigHelper<>(ConfigBooleanEnum.class, integerClz, ConfigStringEnum.class);
+    EaselConfigHelper<ConfigBooleanEnum, I, ConfigStringEnum>
+    fromIntegersOnly(String modName, String configName, Class<? extends I> integerClz) {
+        return new EaselConfigHelper<>(modName, configName, ConfigBooleanEnum.class, integerClz, ConfigStringEnum.class);
     }
 
     // STRINGS
     public static <S extends ConfigStringEnum>
-    ConfigHelper<ConfigBooleanEnum, ConfigIntegerEnum, S>
-    fromStringsOnly(Class<? extends S> stringClz) {
-        return new ConfigHelper<>(ConfigBooleanEnum.class, ConfigIntegerEnum.class, stringClz);
+    EaselConfigHelper<ConfigBooleanEnum, ConfigIntegerEnum, S>
+    fromStringsOnly(String modName, String configName, Class<? extends S> stringClz) {
+        return new EaselConfigHelper<>(modName, configName, ConfigBooleanEnum.class, ConfigIntegerEnum.class, stringClz);
     }
 
     // BOOLEANS, INTEGERS
     public static <B extends ConfigBooleanEnum, I extends ConfigIntegerEnum>
-    ConfigHelper<B, I, ConfigStringEnum>
-    fromBooleansIntegers(Class<? extends B> booleanClz, Class<? extends I> integerClz) {
-        return new ConfigHelper<>(booleanClz, integerClz, ConfigStringEnum.class);
+    EaselConfigHelper<B, I, ConfigStringEnum>
+    fromBooleansIntegers(String modName, String configName, Class<? extends B> booleanClz, Class<? extends I> integerClz) {
+        return new EaselConfigHelper<>(modName, configName, booleanClz, integerClz, ConfigStringEnum.class);
     }
 
     // BOOLEANS, STRINGS
     public static <B extends ConfigBooleanEnum, S extends ConfigStringEnum>
-    ConfigHelper<B, ConfigIntegerEnum, S>
-    fromBooleansStrings(Class<? extends B> booleanClz, Class<? extends S> stringClz) {
-        return new ConfigHelper<>(booleanClz, ConfigIntegerEnum.class, stringClz);
+    EaselConfigHelper<B, ConfigIntegerEnum, S>
+    fromBooleansStrings(String modName, String configName, Class<? extends B> booleanClz, Class<? extends S> stringClz) {
+        return new EaselConfigHelper<>(modName, configName, booleanClz, ConfigIntegerEnum.class, stringClz);
     }
 
     // INTEGERS, STRINGS
     public static <I extends ConfigIntegerEnum, S extends ConfigStringEnum>
-    ConfigHelper<ConfigBooleanEnum, I, S>
-    fromIntegersStrings(Class<? extends I> integerClz, Class<? extends S> stringClz) {
-        return new ConfigHelper<>(ConfigBooleanEnum.class, integerClz, stringClz);
+    EaselConfigHelper<ConfigBooleanEnum, I, S>
+    fromIntegersStrings(String modName, String configName, Class<? extends I> integerClz, Class<? extends S> stringClz) {
+        return new EaselConfigHelper<>(modName, configName, ConfigBooleanEnum.class, integerClz, stringClz);
     }
 
     // --------------------------------------------------------------------------------
@@ -192,7 +203,11 @@ public class ConfigHelper<B extends ConfigBooleanEnum, I extends ConfigIntegerEn
     }
 
     public void setBoolean(B choice, boolean value) {
+        boolean needsSaving = (booleanOptions[choice.ordinal()] != value);
         booleanOptions[choice.ordinal()] = value;
+
+        if (needsSaving)
+            save();
     }
 
     // --------------------------------------------------------------------------------
@@ -207,7 +222,12 @@ public class ConfigHelper<B extends ConfigBooleanEnum, I extends ConfigIntegerEn
     }
 
     public void setInt(I choice, int value) {
+        boolean needsSaving = (integerOptions[choice.ordinal()] != value);
+
         integerOptions[choice.ordinal()] = value;
+
+        if (needsSaving)
+            save();
     }
 
     // --------------------------------------------------------------------------------
@@ -222,17 +242,29 @@ public class ConfigHelper<B extends ConfigBooleanEnum, I extends ConfigIntegerEn
     }
 
     public void setString(S choice, String value) {
+        boolean needsSaving = !(stringOptions[choice.ordinal()].equals(value));
         stringOptions[choice.ordinal()] = value;
+
+        if (needsSaving)
+            save();
     }
 
     // --------------------------------------------------------------------------------
 
-    public JsonObject serialize() {
+    public JsonObject toJson() {
         return new Gson().toJsonTree(this).getAsJsonObject();
     }
 
-    public void deserialize(JsonObject obj) {
-        ConfigHelper other = new Gson().fromJson(obj, ConfigHelper.class);
+    public void loadFromJson(JsonObject obj) {
+        EaselConfigHelper other = new Gson().fromJson(obj, EaselConfigHelper.class);
+
+        this.booleanOptions = other.booleanOptions;
+        this.integerOptions = other.integerOptions;
+        this.stringOptions = other.stringOptions;
+    }
+
+    public void loadFromJsonString(String jsonString) {
+        EaselConfigHelper other = new Gson().fromJson(jsonString, EaselConfigHelper.class);
 
         this.booleanOptions = other.booleanOptions;
         this.integerOptions = other.integerOptions;
@@ -245,5 +277,33 @@ public class ConfigHelper<B extends ConfigBooleanEnum, I extends ConfigIntegerEn
     }
 
     // --------------------------------------------------------------------------------
+
+    private void save() {
+        System.out.println("EaselConfigHelper saving...");
+        try {
+            SpireConfig spireConfig = new SpireConfig(modName, configName);
+            spireConfig.setString("json", toString());
+            spireConfig.save();
+        }
+        catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private void load() {
+        System.out.println("EaselConfigHelper loading...");
+        try {
+            SpireConfig spireConfig = new SpireConfig(modName, configName);
+            spireConfig.load();
+
+            if (spireConfig.has("json")) {
+                loadFromJsonString(spireConfig.getString("json"));
+            }
+        }
+        catch (IOException e) {
+            e.printStackTrace();
+            // No config yet?
+        }
+    }
 
 }

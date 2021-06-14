@@ -6,6 +6,10 @@ import basemod.interfaces.PostUpdateSubscriber;
 import basemod.interfaces.RenderSubscriber;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.evacipated.cardcrawl.modthespire.lib.SpireInitializer;
+import easel.config.EaselConfigHelper;
+import easel.config.enums.ConfigBooleanEnum;
+import easel.config.enums.ConfigIntegerEnum;
+import easel.config.enums.ConfigStringEnum;
 import easel.ui.AbstractWidget;
 import easel.ui.AnchorPosition;
 import easel.ui.containers.MoveContainer;
@@ -38,9 +42,20 @@ public class Easel implements PostInitializeSubscriber, RenderSubscriber, PostUp
 
     private ArrayList<StyledContainer> containers = new ArrayList<>();
 
+    private EaselConfigHelper<ConfigBooleanEnum, ConfigIntegerEnum, SerializingMoveContainer> configHelper;
     private float delta = 80;
 
-    private String lastSerialization = "{\"widgets\":[{\"addOrder\":0,\"left\":812.0,\"bottom\":254.0},{\"addOrder\":2,\"left\":697.0,\"bottom\":189.0},{\"addOrder\":1,\"left\":779.0,\"bottom\":115.0},{\"addOrder\":3,\"left\":996.0,\"bottom\":193.0}]}";
+    private enum SerializingMoveContainer implements ConfigStringEnum {
+        MOVE_CONTAINER_LOCATIONS("");
+
+        String val;
+
+        SerializingMoveContainer(String val) {
+            this.val = val;
+        }
+
+        @Override public String getDefault() { return val; }
+    }
 
     @Override
     public void receivePostInitialize() {
@@ -106,28 +121,24 @@ public class Easel implements PostInitializeSubscriber, RenderSubscriber, PostUp
 //                .resizeRowsToFitTallestChildren()
 //                .anchoredCenteredOnScreen();
 
-        widgets.add(
-                new MoveContainer()
-                        .withAllChildrenOfLayout(layout)
-                        .onRightClick(container -> {
-                            System.out.println("SERIALIZED------------------");
-                            System.out.println( container.serialize() );
-                            System.out.println("----------------------------");
+        configHelper = EaselConfigHelper.fromStringsOnly("Easel", "EaselMoveTests", SerializingMoveContainer.class);
 
-                            if (EaselInputHelper.isShiftPressed()) {
-                                System.out.println("STORED");
-                                lastSerialization = container.serialize();
-                            }
-                            else if (EaselInputHelper.isAltPressed()) {
-                                System.out.println("RESTORED");
-                                container.deserialize(lastSerialization);
-                            }
+        MoveContainer mc = new MoveContainer()
+                .withAllChildrenOfLayout(layout)
+                .onRightClick(container -> {
+                    System.out.println("SERIALIZED------------------");
+                    System.out.println(container.serialize());
+                    System.out.println("----------------------------");
+
+                    configHelper.setString(SerializingMoveContainer.MOVE_CONTAINER_LOCATIONS, container.serialize());
 
 //                            String vertical = "{\"left\":[1510.0,1510.0,1510.0,1510.0],\"bottom\":[800.0,590.0,380.0,170.0],\"addOrders\":[0,1,2,3]}";
 //                            container.deserialize(new Gson().fromJson(vertical));
-                        })
-                        .anchoredCenteredOnScreen()
-        );
+                })
+                .anchoredCenteredOnScreen();
+
+        mc.deserialize(configHelper.getString(SerializingMoveContainer.MOVE_CONTAINER_LOCATIONS));
+        widgets.add(mc);
 
 //        widgets.add(
 //                new MoveContainer()

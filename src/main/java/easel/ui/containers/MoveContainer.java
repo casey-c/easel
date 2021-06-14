@@ -286,6 +286,9 @@ public class MoveContainer extends AbstractWidget<MoveContainer> {
      * @see #serialize()
      */
     public boolean deserialize(String jsonString) {
+        if (jsonString.isEmpty())
+            return (map.size() == 0);
+
         int numValuesUpdated = 0;
 
         Gson gson = new Gson();
