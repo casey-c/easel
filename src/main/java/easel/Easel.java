@@ -7,7 +7,6 @@ import basemod.interfaces.RenderSubscriber;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.evacipated.cardcrawl.modthespire.lib.SpireInitializer;
 import easel.config.EaselConfigHelper;
-import easel.config.enums.ConfigBooleanEnum;
 import easel.config.enums.ConfigIntegerEnum;
 import easel.config.enums.ConfigStringEnum;
 import easel.config.samples.SampleBooleanChoices;
@@ -18,7 +17,6 @@ import easel.ui.containers.StyledContainer;
 import easel.ui.layouts.HorizontalLayout;
 import easel.ui.text.Label;
 import easel.utils.EaselFonts;
-import easel.utils.EaselInputHelper;
 import easel.utils.textures.TextureLoader;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -43,18 +41,14 @@ public class Easel implements PostInitializeSubscriber, RenderSubscriber, PostUp
 
     private ArrayList<StyledContainer> containers = new ArrayList<>();
 
-    private EaselConfigHelper<SampleBooleanChoices, ConfigIntegerEnum, SerializingMoveContainer> configHelper;
+    private EaselConfigHelper<SampleBooleanChoices, ConfigIntegerEnum, TestStringOptions> configHelper;
     private float delta = 80;
 
-    private enum SerializingMoveContainer implements ConfigStringEnum {
+    private enum TestStringOptions implements ConfigStringEnum {
         MOVE_CONTAINER_LOCATIONS("");
 
         String val;
-
-        SerializingMoveContainer(String val) {
-            this.val = val;
-        }
-
+        TestStringOptions(String val) { this.val = val; }
         @Override public String getDefault() { return val; }
     }
 
@@ -92,14 +86,6 @@ public class Easel implements PostInitializeSubscriber, RenderSubscriber, PostUp
                 .withHeader("Four")
                 .withContent(new Label("FOUR"), true);
 
-//        DebugWidget a = new DebugWidget(100, 100, DebugWidget.DEBUG_COLOR_0);
-//        DebugWidget b = new DebugWidget(100, 100, DebugWidget.DEBUG_COLOR_1);
-//        DebugWidget c = new DebugWidget(100, 100, DebugWidget.DEBUG_COLOR_2);
-//        DebugWidget d = new DebugWidget(100, 100, DebugWidget.DEBUG_COLOR_3);
-
-
-        //containers.addAll(Arrays.asList(a, b, c, d));
-
         HorizontalLayout layout = new HorizontalLayout(100, -40)
                 .withDefaultChildAnchorPosition(AnchorPosition.CENTER)
                 .withChild(a)
@@ -109,163 +95,21 @@ public class Easel implements PostInitializeSubscriber, RenderSubscriber, PostUp
                 .scaleToTallestChild()
                 .anchoredCenteredOnScreen();
 
-//        widgets.add(layout);
-
-//        GridLayout layout = new GridLayout()
-//                .withNEvenlySizedCols(500, 2)
-//                .withNEvenlySizedRows(500, 2)
-//                .withChild(0, 0, a )
-//                .withChild(0, 1, b )
-//                .withChild(1, 0, c )
-//                .withChild(1, 1, d )
-//                .resizeColsToFitWidestChildren()
-//                .resizeRowsToFitTallestChildren()
-//                .anchoredCenteredOnScreen();
-
-        configHelper = EaselConfigHelper.fromBooleansStrings("Easel", "EaselMoveTests", SampleBooleanChoices.class, SerializingMoveContainer.class);
+        configHelper = EaselConfigHelper.fromBooleansStrings("Easel", "EaselMoveTests", SampleBooleanChoices.class, TestStringOptions.class);
 
         MoveContainer mc = new MoveContainer()
                 .withAllChildrenOfLayout(layout)
                 .onRightClick(container -> {
-                    System.out.println("SERIALIZED------------------");
-                    System.out.println(container.serialize());
-                    System.out.println("----------------------------");
-
-                    configHelper.setString(SerializingMoveContainer.MOVE_CONTAINER_LOCATIONS, container.serialize());
-
-//                            String vertical = "{\"left\":[1510.0,1510.0,1510.0,1510.0],\"bottom\":[800.0,590.0,380.0,170.0],\"addOrders\":[0,1,2,3]}";
-//                            container.deserialize(new Gson().fromJson(vertical));
+                    configHelper.setString(TestStringOptions.MOVE_CONTAINER_LOCATIONS, container.toJsonString());
                 })
                 .anchoredCenteredOnScreen();
 
-        mc.deserialize(configHelper.getString(SerializingMoveContainer.MOVE_CONTAINER_LOCATIONS));
+        // Load defaults
+        mc.loadFromJsonString(configHelper.getString(TestStringOptions.MOVE_CONTAINER_LOCATIONS));
+
         widgets.add(mc);
 
         System.out.println(configHelper);
-
-//        widgets.add(
-//                new MoveContainer()
-//                        .withChild(
-//                                new StyledContainer(100, 100)
-//                                        .withContent(
-//                                                new VerticalLayout(100, 20)
-//                                                        .withDefaultChildAnchorPosition(AnchorPosition.CENTER)
-//                                                        .withChild(new Label("Row 1", EaselColors.SEQ_BLUE_0()))
-//                                                        .withChild(new Label("Row 2", EaselColors.SEQ_BLUE_1()))
-//                                                        .withChild(new Label("Row 3", EaselColors.SEQ_BLUE_2()))
-//                                                        .withChild(new Label("Row 4", EaselColors.SEQ_BLUE_3()))
-//                                                        .withChild(new Label("Row 5", EaselColors.SEQ_BLUE_4()))
-//                                                        .scaleToWidestChild(),
-//                                                true
-//                                        )
-//                                        .scaleToContent()
-//                                        .anchoredCenteredOnScreen()
-//                        )
-//                        .withChild(
-//                                new StyledContainer(100, 100)
-//                                        .withHeader("Pie Chart", "Right click to randomize")
-//                                        .withHeaderColor(EaselColors.HEADER_SEA_GLASS())
-//                                        .withContent(
-//                                                new PieChartWidget(200, 200)
-//                                                        .withRegion(6, EaselColors.QUAL_RED())
-//                                                        .withRegion(5, EaselColors.QUAL_GREEN())
-//                                                        .withRegion(1, EaselColors.QUAL_BLUE())
-//                                                        .withRegion(1, EaselColors.QUAL_PURPLE())
-//                                                        .onRightClick( pie -> {
-//                                                            if (EaselInputHelper.isShiftPressed()) {
-//                                                                pie
-//                                                                        .withCounts(6, 5, 1, 1)
-//                                                                        .withColors(
-//                                                                                EaselColors.QUAL_RED(),
-//                                                                                EaselColors.QUAL_GREEN(),
-//                                                                                EaselColors.QUAL_BLUE(),
-//                                                                                EaselColors.QUAL_PURPLE());
-//                                                            }
-//                                                            else {
-//                                                                Random r = new Random();
-//                                                                int index = r.nextInt(4);
-//                                                                pie.updateRegionCount(index, r.nextInt(6) + 1);
-//                                                                pie.updateRegionColor(index, EaselColors.rainbow());
-//                                                            }
-//                                                        } )
-////                                                        .withColors(EaselColors.QUAL_RED(), EaselColors.QUAL_GREEN(), EaselColors.QUAL_BLUE(), EaselColors.QUAL_PURPLE())
-////                                                        .withCounts(6, 5, 1, 1)
-//                                                ,
-//                                                true
-//                                        )
-//                                        .scaleToContent()
-//                                        .anchoredCenteredOnScreen()
-//                        )
-//                        .withChild(
-//                                new StyledContainer(100, 100)
-//                                        .withHeader("Debug Widgets", "Right click for caw caw")
-//                                        .withHeaderColor(EaselColors.HEADER_RED())
-//                                        .withContent(
-//                                                new DebugWidget(300, 300),
-//                                                true
-//                                        )
-//                                        .onRightClick(container -> {
-//                                            EaselSoundHelper.cawCaw();
-//                                        })
-//                                        .scaleToContent()
-//                                        .anchoredCenteredOnScreen()
-//                        )
-//        );
-
-//        widgets.add(
-//                new StyledContainer(100, 100)
-//                        .onRightClick(container -> {
-//                            ap = ap.next();
-//                            container.withContentAnchor(ap);
-//                        })
-//                        .withContent(new Label("No Header"), true)
-//                        .scaleToContent()
-//                        .makeMovable()
-//        );
-//
-//        widgets.add(
-//                new StyledContainer(500, 500)
-//                        .withHeader("Title")
-//                        .onRightClick(container -> {
-//                            ap = ap.next();
-//                            container.withContentAnchor(ap);
-//                        })
-//                        .withContent(new Label("Just the title"), true)
-//                        .scaleToContent()
-//                        .makeMovable()
-//        );
-//
-//        widgets.add(
-//                new StyledContainer(500, 500)
-//                        .withHeader("Swap Tests", "Very long header text compared to content")
-//                        .onRightClick(container -> {
-//                            ap = ap.next();
-//                            container.withContentAnchor(ap).refreshAnchor();
-//                        })
-//                        .withContent(
-//                                new SwapContainer<>(SwapWindows.class)
-//                                        .withWidget(SwapWindows.MAIN, new Label("1"), true)
-//                                        .withWidget(SwapWindows.SECONDARY, new Label("2"))
-//                                        .onLeftClick(container -> {
-//                                            if (KeyHelper.isShiftPressed())
-//                                                container.nextView();
-//                                        }),
-//                                true
-//                        )
-////                        .withContent(
-////                                new PieChartWidget(200, 200)
-////                                        .withCounts(1, 1)
-////                                        .withColors(Color.WHITE, Color.BLACK),
-////                                true
-////                        )
-//                        .scaleToContent()
-//                        .makeMovable()
-//        );
-//
-        // Make a nice starting location for all these widgets
-//        HorizontalLayout layout = new HorizontalLayout(100, 40);
-//        widgets.forEach(layout::withChild);
-//        layout.anchoredCenteredOnScreen();
     }
 
 

@@ -17,12 +17,36 @@ import easel.utils.UpdateSuppressor;
 import java.util.*;
 import java.util.stream.Stream;
 
-@SuppressWarnings("rawtypes")
+/**
+ * <p>
+ * A special kind of container that grants the ability for each direct child to be LEFT+CLICK+DRAGGED and moved around on the screen. The movable regions of these tracked children will be their content bounds, using {@link AbstractWidget#isMouseInContentBounds()} to determine which child to move. This container is currently a full screen widget and does not adjust its children positions using the typical {@link AbstractWidget#anchoredAt(float, float, AnchorPosition)} downward percolation (i.e. the children will not be affected by anchoring this widget somewhere else, unlike most other containers). As with any other container, it can (and should) be used to <code>render()</code> and <code>update()</code>, as it will pass those function calls down the hierarchy.
+ * </p>
+ * <p>
+ * This widget can serialize/deserialize the current positions of the tracked widgets. This information is in JSON string form, and can be directly used within the {@link easel.config.EaselConfigHelper} to have persistent locations of widgets across game boots. You can learn more about this serialization process on the {@link #toJsonString()} and {@link #loadFromJsonString(String)} javadocs.
+ * </p>
+ * <p>
+ * The following is an example that makes all children of a layout movable and leverages the {@link easel.config.EaselConfigHelper} pattern to make the moves persistent. It will SAVE the positions of the moved children when right clicking anywhere, and will attempt to LOAD these saved positions after this container is initialized. The move container is added to the widgets array at the end like any other widget might be, to be used in something like <code>widgets.forEach(widget → widget.render(sb))</code> (or similarly for <code>update()</code> as well) in order for everything to be rendered and updated properly.
+ * </p>
+ * <pre>
+ * {@code
+ * MoveContainer mc = new MoveContainer()
+ *   .withAllChildrenOfLayout(layout)
+ *   .onRightClick(container -> {
+ *     configHelper.setString(MyStringConfigEnum.MOVE_CONTAINER_LOCATIONS, container.toJsonString());
+ *   })
+ *   .anchoredCenteredOnScreen();
+ *
+ * // Load default settings. The MyStringConfigEnum has a default value of "" so that the first time it's used doesn't crash.
+ * mc.loadFromJsonString(configHelper.getString(MyStringConfigEnum.MOVE_CONTAINER_LOCATIONS));
+ *
+ * widgets.add(mc);
+ * }
+ * </pre>
+ */
 public class MoveContainer extends AbstractWidget<MoveContainer> {
     private final float width;
     private final float height;
 
-    //private final TreeMap<Integer, AbstractWidget> map = new TreeMap<>();
     private final TreeMap<Integer, MapItem> map = new TreeMap<>();
 
     private int addOrder = 0;
@@ -44,31 +68,68 @@ public class MoveContainer extends AbstractWidget<MoveContainer> {
 
     // --------------------------------------------------------------------------------
 
+    /**
+     * Adds a new child to be managed by this container. The new child will be added on top of all previously added children, and will be movable.
+     * @param child the new child to be managed
+     * @return this widget
+     * @see #withAllChildrenOfLayout(GridLayout)
+     * @see #withAllChildrenOfLayout(VerticalLayout)
+     * @see #withAllChildrenOfLayout(HorizontalLayout)
+     */
     public MoveContainer withChild(AbstractWidget child) {
         map.put(getTopMostIndex() + 1, new MapItem(child, addOrder++));
         return this;
     }
 
+    /**
+     * Transfers all children of the given layout to be managed by this move container instead. The children are added in the order of the layout's <code>iterator()</code> stream, and then can be moved as if they were individually added using {@link #withChild(AbstractWidget)}. This function is intended to make it easy to layout widgets into nice default positions using a throwaway layout. I.e. do NOT continue to re-use the layout with the intent of using it to manage its original children, as this move container will become the new parent. To ensure that this restriction is followed, the layout is purposely cleared after all its children are transferred over.
+     * @param layout the layout whose children will all be made movable by this container
+     * @return this container
+     * @see #withChild(AbstractWidget)
+     * @see #withAllChildrenOfLayout(HorizontalLayout)
+     * @see #withAllChildrenOfLayout(GridLayout)
+     */
     public MoveContainer withAllChildrenOfLayout(VerticalLayout layout) {
         layout.iterator().forEach( child -> {
             map.put(getTopMostIndex() + 1, new MapItem(child, addOrder++));
         });
 
+        layout.clear();
+
         return this;
     }
 
+    /**
+     * Transfers all children of the given layout to be managed by this move container instead. The children are added in the order of the layout's <code>iterator()</code> stream, and then can be moved as if they were individually added using {@link #withChild(AbstractWidget)}. This function is intended to make it easy to layout widgets into nice default positions using a throwaway layout. I.e. do NOT continue to re-use the layout with the intent of using it to manage its original children, as this move container will become the new parent. To ensure that this restriction is followed, the layout is purposely cleared after all its children are transferred over.
+     * @param layout the layout whose children will all be made movable by this container
+     * @return this container
+     * @see #withChild(AbstractWidget)
+     * @see #withAllChildrenOfLayout(VerticalLayout)
+     * @see #withAllChildrenOfLayout(GridLayout)
+     */
     public MoveContainer withAllChildrenOfLayout(HorizontalLayout layout) {
         layout.iterator().forEach( child -> {
             map.put(getTopMostIndex() + 1, new MapItem(child, addOrder++));
         });
 
+        layout.clear();
         return this;
     }
 
+    /**
+     * Transfers all children of the given layout to be managed by this move container instead. The children are added in the order of the layout's <code>iterator()</code> stream, and then can be moved as if they were individually added using {@link #withChild(AbstractWidget)}. This function is intended to make it easy to layout widgets into nice default positions using a throwaway layout. I.e. do NOT continue to re-use the layout with the intent of managing its original children, as this move container will become the new parent. To ensure that this restriction is followed, the layout is purposely cleared after all its children are transferred over.
+     * @param layout the layout whose children will all be made movable by this container
+     * @return this container
+     * @see #withChild(AbstractWidget)
+     * @see #withAllChildrenOfLayout(HorizontalLayout)
+     * @see #withAllChildrenOfLayout(VerticalLayout)
+     */
     public MoveContainer withAllChildrenOfLayout(GridLayout layout) {
         layout.iterator().forEach( child -> {
             map.put(getTopMostIndex() + 1, new MapItem(child, addOrder++));
         });
+
+        layout.clear();
 
         return this;
     }
@@ -135,7 +196,7 @@ public class MoveContainer extends AbstractWidget<MoveContainer> {
 
     private Optional<Map.Entry<Integer, MapItem>> findTopMostWidgetUnderMouse() {
         for (Map.Entry<Integer, MapItem> item : map.descendingMap().entrySet()) {
-            if (item.getValue().widget.isMouseInBounds())
+            if (item.getValue().widget.isMouseInContentBounds())
                 return Optional.of(item);
         }
 
@@ -273,7 +334,10 @@ public class MoveContainer extends AbstractWidget<MoveContainer> {
 
     /**
      * <p>
-     * Forcibly update all widget positions based on a previously serialized string. Note that the serialization writes out information about widget positions to a JSON formatted string, with the ability to identify widgets based on the order they are added to this container. Thus, this deserialization step only works correctly if you've added the same widgets in the same order as the time when {@link #serialize()} was called - i.e. unless you're doing something very weird and fancy by adding a variable number of widgets in a dynamic way, this deserialization / serialization step should work out of the box.
+     * Forcibly update all widget positions based on a previously serialized string. Note that the serialization writes out information about widget positions to a JSON formatted string, with the ability to identify widgets based on the order they are added to this container. Thus, this deserialization step only works correctly if you've added the same widgets in the same order as the time when {@link #toJsonString()} was called - i.e. unless you're doing something very weird and fancy by adding a variable number of widgets in a dynamic way, this deserialization / serialization step should work out of the box. Be sure to call this load AFTER adding all widgets to the container that existed when the serialized string was created.
+     * </p>
+     * <p>
+     * An empty <code>jsonString</code> argument will be ignored, and if using a {@link easel.config.EaselConfigHelper}-style custom String enum, you can use "" as the default value for it.
      * </p>
      * <p>
      * In the backend, this deserialization works by looping through each saved (addOrder, left, bottom) triplet in the serialized string, and trying to match up the widgets currently in the map. If the current map contains a widget which was added with the same addOrder as the triplet, that particular widget will be {@link AbstractWidget#anchoredAt(float, float, AnchorPosition)} with the (left, bottom) coordinates. This function will also attempt to restore the stacking order correctly - the serialization step stores information in order from bottom to top, and the deserialization loops through that same order and will bring elements to the top if they're valid. If all widgets in the map can be linked 1:1 with the elements in the serialized string, this function will return true.
@@ -281,11 +345,11 @@ public class MoveContainer extends AbstractWidget<MoveContainer> {
      * <p>
      * Note that if you aren't using this function as intended (i.e. if you're getting anything other than true as the output as it fails to 1:1 update each widget), there are no guarantees that this function will be stable and not crash. So if you're doing something custom enough for this to return false, then you really shouldn't be using this at all and should roll your own serialization/deserialization code to fit your particular needs. Scary warning aside, if you're just using this in a predictable way (whenever a deserialize gets called, the container has the same basic structure of widgets added to it when the serialize was called), then this should be safe to use.
      * </p>
-     * @param jsonString a string generated by a previous call of {@link #serialize()}
+     * @param jsonString a string generated by a previous call of {@link #toJsonString()}
      * @return true if the container was able to link all elements of the serialized input string to all elements of the map and update them (successful 1 to 1 update of all tracked widgets).
-     * @see #serialize()
+     * @see #toJsonString()
      */
-    public boolean deserialize(String jsonString) {
+    public boolean loadFromJsonString(String jsonString) {
         if (jsonString.isEmpty())
             return (map.size() == 0);
 
@@ -305,10 +369,10 @@ public class MoveContainer extends AbstractWidget<MoveContainer> {
     }
 
     /**
-     * @return a JSON formatted string storing the positions of each element in the map, for recovering later with {@link #deserialize(String)}
-     * @see #deserialize(String)
+     * @return a JSON formatted string storing the positions of each element in the map, for recovering later with {@link #loadFromJsonString(String)}
+     * @see #loadFromJsonString(String)
      */
-    public String serialize() {
+    public String toJsonString() {
         SerializationHelperContainer container = new SerializationHelperContainer();
         container.widgets = new ArrayList<>(map.size());
 
