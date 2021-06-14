@@ -10,6 +10,7 @@ import easel.config.EaselConfigHelper;
 import easel.config.enums.ConfigBooleanEnum;
 import easel.config.enums.ConfigIntegerEnum;
 import easel.config.enums.ConfigStringEnum;
+import easel.config.samples.SampleBooleanChoices;
 import easel.ui.AbstractWidget;
 import easel.ui.AnchorPosition;
 import easel.ui.containers.MoveContainer;
@@ -42,7 +43,7 @@ public class Easel implements PostInitializeSubscriber, RenderSubscriber, PostUp
 
     private ArrayList<StyledContainer> containers = new ArrayList<>();
 
-    private EaselConfigHelper<ConfigBooleanEnum, ConfigIntegerEnum, SerializingMoveContainer> configHelper;
+    private EaselConfigHelper<SampleBooleanChoices, ConfigIntegerEnum, SerializingMoveContainer> configHelper;
     private float delta = 80;
 
     private enum SerializingMoveContainer implements ConfigStringEnum {
@@ -121,7 +122,7 @@ public class Easel implements PostInitializeSubscriber, RenderSubscriber, PostUp
 //                .resizeRowsToFitTallestChildren()
 //                .anchoredCenteredOnScreen();
 
-        configHelper = EaselConfigHelper.fromStringsOnly("Easel", "EaselMoveTests", SerializingMoveContainer.class);
+        configHelper = EaselConfigHelper.fromBooleansStrings("Easel", "EaselMoveTests", SampleBooleanChoices.class, SerializingMoveContainer.class);
 
         MoveContainer mc = new MoveContainer()
                 .withAllChildrenOfLayout(layout)
@@ -139,6 +140,8 @@ public class Easel implements PostInitializeSubscriber, RenderSubscriber, PostUp
 
         mc.deserialize(configHelper.getString(SerializingMoveContainer.MOVE_CONTAINER_LOCATIONS));
         widgets.add(mc);
+
+        System.out.println(configHelper);
 
 //        widgets.add(
 //                new MoveContainer()

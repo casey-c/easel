@@ -8,5 +8,4 @@ import easel.config.EaselConfigHelper;
  */
 public interface ConfigBooleanEnum {
     boolean getDefault();
-    int ordinal();
 }
