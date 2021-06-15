@@ -4,8 +4,11 @@ import basemod.BaseMod;
 import basemod.interfaces.PostInitializeSubscriber;
 import basemod.interfaces.PostUpdateSubscriber;
 import basemod.interfaces.RenderSubscriber;
+import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.evacipated.cardcrawl.modthespire.lib.SpireInitializer;
+import com.megacrit.cardcrawl.core.Settings;
+import com.megacrit.cardcrawl.helpers.FontHelper;
 import easel.config.EaselConfigHelper;
 import easel.config.enums.ConfigIntegerEnum;
 import easel.config.enums.ConfigStringEnum;
@@ -15,8 +18,12 @@ import easel.ui.AnchorPosition;
 import easel.ui.containers.MoveContainer;
 import easel.ui.containers.StyledContainer;
 import easel.ui.layouts.HorizontalLayout;
+import easel.ui.layouts.VerticalLayout;
 import easel.ui.text.Label;
+import easel.ui.text.SmartLabel;
 import easel.utils.EaselFonts;
+import easel.utils.EaselSoundHelper;
+import easel.utils.colors.EaselColors;
 import easel.utils.textures.TextureLoader;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -36,80 +43,60 @@ public class Easel implements PostInitializeSubscriber, RenderSubscriber, PostUp
     }
 
     private ArrayList<AbstractWidget> widgets = new ArrayList<>();
-//    private AnchorPosition ap = AnchorPosition.LEFT_TOP;
-//    private enum SwapWindows { MAIN, SECONDARY };
-
-    private ArrayList<StyledContainer> containers = new ArrayList<>();
-
-    private EaselConfigHelper<SampleBooleanChoices, ConfigIntegerEnum, TestStringOptions> configHelper;
-    private float delta = 80;
-
-    private enum TestStringOptions implements ConfigStringEnum {
-        MOVE_CONTAINER_LOCATIONS("");
-
-        String val;
-        TestStringOptions(String val) { this.val = val; }
-        @Override public String getDefault() { return val; }
-    }
 
     @Override
     public void receivePostInitialize() {
         TextureLoader.loadTextures();
         EaselFonts.loadFonts();
 
-//        MoveContainer moveContainer =
-//                new MoveContainer()
-//                        .withChild(new Label("First").withMargins(20))
-//                        .withChild(new Label("Second").withMargins(20))
-//                        .withChild(new Label("Third").withMargins(20))
-//                        .withChild(new Label("Fourth").withMargins(20));
-//
-//        widgets.add(
-//                moveContainer
-//        );
+        // Tests
+        VerticalLayout layout = new VerticalLayout(10, 20)
+                .withChild(
+                        new StyledContainer(100, 100)
+                                .withHeader("Tip Body Font")
+                                .withHeaderColor(EaselColors.HEADER_STRONG_PURPLE())
+                                .withContent(
+                                        new SmartLabel(FontHelper.tipBodyFont, 500, 10)
+                                                .withTextColor(Settings.CREAM_COLOR)
+                                                .withText("Hello, world.", Settings.RED_TEXT_COLOR)
+                                                .withText(" Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore")
+                                                .withText(" magna aliqua.", Settings.BLUE_TEXT_COLOR)
+                                                .withText(" Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.")
+                                                .onRightClick(label -> {
+                                                    EaselSoundHelper.cawCaw();
+                                                }),
+                                        true
+                                )
+                                .scaleToContent()
+                )
+                .withChild(
+                        new StyledContainer(100, 100)
+                                .withHeader("Easel Italic Font")
+                                .withHeaderColor(EaselColors.HEADER_LIGHT_ALGAE())
+                                .withContent(
+                                        new SmartLabel(EaselFonts.MEDIUM_ITALIC, 300, 10)
+                                                .withText("Hello, world.")
+                                                .withNewlines(1)
+                                                .withText("Hello, world.")
+                                                .withNewlines(2)
+                                                .withText("Hello, world.")
+                                                .withNewlines(2)
+                                                .withText(" Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.")
+                                                .withNewlines(2)
+                                                .withText(" Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.")
+                                                .onRightClick(label -> {
+                                                    EaselSoundHelper.cawCaw();
+                                                }),
+                                true
+                                )
+                                .scaleToContent()
+                )
+                .anchoredCenteredOnScreen()
+                ;
 
-//        HorizontalLayout layout = new HorizontalLayout(100, 20)
-//                .withChild(new StyledContainer(300, 200).withHeader("One").withContent(new Label("ONE"), true))
-//                .withChild(new StyledContainer(300, 200).withHeader("Two").withContent(new Label("TWO"), true))
-//                .withChild(new StyledContainer(300, 200).withHeader("Three").withContent(new Label("THREE"), true))
-//                .anchoredCenteredOnScreen();
-        StyledContainer a = new StyledContainer(300, 200)
-                .withHeader("One")
-                .withContent(new Label("ONE"), true);
-        StyledContainer b = new StyledContainer(300, 200)
-                .withHeader("Two")
-                .withContent(new Label("TWO"), true);
-        StyledContainer c = new StyledContainer(300, 200)
-                .withHeader("Three")
-                .withContent(new Label("THREE"), true);
-        StyledContainer d = new StyledContainer(300, 200)
-                .withHeader("Four")
-                .withContent(new Label("FOUR"), true);
-
-        HorizontalLayout layout = new HorizontalLayout(100, -40)
-                .withDefaultChildAnchorPosition(AnchorPosition.CENTER)
-                .withChild(a)
-                .withChild(b)
-                .withChild(c)
-                .withChild(d)
-                .scaleToTallestChild()
-                .anchoredCenteredOnScreen();
-
-        configHelper = EaselConfigHelper.fromBooleansStrings("Easel", "EaselMoveTests", SampleBooleanChoices.class, TestStringOptions.class);
-
-        MoveContainer mc = new MoveContainer()
-                .withAllChildrenOfLayout(layout)
-                .onRightClick(container -> {
-                    configHelper.setString(TestStringOptions.MOVE_CONTAINER_LOCATIONS, container.toJsonString());
-                })
-                .anchoredCenteredOnScreen();
-
-        // Load defaults
-        mc.loadFromJsonString(configHelper.getString(TestStringOptions.MOVE_CONTAINER_LOCATIONS));
-
-        widgets.add(mc);
-
-        System.out.println(configHelper);
+        widgets.add(
+                new MoveContainer().withAllChildrenOfLayout(layout)
+        );
     }
 
 
