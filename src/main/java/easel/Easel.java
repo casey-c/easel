@@ -9,17 +9,10 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.evacipated.cardcrawl.modthespire.lib.SpireInitializer;
 import com.megacrit.cardcrawl.core.Settings;
 import com.megacrit.cardcrawl.helpers.FontHelper;
-import easel.config.EaselConfigHelper;
-import easel.config.enums.ConfigIntegerEnum;
-import easel.config.enums.ConfigStringEnum;
-import easel.config.samples.SampleBooleanChoices;
 import easel.ui.AbstractWidget;
-import easel.ui.AnchorPosition;
 import easel.ui.containers.MoveContainer;
 import easel.ui.containers.StyledContainer;
-import easel.ui.layouts.HorizontalLayout;
 import easel.ui.layouts.VerticalLayout;
-import easel.ui.text.Label;
 import easel.ui.text.SmartLabel;
 import easel.utils.EaselFonts;
 import easel.utils.EaselSoundHelper;
@@ -57,10 +50,10 @@ public class Easel implements PostInitializeSubscriber, RenderSubscriber, PostUp
                                 .withHeaderColor(EaselColors.HEADER_STRONG_PURPLE())
                                 .withContent(
                                         new SmartLabel(FontHelper.tipBodyFont, 500, 10)
-                                                .withTextColor(Settings.CREAM_COLOR)
-                                                .withText("Hello, world.", Settings.RED_TEXT_COLOR)
+                                                .withTextColor(Color.GRAY)
+                                                .withText(Settings.RED_TEXT_COLOR, "Hello, world.")
                                                 .withText(" Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore")
-                                                .withText(" magna aliqua.", Settings.BLUE_TEXT_COLOR)
+                                                .withText(Settings.BLUE_TEXT_COLOR, " magna aliqua.")
                                                 .withText(" Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.")
                                                 .onRightClick(label -> {
                                                     EaselSoundHelper.cawCaw();
@@ -77,7 +70,7 @@ public class Easel implements PostInitializeSubscriber, RenderSubscriber, PostUp
                                         new SmartLabel(EaselFonts.MEDIUM_ITALIC, 300, 10)
                                                 .withText("Hello, world.")
                                                 .withNewlines(1)
-                                                .withText("Hello, world.")
+                                                .withText(EaselColors::rainbow, "Hello, world.")
                                                 .withNewlines(2)
                                                 .withText("Hello, world.")
                                                 .withNewlines(2)

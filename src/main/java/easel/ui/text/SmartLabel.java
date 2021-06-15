@@ -6,9 +6,9 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.megacrit.cardcrawl.core.Settings;
 import com.megacrit.cardcrawl.helpers.FontHelper;
 import easel.ui.AbstractWidget;
-import easel.utils.EaselGraphicsHelper;
 
 import java.util.ArrayList;
+import java.util.function.Supplier;
 
 public class SmartLabel extends AbstractWidget<SmartLabel> {
     private float textHeight;
@@ -18,18 +18,19 @@ public class SmartLabel extends AbstractWidget<SmartLabel> {
     private float lineSpacing;
 
     private BitmapFont font;
-    private Color currColor = Settings.CREAM_COLOR;
+
+    private Supplier<Color> colorSupplier = () -> Settings.CREAM_COLOR;
 
     private static final class TextGroup {
         String text;
         int line;
-        Color color;
+        Supplier<Color> colorSupplier;
         float width;
 
-        public TextGroup(String text, int line, Color color, float width) {
+        public TextGroup(String text, int line, Supplier<Color> colorSupplier, float width) {
             this.text = text;
             this.line = line;
-            this.color = color;
+            this.colorSupplier = colorSupplier;
             this.width = width;
         }
     }
@@ -64,20 +65,35 @@ public class SmartLabel extends AbstractWidget<SmartLabel> {
         return this;
     }
 
-    public SmartLabel withText(String text, Color textColor) {
-        Color previousColor = currColor;
-        this.currColor = textColor;
+    public SmartLabel withText(Color textColor, String text) {
+        Supplier<Color> previousSupplier = this.colorSupplier;
+        this.colorSupplier = () -> textColor;
 
         appendTextByWords(text);
 
-        this.currColor = previousColor;
+        this.colorSupplier = previousSupplier;
+        return this;
+    }
+
+    public SmartLabel withText(Supplier<Color> colorSupplier, String text) {
+        Supplier<Color> previousSupplier = this.colorSupplier;
+        this.colorSupplier = colorSupplier;
+
+        appendTextByWords(text);
+
+        this.colorSupplier = previousSupplier;
         return this;
     }
 
     // --------------------------------------------------------------------------------
 
     public SmartLabel withTextColor(Color color) {
-        this.currColor = color;
+        this.colorSupplier = () -> color;
+        return this;
+    }
+
+    public SmartLabel withTextColor(Supplier<Color> colorSupplier) {
+        this.colorSupplier = colorSupplier;
         return this;
     }
 
@@ -120,7 +136,7 @@ public class SmartLabel extends AbstractWidget<SmartLabel> {
         if (!contents.isEmpty()) {
             float width = FontHelper.getWidth(font, contents, 1.0f) / Settings.scale;
 
-            groups.add(new TextGroup(contents, lastLine, currColor, width));
+            groups.add(new TextGroup(contents, lastLine, colorSupplier, width));
 
             // Recompute the total textWidth
             if (lastLeft > textWidth)
@@ -186,7 +202,7 @@ public class SmartLabel extends AbstractWidget<SmartLabel> {
 
         for (TextGroup group : groups) {
             String text = group.text;
-            Color color = group.color;
+            Color color = group.colorSupplier.get();
 
             while (currLine < group.line) {
                 top -= (fontLineHeight + lineSpacing);
