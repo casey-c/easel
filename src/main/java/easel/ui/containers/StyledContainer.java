@@ -16,7 +16,8 @@ import easel.utils.colors.EaselColors;
 import easel.utils.textures.TextureAtlasDatabase;
 import easel.utils.textures.TextureDatabase;
 
-import java.util.Arrays;
+import java.util.List;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 public class StyledContainer extends AbstractWidget<StyledContainer> {
@@ -199,20 +200,7 @@ public class StyledContainer extends AbstractWidget<StyledContainer> {
         return this;
     }
 
-    public StyledContainer scaleToContentWidth() {
-        if (content == null)
-            return this;
-
-        float newWidth = content.getWidth();
-
-        // Account for the header width as well
-        if (hasHeader) {
-            if (hasCustomHeader)
-                newWidth = Math.max(newWidth, customHeader.getWidth());
-            else
-                newWidth = Math.max(newWidth, defaultHeader.getWidth());
-        }
-
+    public StyledContainer withWidth(float newWidth) {
         npFullShadow.withWidth(newWidth);
         npFullBase.withWidth(newWidth);
         npFullTrim.withWidth(newWidth);
@@ -229,12 +217,7 @@ public class StyledContainer extends AbstractWidget<StyledContainer> {
         return this;
     }
 
-    public StyledContainer scaleToContentHeight() {
-        if (content == null)
-            return this;
-
-        float newHeight = content.getHeight() + getHeaderHeight();
-
+    public StyledContainer withHeight(float newHeight) {
         npFullShadow.withHeight(newHeight);
         npFullBase.withHeight(newHeight);
         npFullTrim.withHeight(newHeight);
@@ -246,9 +229,144 @@ public class StyledContainer extends AbstractWidget<StyledContainer> {
         return this;
     }
 
+    public StyledContainer scaleToContentWidth() {
+        if (content == null)
+            return this;
+
+        float newWidth = content.getWidth();
+
+        // Account for the header width as well
+        if (hasHeader) {
+            if (hasCustomHeader)
+                newWidth = Math.max(newWidth, customHeader.getWidth());
+            else
+                newWidth = Math.max(newWidth, defaultHeader.getWidth());
+        }
+
+        return withWidth(newWidth);
+    }
+
+    public StyledContainer scaleToContentHeight() {
+        if (content == null)
+            return this;
+
+        return withHeight(content.getHeight() + getHeaderHeight());
+    }
+
     public StyledContainer scaleToContent() {
         scaleToContentWidth();
         return scaleToContentHeight();
+    }
+
+    // --------------------------------------------------------------------------------
+
+    public static void syncContainerWidths(StyledContainer... containers) {
+        syncContainerWidths(false, containers);
+    }
+
+    public static void syncContainerWidths(Stream<StyledContainer> containers) {
+        syncContainerWidths(false, containers);
+    }
+
+    public static void syncContainerWidths(List<StyledContainer> containers) {
+        syncContainerWidths(false, containers);
+    }
+
+    /**
+     * See {@link #syncContainerWidths(boolean, Stream)}} for details. This version uses a variadic list instead of a stream.
+     * @param scaleToContentFirst whether to call {@link #scaleToContent()} on each container first before scaling all widths to the maximum
+     * @param containers a variadic list of containers to scale widths of
+     * @see #syncContainerWidths(boolean, Stream)
+     */
+    public static void syncContainerWidths(boolean scaleToContentFirst, StyledContainer... containers) {
+        syncContainerWidths(scaleToContentFirst, Stream.of(containers));
+    }
+
+    /**
+     * <p>
+     * Makes all StyledContainers in the stream share the width of the widest one. As this is a width altering function, each affected widget will require re-anchoring before being used. The <code>scaleToContentFirst</code> flag is mostly for convenience and if set, will call {@link #scaleToContent()} on all widgets before computing the the final new width.
+     * </p>
+     * <p>
+     * An example use:
+     * </p>
+     * <pre>
+     * {@code
+     * // This is some layout which contains the StyledContainers as children:
+     * layout = ...;
+     *
+     * // We want to sync up all the containers to have the same width
+     * // the first argument "true" simply calls .scaleToContent() on each container before computing the width to scale everything to
+     * StyledContainer.syncContainerWidths(true, layout.iteratorOfType(StyledContainer.class));
+     *
+     * // We've (probably) adjusted the dimensions of multiple styled containers, so be sure to reanchor everything affected
+     * // Since we've stored the containers in a layout, you can just perform your anchoring step on it now
+     * layout.anchoredCenteredOnScreen();
+     * }
+     * </pre>
+     * @param scaleToContentFirst whether to call {@link #scaleToContent()} on each container first before scaling all widths to the maximum
+     * @param containers a stream of containers to scale widths of
+     * @see #syncContainerHeights(boolean, Stream)
+     * @see #syncContainerWidths(boolean, StyledContainer...)
+     */
+    public static void syncContainerWidths(boolean scaleToContentFirst, Stream<StyledContainer> containers) {
+        syncContainerWidths(scaleToContentFirst, containers.collect(Collectors.toList()));
+    }
+
+    public static void syncContainerWidths(boolean scaleToContentFirst, List<StyledContainer> containers) {
+        if (scaleToContentFirst)
+            containers.forEach(StyledContainer::scaleToContent);
+
+        float maxWidth = containers.stream().map(container -> container.width)
+                .max(Float::compareTo)
+                .orElse(0.0f);
+
+        containers.forEach(container -> container.withWidth(maxWidth));
+    }
+
+    // --------------------------------------------------------------------------------
+
+    public static void syncContainerHeights(StyledContainer... containers) {
+        syncContainerHeights(false, containers);
+    }
+
+    public static void syncContainerHeights(Stream<StyledContainer> containers) {
+        syncContainerHeights(false, containers);
+    }
+
+    public static void syncContainerHeights(List<StyledContainer> containers) {
+        syncContainerHeights(false, containers);
+    }
+
+    /**
+     * A variant of {@link #syncContainerHeights(boolean, Stream)} using a variadic list as the arguments.
+     * @param scaleToContentFirst whether to call {@link #scaleToContent()} on each container first before scaling all heights to the maximum
+     * @param containers a variadic list of containers to scale heights of
+     * @see #syncContainerHeights(boolean, Stream)
+     */
+    public static void syncContainerHeights(boolean scaleToContentFirst, StyledContainer... containers) {
+        syncContainerHeights(scaleToContentFirst, Stream.of(containers));
+    }
+
+    /**
+     * Makes all containers share the height of the tallest container. Not as common as {@link #syncContainerWidths(boolean, Stream)}, but can be used in a similar manner.
+     * @param scaleToContentFirst whether to call {@link #scaleToContent()} on each container first before scaling all heights to the maximum
+     * @param containers a stream of containers to scale heights of
+     * @see #syncContainerWidths(boolean, Stream)
+     * @see #syncContainerHeights(boolean, StyledContainer...)
+     */
+    public static void syncContainerHeights(boolean scaleToContentFirst, Stream<StyledContainer> containers) {
+        syncContainerHeights(scaleToContentFirst, containers.collect(Collectors.toList()));
+    }
+
+    public static void syncContainerHeights(boolean scaleToContentFirst, List<StyledContainer> containers) {
+        if (scaleToContentFirst)
+            containers.forEach(StyledContainer::scaleToContent);
+
+        float maxHeight = containers.stream().map(container -> container.height)
+                .max(Float::compareTo)
+                .orElse(0.0f);
+
+        containers.forEach(container -> container.withHeight(maxHeight));
     }
 
     // --------------------------------------------------------------------------------

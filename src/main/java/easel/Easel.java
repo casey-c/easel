@@ -10,6 +10,7 @@ import com.evacipated.cardcrawl.modthespire.lib.SpireInitializer;
 import com.megacrit.cardcrawl.core.Settings;
 import com.megacrit.cardcrawl.helpers.FontHelper;
 import easel.ui.AbstractWidget;
+import easel.ui.AnchorPosition;
 import easel.ui.containers.MoveContainer;
 import easel.ui.containers.StyledContainer;
 import easel.ui.layouts.VerticalLayout;
@@ -22,6 +23,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import java.util.ArrayList;
+import java.util.stream.Stream;
 
 @SpireInitializer
 public class Easel implements PostInitializeSubscriber, RenderSubscriber, PostUpdateSubscriber {
@@ -48,6 +50,7 @@ public class Easel implements PostInitializeSubscriber, RenderSubscriber, PostUp
                         new StyledContainer(100, 100)
                                 .withHeader("Tip Body Font")
                                 .withHeaderColor(EaselColors.HEADER_STRONG_PURPLE())
+                                .withContentAnchor(AnchorPosition.LEFT_TOP)
                                 .withContent(
                                         new SmartLabel(FontHelper.tipBodyFont, 500, 10)
                                                 .withTextColor(Color.GRAY)
@@ -63,9 +66,10 @@ public class Easel implements PostInitializeSubscriber, RenderSubscriber, PostUp
                                 .scaleToContent()
                 )
                 .withChild(
-                        new StyledContainer(100, 100)
+                        new StyledContainer(700, 100)
                                 .withHeader("Easel Italic Font")
                                 .withHeaderColor(EaselColors.HEADER_LIGHT_ALGAE())
+                                .withContentAnchor(AnchorPosition.LEFT_TOP)
                                 .withContent(
                                         new SmartLabel(EaselFonts.MEDIUM_ITALIC, 300, 10)
                                                 .withText("Hello, world.")
@@ -82,10 +86,12 @@ public class Easel implements PostInitializeSubscriber, RenderSubscriber, PostUp
                                                 }),
                                 true
                                 )
-                                .scaleToContent()
-                )
-                .anchoredCenteredOnScreen()
-                ;
+                                .scaleToContentHeight()
+                );
+
+        StyledContainer.syncContainerHeights(true, layout.iteratorOfType(StyledContainer.class));
+
+        layout.anchoredCenteredOnScreen();
 
         widgets.add(
                 new MoveContainer().withAllChildrenOfLayout(layout)
