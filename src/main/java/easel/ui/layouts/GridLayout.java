@@ -242,18 +242,52 @@ public final class GridLayout extends AbstractWidget<GridLayout> {
 
     // --------------------------------------------------------------------------------
 
-    protected Stream<LayoutItem> iteratorByRow(int row) {
+    /**
+     * Returns all children in the given row, in no particular order.
+     * @param row the row to pull children from
+     * @return a stream containing any widget that sits in this row
+     */
+    public Stream<LayoutItem> iteratorByRow(int row) {
         return children.entrySet()
                 .stream()
                 .filter(a -> a.getKey().row == row)
                 .map(Map.Entry::getValue);
     }
 
-    protected Stream<LayoutItem> iteratorByCol(int col) {
+    /**
+     * Returns all children in the given column, in no particular order.
+     * @param col the column to pull children from
+     * @return a stream containing any widget that sits in this column
+     */
+    public Stream<LayoutItem> iteratorByCol(int col) {
         return children.entrySet()
                 .stream()
                 .filter(a -> a.getKey().col == col)
                 .map(Map.Entry::getValue);
+    }
+
+    /**
+     * Returns all children in the given column of a particular type, in no particular order. Children in this column which are not instances of the given type are not added to the stream. This is mostly for convenience as recovering the type inside the stream can make some code cleaner. This variant of {@link #iteratorByCol(int)} has a slight performance penalty due to making sure the casts are safe.
+     * @param col the column to pull children from
+     * @param clz the class of widget caught by the filter
+     * @param <T> the type of widget that will be in the final stream
+     * @return a stream containing any widget of type <code>T</code> that sits in this column
+     * @see #iteratorByCol(int)
+     */
+    public <T> Stream<T> iteratorByColOfType(int col, Class<T> clz) {
+        return iteratorByCol(col).filter(clz::isInstance).map(w -> (T)w);
+    }
+
+    /**
+     * Returns all children in the given row of a particular type, in no particular order. Children in this row which are not instances of the given type are not added to the stream. This is mostly for convenience as recovering the type inside the stream can make some code cleaner. This variant of {@link #iteratorByRow(int)} has a slight performance penalty due to making sure the casts are safe.
+     * @param row the row to pull children from
+     * @param clz the class of widget caught by the filter
+     * @param <T> the type of widget that will be in the final stream
+     * @return a stream containing any widget of type <code>T</code> that sits in this row
+     * @see #iteratorByRow(int)
+     */
+    public <T> Stream<T> iteratorByRowOfType(int row, Class<T> clz) {
+        return iteratorByRow(row).filter(clz::isInstance).map(w -> (T)w);
     }
 
     // Originally used for growth policy stuff (which got cut for simplicity)
@@ -453,6 +487,17 @@ public final class GridLayout extends AbstractWidget<GridLayout> {
      */
     public Stream<AbstractWidget> iterator() {
         return this.children.values().stream().map(item -> item.widget);
+    }
+
+    /**
+     * A stream of children handled by this widget who are of the specific type, for convenience purposes. Like {@link #iterator()}, the resulting stream is in no particular order. If you know you've built the layout with all objects of a particular type, you can quickly recover them all into a stream that remembers the type. This has a slight performance penalty over {@link #iterator()} due to checking each child against the type for safe casts, but the resulting stream will be properly typed to make it easier to work with. Children managed by this layout who are not of the given type will not be included in the stream, so be wary if using this variant of the iterator.
+     * @param clz the class for the type
+     * @param <T> the type of child to extract
+     * @return a stream of children who fit the given type
+     * @see #iterator()
+     */
+    public <T> Stream<T> iteratorOfType(Class<T> clz) {
+        return iterator().filter(clz::isInstance).map(c -> (T)c);
     }
 
     // --------------------------------------------------------------------------------

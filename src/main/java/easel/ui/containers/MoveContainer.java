@@ -182,6 +182,17 @@ public class MoveContainer extends AbstractWidget<MoveContainer> {
         return map.values().stream().map(item -> item.widget);
     }
 
+    /**
+     * Returns all children managed by this widget of a particular type. Children that are not of the given type are not included in the final stream. This variant of {@link #iterator()} has a slight performance penalty due to making sure the casts are safe.
+     * @param clz the class of widget caught by the filter
+     * @param <T> the type of widget that will be in the final stream
+     * @return a stream containing all children managed by this widget of a particular type, in their render order from bottom to top
+     * @see #iterator()
+     */
+    public <T> Stream<T> iteratorOfType(Class<T> clz) {
+        return iterator().filter(clz::isInstance).map(w -> (T)w);
+    }
+
     // --------------------------------------------------------------------------------
 
     private boolean moving;

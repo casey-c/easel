@@ -100,10 +100,21 @@ abstract class AbstractOneDimensionalLayout<T extends AbstractOneDimensionalLayo
     }
 
     /**
-     * @return a stream of all children currently handled by this widget, from top to bottom
+     * @return a stream of all children currently handled by this widget, from top to bottom (or left to right)
      */
     public Stream<AbstractWidget> iterator() {
         return this.children.stream().map(item -> item.widget);
+    }
+
+    /**
+     * A stream of children handled by this widget who are of the specific type, for convenience purposes. Follows the same top to bottom / left to right ordering of the regular iterator. If you know you've built the layout with all objects of a particular type, you can quickly recover them all into a stream that remembers the type. This has a slight performance penalty over {@link #iterator()} due to checking each child against the type for safe casts, but the resulting stream will be properly typed to make it easier to work with. Children managed by this layout who are not of the given type will not be included in the stream, so be wary if using this variant of the iterator.
+     * @param clz the class for the type
+     * @param <T> the type of child to extract
+     * @return a stream of children who fit the given type
+     * @see #iterator()
+     */
+    public <T> Stream<T> iteratorOfType(Class<T> clz) {
+        return iterator().filter(clz::isInstance).map(c -> (T)c);
     }
 
     // --------------------------------------------------------------------------------
