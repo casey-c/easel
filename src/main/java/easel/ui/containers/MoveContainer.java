@@ -241,7 +241,7 @@ public class MoveContainer extends AbstractWidget<MoveContainer> {
                 ((StyledContainer)moveTarget).withShadows(false);
             }
 
-            UpdateSuppressor.releaseUpdateSuppression();
+            UpdateSuppressor.suppressUpdates(false);
 //            SoundHelper.uiClick2();
         }
     }
@@ -261,13 +261,13 @@ public class MoveContainer extends AbstractWidget<MoveContainer> {
 
             // Nothing under mouse
             if (!target.isPresent()) {
-                UpdateSuppressor.releaseAllSuppression();
+                UpdateSuppressor.suppressAll(false);
                 return;
             }
 
             // Left click started (start moving)
             if (InputHelper.justClickedLeft) {
-                UpdateSuppressor.suppressAll();
+                UpdateSuppressor.suppressAll(true);
 
                 Map.Entry<Integer, MapItem> validTarget = target.get();
                 this.moveTarget = validTarget.getValue().widget;
@@ -291,7 +291,7 @@ public class MoveContainer extends AbstractWidget<MoveContainer> {
                 this.startingWidgetTop = moveTarget.getTop();
             }
             else {
-                UpdateSuppressor.suppressTips();
+                UpdateSuppressor.suppressTips(true);
             }
         }
 

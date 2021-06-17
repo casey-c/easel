@@ -16,6 +16,9 @@ import java.util.HashMap;
 // this probably isn't ok lol
 import static com.megacrit.cardcrawl.ui.panels.ExhaustPanel.fontScale;
 
+/**
+ * A builder for making font creation a bit more convenient. The default settings attempt to mimic the <code>tipBodyFont</code> from the base game, and you can alter individual pieces of it without needing to worry about changing the entire thing. Fonts should be built in a post-initialize hook from BaseMod and then stored statically somewhere for access. Easel comes built with a few custom fonts already, e.g. {@link EaselFonts#SMALLER_TIP_BODY}, whose constructions use this builder if you're looking for examples of use.
+ */
 public class BitmapFontBuilder {
     // Defaults mimic tipBodyFont
 

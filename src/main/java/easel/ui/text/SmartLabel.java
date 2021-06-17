@@ -130,6 +130,7 @@ public class SmartLabel extends AbstractWidget<SmartLabel> {
 
     /**
      * Appends the given text to the end of the label, with a specific (temporary) color. After adding all the text, the temporary color will revert back to the one set by the last call of {@link #withTextColor(Color)}, or the base game's <code>Settings.CREAM_COLOR</code> pale white color, if that function has not been used. The given text string will be split by words (words are determined by calling <code>text.split(" ")</code> to split on spaces, skipping over empty strings), and then added onto the block at the end of the current line until a new line needs to be formed. A new line is automatically formed whenever adding a word will cause the current line's width to exceed the <code>lineWidth</code> set by the constructor.
+     * @param textColor the color for this block of text
      * @param text the text to append
      * @return this widget
      */
@@ -145,6 +146,7 @@ public class SmartLabel extends AbstractWidget<SmartLabel> {
 
     /**
      * Appends the given text to the end of the label, with a specific (temporary) color. This variant uses a supplier so that you can have dynamically updated colors by including a reference to a function handle. After adding all the text, the temporary color will revert back to the one set by the last call of {@link #withTextColor(Color)}, or the base game's <code>Settings.CREAM_COLOR</code> pale white color, if that function has not been used. The given text string will be split by words (words are determined by calling <code>text.split(" ")</code> to split on spaces, skipping over empty strings), and then added onto the block at the end of the current line until a new line needs to be formed. A new line is automatically formed whenever adding a word will cause the current line's width to exceed the <code>lineWidth</code> set by the constructor.
+     * @param colorSupplier the color for this block of text
      * @param text the text to append
      * @return this widget
      */

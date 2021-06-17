@@ -1,10 +1,12 @@
 package easel.utils;
 
-import basemod.BaseMod;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import easel.Easel;
 import easel.utils.colors.EaselColors;
 
+/**
+ * Some pre-built fonts used by Easel which can be used in other mods.
+ */
 public class EaselFonts {
     /**
      * A slightly smaller version of {@link com.megacrit.cardcrawl.helpers.FontHelper#tipBodyFont}.
