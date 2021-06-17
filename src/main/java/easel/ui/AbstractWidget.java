@@ -951,27 +951,19 @@ public abstract class AbstractWidget<T extends AbstractWidget<T>> {
     protected void mouseEnter() {
         onMouseEnter.accept((T)this);
         isHovered = true;
-
-        Easel.logger.info("Hover started: " + this);
     }
 
     protected void mouseLeave() {
         onMouseLeave.accept((T)this);
         isHovered = false;
-
-        Easel.logger.info("Hover finished: " + this);
     }
 
     protected void leftMouseClick() {
         onLeftClick.accept((T)this);
-
-        Easel.logger.info("Left-Clicked: " + this);
     }
 
     protected void rightMouseClick() {
         onRightClick.accept((T)this);
-
-        Easel.logger.info("Right-Clicked: " + this);
     }
 
 
@@ -1003,8 +995,8 @@ public abstract class AbstractWidget<T extends AbstractWidget<T>> {
         else if (hb.hovered && CInputActionSet.select.isJustPressed()) {
             CInputActionSet.select.unpress();
 
-            Easel.logger.info("Clicked (using CInputActionSet)");
-            Easel.logger.info(this);
+//            Easel.logger.info("Clicked (using CInputActionSet)");
+//            Easel.logger.info(this);
 
             leftMouseClick();
         }
