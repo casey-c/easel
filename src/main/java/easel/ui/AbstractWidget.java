@@ -1063,6 +1063,9 @@ public abstract class AbstractWidget<T extends AbstractWidget<T>> {
 
     // --------------------------------------------------------------------------------
 
+    /**
+     * @return true if the current mouse position is contained inside the content dimensions (e.g. {@link #getContentLeft()} and {@link #getContentRight()} etc.)
+     */
     public boolean isMouseInContentBounds() {
         int mx = EaselInputHelper.getMouseX();
         int my = EaselInputHelper.getMouseY();
@@ -1071,6 +1074,9 @@ public abstract class AbstractWidget<T extends AbstractWidget<T>> {
                 (my >= getContentBottom() && my <= getContentTop()));
     }
 
+    /**
+     * @return true if the current mouse position is contained inside the full dimensions (e.g. {@link #getLeft()} and {@link #getRight()} etc.)
+     */
     public boolean isMouseInBounds() {
         int mx = EaselInputHelper.getMouseX();
         int my = EaselInputHelper.getMouseY();

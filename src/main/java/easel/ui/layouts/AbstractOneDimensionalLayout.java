@@ -15,6 +15,9 @@ abstract class AbstractOneDimensionalLayout<T extends AbstractOneDimensionalLayo
     protected float totalWidth, totalHeight;
     protected float spacing;
 
+    protected boolean shouldAutoScaleToContent = false;
+    private boolean hasAlreadyScaledToContent = false;
+
     public AbstractOneDimensionalLayout(float spacing) {
         this.spacing = spacing;
     }
@@ -81,9 +84,16 @@ abstract class AbstractOneDimensionalLayout<T extends AbstractOneDimensionalLayo
     }
 
     // --------------------------------------------------------------------------------
+    protected abstract void autoscale();
 
     @Override
     public T anchoredAt(float x, float y, AnchorPosition anchorPosition, InterpolationSpeed movementSpeed) {
+        if (shouldAutoScaleToContent && !hasAlreadyScaledToContent) {
+            shouldAutoScaleToContent = false;
+            hasAlreadyScaledToContent = true;
+            autoscale();
+        }
+
         super.anchoredAt(x, y, anchorPosition, movementSpeed);
         anchorChildren(movementSpeed);
         return (T)this;

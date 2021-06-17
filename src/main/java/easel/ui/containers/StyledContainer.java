@@ -20,6 +20,29 @@ import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+/**
+ * <p>
+ * A container with a nice textured background and borders. Contains some helpers for making it have a nice header and for scaling everything to fit the given contents. Like layouts or other containers: anchoring, rendering, updates and the other usual suspects will be passed down the hierarchy, so calling them once on the container itself will be sufficient to handle the content and header widgets managed by this container. StyledContainers work nicely with {@link MoveContainer}s, and are designed as a "super" tooltip to give the base game tooltips a bit more flexibility. They can also be used as larger screens as well.
+ * </p>
+ * <p>
+ * Example use:
+ * </p>
+ * <pre>
+ * {@code
+ * StyledContainer c = new StyledContainer(500, 500)
+ *     .withHeader("Title", "Subtitle")
+ *     .withHeaderAnchor(AnchorPosition.LEFT_CENTER)
+ *     .withHeaderColor(EaselColors.HEADER_PURPLE())
+ *     .withContent(
+ *         new VerticalLayout(20)
+ *             .withChild(new Label("Content One"))
+ *             .withChild(new Label("Content Two"))
+ *     )
+ *     .scaleToContent()
+ *     .anchoredCenteredOnScreen();
+ * }
+ * </pre>
+ */
 public class StyledContainer extends AbstractWidget<StyledContainer> {
     private float width;
     private float height;
@@ -47,7 +70,7 @@ public class StyledContainer extends AbstractWidget<StyledContainer> {
     private Color baseColor = EaselColors.TOOLTIP_BASE();
     private Color trimColor = EaselColors.TOOLTIP_TRIM();
     private Color trimHighlightColor = EaselColors.TOOLTIP_TRIM_HIGHLIGHT();
-    private Color headerColor = EaselColors.HEADER_PURPLE();
+    private Color headerColor = EaselColors.HEADER_BLUE();
 
     // Shadows
     private boolean renderFullShadows = false;
@@ -61,6 +84,11 @@ public class StyledContainer extends AbstractWidget<StyledContainer> {
 
     // --------------------------------------------------------------------------------
 
+    /**
+     * Constructs a new styled container with the given dimensions. These dimensions can be changed later (e.g. scaled to content with {@link #scaleToContent()} or resized manually with {@link #withDimensions(float, float)}).
+     * @param width the entire width of the container
+     * @param height the entire height of the container
+     */
     public StyledContainer(float width, float height) {
         this.npFullShadow = new NinePatchWidget(width, height, atlas.findRegion("shadow"))
                 .withColor(Settings.QUARTER_TRANSPARENT_WHITE_COLOR);
@@ -90,6 +118,11 @@ public class StyledContainer extends AbstractWidget<StyledContainer> {
                 .withColor(trimColor);
     }
 
+    /**
+     * Add a single-line title to this container with the given text. Header text position is affected by {@link #withHeaderAnchor(AnchorPosition)}.
+     * @param title the text to serve as the header
+     * @return this widget
+     */
     public StyledContainer withHeader(String title) {
         this.hasHeader = true;
         this.hasCustomHeader = false;
@@ -105,6 +138,12 @@ public class StyledContainer extends AbstractWidget<StyledContainer> {
         return this;
     }
 
+    /**
+     * Add a double-line title/subtitle to this container with the given text. Header text position is affected by {@link #withHeaderAnchor(AnchorPosition)}.
+     * @param title the text to serve as the header title
+     * @param subtitle the text to serve as the header subtitle
+     * @return this widget
+     */
     public StyledContainer withHeader(String title, String subtitle) {
         this.hasHeader = true;
         this.hasCustomHeader = false;
@@ -121,6 +160,12 @@ public class StyledContainer extends AbstractWidget<StyledContainer> {
         return this;
     }
 
+    /**
+     * Add a custom child widget to serve as this containers header. Header position is affected by {@link #withHeaderAnchor(AnchorPosition)}.
+     * @param customHeader the widget which will sit in the header region (which automatically scales to surround this custom header)
+     * @param autoAddMargins if true, will call {@link AbstractWidget#withMargins(float, float)} on the <code>customHeader</code> with some suggested defaults (the header needs some sort of margins to not touch the borders of the container)
+     * @return this widget
+     */
     public StyledContainer withHeader(AbstractWidget customHeader, boolean autoAddMargins) {
         this.hasHeader = true;
         this.hasCustomHeader = true;
@@ -137,6 +182,11 @@ public class StyledContainer extends AbstractWidget<StyledContainer> {
 
     // --------------------------------------------------------------------------------
 
+    /**
+     * The background color of the header, if it exists (use with one of the header builder functions: {@link #withHeader(String)} etc.). The header colors can be picked from the <code>EaselColors.HEADER_</code> family of colors, such as {@link EaselColors#HEADER_RED()}. These header colors were chosen since they can fit well with the default background and trim colors of the overall container, and will work with the default header text colors. If not set, defaults to {@link EaselColors#HEADER_BLUE()}.
+     * @param headerColor the desired color of the header
+     * @return this widget
+     */
     public StyledContainer withHeaderColor(Color headerColor) {
         this.headerColor = headerColor;
 
@@ -147,12 +197,23 @@ public class StyledContainer extends AbstractWidget<StyledContainer> {
         return this;
     }
 
+    /**
+     * The background color of the entire container texture. Defaults to {@link EaselColors#TOOLTIP_BASE()} if not set.
+     * @param baseColor the new background color
+     * @return this widget
+     */
     public StyledContainer withBaseColor(Color baseColor) {
         this.baseColor = baseColor;
         this.npFullBase.withColor(baseColor);
         return this;
     }
 
+    /**
+     * The trim colors of the entire container texture (for the outermost borders). The styled container mimics some of the base game border style by having a regular trim color and a specific highlight color to contrast against it. Defaults to {@link EaselColors#TOOLTIP_TRIM()} and {@link EaselColors#TOOLTIP_TRIM_HIGHLIGHT()} if not set.
+     * @param trimColor the basic border color
+     * @param trimHighlightColor the highlight color for the border
+     * @return this widget
+     */
     public StyledContainer withTrimColors(Color trimColor, Color trimHighlightColor) {
         this.trimColor = trimColor;
         this.trimHighlightColor = trimHighlightColor;
@@ -169,6 +230,12 @@ public class StyledContainer extends AbstractWidget<StyledContainer> {
     // --------------------------------------------------------------------------------
 
     // TODO remember to talk about the need to refreshAnchor() afterwards
+
+    /**
+     * Sets the position of the header contents inside the header region. Requires anchoring after calling this in order for the changes to take effect.
+     * @param headerAnchor where the header contents are anchored inside the header region
+     * @return this widget
+     */
     public StyledContainer withHeaderAnchor(AnchorPosition headerAnchor) {
         this.headerAnchor = headerAnchor;
 
@@ -179,11 +246,21 @@ public class StyledContainer extends AbstractWidget<StyledContainer> {
         return this;
     }
 
+    /**
+     * Sets the position of the main contents inside the bottom region. Requires anchoring afterwards for the changes to take effect.
+     * @param contentAnchor where the main contents are anchored in the bottom section of the container
+     * @return this widget
+     */
     public StyledContainer withContentAnchor(AnchorPosition contentAnchor) {
         this.contentAnchor = contentAnchor;
         return this;
     }
 
+    /**
+     * Set whether a drop shadow is rendered underneath the container. Defaults to false if not set, and recommended to not alter this manually. Toggled by {@link MoveContainer} when moving styled containers around to improve the aesthetics a bit.
+     * @param enabled if true, will render shadows beneath the entire widget
+     * @return this widget
+     */
     public StyledContainer withShadows(boolean enabled) {
         this.renderFullShadows = enabled;
         return this;
@@ -191,6 +268,12 @@ public class StyledContainer extends AbstractWidget<StyledContainer> {
 
     // --------------------------------------------------------------------------------
 
+    /**
+     * Set the main content of this container. This gets rendered underneath the header (if it exists) and takes up the primary area of the container. The content itself is often a layout containing its own widget hierarchy. Like custom header widgets, this contains a <code>autoAddMargins</code> flag which can be used to automatically give the new content a reasonable set of default margins. Margins on the content widget itself are required for the content to not touch the sides of the container. Requires re-anchoring.
+     * @param content the main widget that is the focus of this container
+     * @param autoAddMargins if true, will call {@link AbstractWidget#withMargins(float)} on the content widget with some suggested values
+     * @return this widget
+     */
     public StyledContainer withContent(AbstractWidget content, boolean autoAddMargins) {
         this.content = content;
 
@@ -200,6 +283,11 @@ public class StyledContainer extends AbstractWidget<StyledContainer> {
         return this;
     }
 
+    /**
+     * Set the new width of the full container to a new value. Requires re-anchoring.
+     * @param newWidth the new width
+     * @return this widget
+     */
     public StyledContainer withWidth(float newWidth) {
         npFullShadow.withWidth(newWidth);
         npFullBase.withWidth(newWidth);
@@ -217,6 +305,11 @@ public class StyledContainer extends AbstractWidget<StyledContainer> {
         return this;
     }
 
+    /**
+     * Set the new height of the full container to a new value Requires re-anchoring.
+     * @param newHeight the new height
+     * @return this widget
+     */
     public StyledContainer withHeight(float newHeight) {
         npFullShadow.withHeight(newHeight);
         npFullBase.withHeight(newHeight);
@@ -229,6 +322,21 @@ public class StyledContainer extends AbstractWidget<StyledContainer> {
         return this;
     }
 
+    /**
+     * Set new dimensions for the full container. Convenience for calling both {@link #withWidth(float)} and {@link #withHeight(float)} at the same time. Requires re-anchoring.
+     * @param newWidth the new width
+     * @param newHeight the new height
+     * @return this widget
+     */
+    public StyledContainer withDimensions(float newWidth, float newHeight) {
+        withWidth(newWidth);
+        return withHeight(newHeight);
+    }
+
+    /**
+     * Automatically scale the container to fit its main content (and header) width. Does nothing if no content widget has been set. Requires re-anchoring.
+     * @return this widget
+     */
     public StyledContainer scaleToContentWidth() {
         if (content == null)
             return this;
@@ -246,6 +354,10 @@ public class StyledContainer extends AbstractWidget<StyledContainer> {
         return withWidth(newWidth);
     }
 
+    /**
+     * Automatically scale the container to fit its main content (and header) height. Does nothing if no content widget has been set. Requires re-anchoring.
+     * @return this widget
+     */
     public StyledContainer scaleToContentHeight() {
         if (content == null)
             return this;
@@ -253,6 +365,10 @@ public class StyledContainer extends AbstractWidget<StyledContainer> {
         return withHeight(content.getHeight() + getHeaderHeight());
     }
 
+    /**
+     * Automatically scale the container to fit the main contents. Calling this after setting up the container's content and headers is extremely common, as it scales the container itself to fit the widgets you've added.
+     * @return this widget
+     */
     public StyledContainer scaleToContent() {
         scaleToContentWidth();
         return scaleToContentHeight();
@@ -260,22 +376,37 @@ public class StyledContainer extends AbstractWidget<StyledContainer> {
 
     // --------------------------------------------------------------------------------
 
+    /**
+     * See {@link #syncContainerWidths(boolean, Stream)}. Will not automatically scale to content first.
+     * @param containers a variadic list of containers to scale
+     * @see #syncContainerWidths(boolean, Stream)
+     */
     public static void syncContainerWidths(StyledContainer... containers) {
         syncContainerWidths(false, containers);
     }
 
+    /**
+     * See {@link #syncContainerWidths(boolean, Stream)}. Will not automatically scale to content first.
+     * @param containers a stream of containers to scale
+     * @see #syncContainerWidths(boolean, Stream)
+     */
     public static void syncContainerWidths(Stream<StyledContainer> containers) {
         syncContainerWidths(false, containers);
     }
 
+    /**
+     * See {@link #syncContainerWidths(boolean, Stream)}. Will not automatically scale to content first.
+     * @param containers a list of containers to scale
+     * @see #syncContainerWidths(boolean, Stream)
+     */
     public static void syncContainerWidths(List<StyledContainer> containers) {
         syncContainerWidths(false, containers);
     }
 
     /**
-     * See {@link #syncContainerWidths(boolean, Stream)}} for details. This version uses a variadic list instead of a stream.
+     * See {@link #syncContainerWidths(boolean, Stream)}
      * @param scaleToContentFirst whether to call {@link #scaleToContent()} on each container first before scaling all widths to the maximum
-     * @param containers a variadic list of containers to scale widths of
+     * @param containers a variadic list of containers to scale
      * @see #syncContainerWidths(boolean, Stream)
      */
     public static void syncContainerWidths(boolean scaleToContentFirst, StyledContainer... containers) {
@@ -295,23 +426,35 @@ public class StyledContainer extends AbstractWidget<StyledContainer> {
      * layout = ...;
      *
      * // We want to sync up all the containers to have the same width
-     * // the first argument "true" simply calls .scaleToContent() on each container before computing the width to scale everything to
+     * // the first argument "true" simply calls .scaleToContent() on each container
+     * // before computing the width to scale everything to
      * StyledContainer.syncContainerWidths(true, layout.iteratorOfType(StyledContainer.class));
      *
-     * // We've (probably) adjusted the dimensions of multiple styled containers, so be sure to reanchor everything affected
-     * // Since we've stored the containers in a layout, you can just perform your anchoring step on it now
+     * // We've (probably) adjusted the dimensions of multiple styled containers, so be sure
+     * // to reanchor everything affected. Since we've stored the containers in a layout, you
+     * // can just perform your anchoring step on it now
      * layout.anchoredCenteredOnScreen();
      * }
      * </pre>
      * @param scaleToContentFirst whether to call {@link #scaleToContent()} on each container first before scaling all widths to the maximum
-     * @param containers a stream of containers to scale widths of
+     * @param containers a stream of containers to scale
      * @see #syncContainerHeights(boolean, Stream)
      * @see #syncContainerWidths(boolean, StyledContainer...)
+     * @see #syncContainerWidths(boolean, List)
+     * @see #syncContainerWidths(Stream)
+     * @see #syncContainerWidths(List)
+     * @see #syncContainerWidths(StyledContainer...)
      */
     public static void syncContainerWidths(boolean scaleToContentFirst, Stream<StyledContainer> containers) {
         syncContainerWidths(scaleToContentFirst, containers.collect(Collectors.toList()));
     }
 
+    /**
+     * See {@link #syncContainerWidths(boolean, Stream)}
+     * @param scaleToContentFirst whether to call {@link #scaleToContent()} on each container first before scaling all widths to the maximum
+     * @param containers a list of containers to scale
+     * @see #syncContainerWidths(boolean, Stream)
+     */
     public static void syncContainerWidths(boolean scaleToContentFirst, List<StyledContainer> containers) {
         if (scaleToContentFirst)
             containers.forEach(StyledContainer::scaleToContent);
@@ -325,22 +468,37 @@ public class StyledContainer extends AbstractWidget<StyledContainer> {
 
     // --------------------------------------------------------------------------------
 
+    /**
+     * See {@link #syncContainerHeights(boolean, Stream)}. Will not automatically scale to content first.
+     * @param containers a variadic list of containers to scale
+     * @see #syncContainerHeights(boolean, Stream)
+     */
     public static void syncContainerHeights(StyledContainer... containers) {
         syncContainerHeights(false, containers);
     }
 
+    /**
+     * See {@link #syncContainerHeights(boolean, Stream)}. Will not automatically scale to content first.
+     * @param containers a stream of containers to scale
+     * @see #syncContainerHeights(boolean, Stream)
+     */
     public static void syncContainerHeights(Stream<StyledContainer> containers) {
         syncContainerHeights(false, containers);
     }
 
+    /**
+     * See {@link #syncContainerHeights(boolean, Stream)}. Will not automatically scale to content first.
+     * @param containers a list of containers to scale
+     * @see #syncContainerHeights(boolean, Stream)
+     */
     public static void syncContainerHeights(List<StyledContainer> containers) {
         syncContainerHeights(false, containers);
     }
 
     /**
-     * A variant of {@link #syncContainerHeights(boolean, Stream)} using a variadic list as the arguments.
+     * See {@link #syncContainerHeights(boolean, Stream)}.
      * @param scaleToContentFirst whether to call {@link #scaleToContent()} on each container first before scaling all heights to the maximum
-     * @param containers a variadic list of containers to scale heights of
+     * @param containers a stream of containers to scale
      * @see #syncContainerHeights(boolean, Stream)
      */
     public static void syncContainerHeights(boolean scaleToContentFirst, StyledContainer... containers) {
@@ -353,11 +511,21 @@ public class StyledContainer extends AbstractWidget<StyledContainer> {
      * @param containers a stream of containers to scale heights of
      * @see #syncContainerWidths(boolean, Stream)
      * @see #syncContainerHeights(boolean, StyledContainer...)
+     * @see #syncContainerHeights(boolean, List)
+     * @see #syncContainerHeights(Stream)
+     * @see #syncContainerHeights(StyledContainer...)
+     * @see #syncContainerHeights(List)
      */
     public static void syncContainerHeights(boolean scaleToContentFirst, Stream<StyledContainer> containers) {
         syncContainerHeights(scaleToContentFirst, containers.collect(Collectors.toList()));
     }
 
+    /**
+     * See {@link #syncContainerHeights(boolean, Stream)}.
+     * @param scaleToContentFirst whether to call {@link #scaleToContent()} on each container first before scaling all heights to the maximum
+     * @param containers a list of containers to scale
+     * @see #syncContainerHeights(boolean, Stream)
+     */
     public static void syncContainerHeights(boolean scaleToContentFirst, List<StyledContainer> containers) {
         if (scaleToContentFirst)
             containers.forEach(StyledContainer::scaleToContent);

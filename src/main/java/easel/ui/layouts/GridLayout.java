@@ -9,6 +9,9 @@ import easel.ui.InterpolationSpeed;
 import java.util.*;
 import java.util.stream.Stream;
 
+/**
+ * UNSTABLE / API subject to change. A more powerful layout to aid arranging things in a grid. Since this class is probably going to be redesigned before the first official release, this documentation will remain unfinished until the API is more stable. For now, the general pattern to use this layout is to construct a new Grid, set up the rows/columns by calling one of {@link #withExactRows(float...)}, {@link #withNEvenlySizedRows(float, int)}, etc. and one of {@link #withExactCols(float...)}, {@link #withRelativeCols(float, float...)}, etc. (use one of the row builders to initialize the rows and one of the column builders for the columns). After that, you may add children using the convenience methods {@link #withChildrenInRow(int, AbstractWidget[])} or by directly specifying the cell {@link #withChild(int, int, AbstractWidget)} it falls into. (Row 0, Column 0) is the top left corner and the grid layout grows down and to the right of that, and when specifying widgets to go into certain cells you must be careful to place them into positions that actually exist from your initialized version in order for the grid to function properly. Finally, when you call an {@link #anchoredAt(float, float, AnchorPosition)}, the children are all moved into place. Like other layouts, you can automatically scale rows or columns using the various helper methods, (e.g. {@link #resizeRowToFitTallestChild(int)}), and managing the usual suspects (render, update, etc.) is as simple as calling those functions on the layout itself (as everything will trickle down the hierarchy as usual).
+ */
 public final class GridLayout extends AbstractWidget<GridLayout> {
     private HashMap<GridLocation, LayoutItem> children = new HashMap<>();
     private float totalWidth;

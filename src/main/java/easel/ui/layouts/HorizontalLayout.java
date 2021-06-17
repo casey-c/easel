@@ -23,9 +23,25 @@ import java.util.stream.Stream;
  */
 public class HorizontalLayout extends AbstractOneDimensionalLayout<HorizontalLayout> {
 
+    /**
+     * Constructs a new horizontal layout with the given row height and horizontal spacing. Child widgets of height less than this <code>desiredHeight</code> will be able to float around vertically in their assigned slot using their anchor position. You can use the other constructor ({@link #HorizontalLayout(float)}) if you want to automatically scale the heights to the tallest child, but using this version means the height allowed for children will not be changed unless you manually alter it using {@link #scaleToTallestChild()}.
+     * @param desiredHeight the height of the horizontal layout (for child anchoring purposes)
+     * @param spacing the horizontal gap in between elements of the layout
+     * @see #HorizontalLayout(float)
+     */
     public HorizontalLayout(float desiredHeight, float spacing) {
         super(spacing);
         this.totalHeight = desiredHeight;
+    }
+
+    /**
+     * Constructs a new horizontal layout with the given horizontal spacing. This constructor guarantees that {@link #scaleToTallestChild()} will be called the FIRST time that any {@link #anchoredAt(float, float, AnchorPosition)} anchoring occurs (only the first time). This is essentially a convenience method for the usual pattern where the row height set by the other constructor is ignored with a manual {@link #scaleToTallestChild()} before anchoring. This variant just does it automatically. To ensure performance, this auto-scaling only occurs the first time an anchoring occurs (which, presumably is after all children have been added), and must be done manually later if things change beyond that.
+     * @param spacing the horizontal gap in between elements of the layout
+     * @see #HorizontalLayout(float, float)
+     */
+    public HorizontalLayout(float spacing) {
+        super(spacing);
+        this.shouldAutoScaleToContent = true;
     }
 
     @Override public float getContentWidth() { return totalWidth - spacing; }
@@ -35,6 +51,8 @@ public class HorizontalLayout extends AbstractOneDimensionalLayout<HorizontalLay
     protected void updateSize(AbstractWidget newChild) {
         this.totalWidth += (spacing + newChild.getWidth());
     }
+
+    @Override protected void autoscale() { scaleToTallestChild(); }
 
     @Override
     protected void anchorChildren(InterpolationSpeed withDelay) {

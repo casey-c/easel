@@ -23,13 +23,24 @@ import java.util.stream.Stream;
  */
 public class VerticalLayout extends AbstractOneDimensionalLayout<VerticalLayout> {
     /**
-     * Constructs a new vertical layout with a total desired width and the vertical spacing between each widget.
-     * @param desiredWidth how much space the
-     * @param spacing vertical space in between widgets (in pixels)
+     * Constructs a new vertical layout with the given column width and vertical spacing. Child widgets of width less than this <code>desiredWidth</code> will be able to float around horizontally in their assigned slot using their anchor position. You can use the other constructor ({@link #VerticalLayout(float)}) if you want to automatically scale the widths to the tallest child, but using this version means the height allowed for children will not be changed unless you manually alter it using {@link #scaleToWidestChild()}.
+     * @param desiredWidth the width of the vertical layout (for child anchoring purposes)
+     * @param spacing the vertical gap in between elements of the layout
+     * @see #VerticalLayout(float)
      */
     public VerticalLayout(float desiredWidth, float spacing) {
         super(spacing);
         this.totalWidth = desiredWidth;
+    }
+
+    /**
+     * Constructs a new vertical layout with the given vertical spacing. This constructor guarantees that {@link #scaleToWidestChild()} will be called the FIRST time that any {@link #anchoredAt(float, float, AnchorPosition)} anchoring occurs (only the first time). This is essentially a convenience method for the usual pattern where the column width set by the other constructor is ignored with a manual {@link #scaleToWidestChild()} before anchoring. This variant just does it automatically. To ensure performance, this auto-scaling only occurs the first time an anchoring occurs (which, presumably is after all children have been added), and must be done manually later if things change beyond that.
+     * @param spacing the vertical gap in between elements of the layout
+     * @see #VerticalLayout(float, float)
+     */
+    public VerticalLayout(float spacing) {
+        super(spacing);
+        this.shouldAutoScaleToContent = true;
     }
 
     @Override public float getContentWidth() { return totalWidth; }
@@ -46,6 +57,7 @@ public class VerticalLayout extends AbstractOneDimensionalLayout<VerticalLayout>
         this.totalHeight = 0;
     }
 
+    @Override protected void autoscale() { scaleToWidestChild(); }
 
     @Override
     protected void anchorChildren(InterpolationSpeed withDelay) {

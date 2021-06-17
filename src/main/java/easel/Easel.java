@@ -101,31 +101,13 @@ public class Easel implements PostInitializeSubscriber, RenderSubscriber, PostUp
 
     @Override
     public void receiveRender(SpriteBatch sb) {
-//        GraphicsHelper.dimFullScreen(sb, true);
-
         widgets.forEach(widget -> {
-            widget
-                    //.anchoredCenteredOnMouse(40, -40, AnchorPosition.LEFT_TOP, 20)
-                    .render(sb);
+            widget.render(sb);
         });
     }
-
-    private long nextUpdateTime;
-    private int numShifts;
 
     @Override
     public void receivePostUpdate() {
         widgets.forEach(AbstractWidget::update);
-//
-//
-//        if (System.currentTimeMillis() > nextUpdateTime) {
-//            float delta = (numShifts++ % 2 == 0) ? 20 : -20;
-//
-//            AtomicLong time = new AtomicLong(200);
-//            for (StyledContainer c : containers)
-//                c.delayedAnchoredAt(c.getLeft(), c.getBottom() + delta, AnchorPosition.LEFT_BOTTOM, InterpolationSpeed.FAST, time.addAndGet(100));
-//
-//            nextUpdateTime = System.currentTimeMillis() + 600;
-//        }
     }
 }
