@@ -53,7 +53,7 @@ public class StyledContainer extends AbstractWidget<StyledContainer> {
     private AnchorPosition headerAnchor = AnchorPosition.CENTER;
     private AnchorPosition contentAnchor = AnchorPosition.CENTER;
 
-    private static final TextureAtlas atlas = TextureAtlasDatabase.STYLED_CONTAINER.getAtlas();
+    private static final TextureAtlas atlas = TextureAtlasDatabase.STYLED_CONTAINER.getTextureAtlas();
 
     private NinePatchWidget npFullShadow;
     private NinePatchWidget npFullBase;

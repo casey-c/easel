@@ -2,7 +2,12 @@ package easel.utils.textures;
 
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 
-public enum TextureAtlasDatabase {
+/**
+ * Contains all texture atlases used by Easel.
+ * @see TextureDatabase
+ * @see TextureLoader
+ */
+public enum TextureAtlasDatabase implements ITextureAtlasDatabaseEnum {
     SMALL_HEADERED_TOOL_TIP("easel/textures/headeredToolTips/SmallHeadered.atlas"),
     LARGE_HEADERED_TOOL_TIP("easel/textures/headeredToolTips/LargeHeadered.atlas"),
     //STYLED_CONTAINER("easel/textures/container/StyledContainer.atlas"),
@@ -20,11 +25,11 @@ public enum TextureAtlasDatabase {
         this.internalPath = internalPath;
     }
 
-    protected void load() {
+    public void load() {
         this.atlas = new TextureAtlas(internalPath);
     }
 
-    public TextureAtlas getAtlas() {
+    public TextureAtlas getTextureAtlas() {
         return atlas;
     }
 }

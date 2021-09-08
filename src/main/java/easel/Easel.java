@@ -4,6 +4,8 @@ import basemod.BaseMod;
 import basemod.interfaces.PostInitializeSubscriber;
 import com.evacipated.cardcrawl.modthespire.lib.SpireInitializer;
 import easel.utils.EaselFonts;
+import easel.utils.textures.TextureAtlasDatabase;
+import easel.utils.textures.TextureDatabase;
 import easel.utils.textures.TextureLoader;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -22,7 +24,12 @@ public class Easel implements PostInitializeSubscriber {
 
     @Override
     public void receivePostInitialize() {
-        TextureLoader.loadTextures();
+        TextureLoader.loadTextures(TextureDatabase.values());
+        Easel.logger.info("TextureManager: loaded " + TextureDatabase.values().length + " textures.");
+
+        TextureLoader.loadTextureAtlases(TextureAtlasDatabase.values());
+        Easel.logger.info("TextureManager: loaded " + TextureAtlasDatabase.values().length + " texture atlases.");
+
         EaselFonts.loadFonts();
     }
 }

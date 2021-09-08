@@ -10,6 +10,9 @@ import easel.ui.InterpolationSpeed;
 
 import java.util.ArrayList;
 
+/**
+ * A collection of {@link SimpleTextureWidget}s stacked on top of each other. All textures share the same dimensions and can have their {@link SimpleTextureWidget#withColor(Color)} easily updated from one convenient interface. This is similar to a {@link easel.ui.graphics.ninepatch.LayeredNinePatch}.
+ */
 public class LayeredTextureWidget extends AbstractWidget<LayeredTextureWidget> {
     private float width;
     private float height;
@@ -101,6 +104,6 @@ public class LayeredTextureWidget extends AbstractWidget<LayeredTextureWidget> {
 
     @Override
     protected void renderWidget(SpriteBatch sb) {
-
+        layers.forEach(layer -> layer.render(sb));
     }
 }
