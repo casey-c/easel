@@ -22,8 +22,8 @@ public class EaselGraphicsHelper {
         sb.draw(ImageMaster.WHITE_SQUARE_IMG,
                 left * Settings.xScale,
                 bottom * Settings.yScale,
-                width * Settings.xScale,
-                height * Settings.yScale);
+                width * Settings.scale,
+                height * Settings.scale);
     }
 
     /**

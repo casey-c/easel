@@ -109,9 +109,11 @@ public class SimpleTextureWidget extends AbstractWidget<SimpleTextureWidget> {
     protected void renderWidget(SpriteBatch sb) {
         sb.setColor(renderColor);
         sb.draw(textureRegion,
-                getContentLeft() * Settings.xScale,
-                getContentBottom() * Settings.yScale,
-                getContentWidth() * Settings.xScale,
-                getContentHeight() * Settings.yScale);
+                Math.round(getContentLeft() * Settings.xScale),
+                Math.round(getContentBottom() * Settings.yScale),
+//                getContentWidth() * Settings.xScale,
+//                getContentHeight() * Settings.yScale);
+                Math.round(getContentWidth() * Settings.scale),
+                Math.round(getContentHeight() * Settings.scale));
     }
 }
