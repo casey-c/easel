@@ -125,6 +125,11 @@ public abstract class AbstractWidget<T extends AbstractWidget<T>> {
     protected Consumer<T> onMouseEnter = NOOP;
     protected Consumer<T> onMouseLeave = NOOP;
 
+    protected Consumer<T> onRightMouseDown = NOOP;
+    protected Consumer<T> onRightMouseUp = NOOP;
+    protected Consumer<T> onLeftMouseDown = NOOP;
+    protected Consumer<T> onLeftMouseUp = NOOP;
+
 //    private boolean hasMovable;
 //    private MovableWidget movableWidget;
 
@@ -894,6 +899,30 @@ public abstract class AbstractWidget<T extends AbstractWidget<T>> {
         return (T)this;
     }
 
+    public T onRightMouseDown(Consumer<T> onRightMouseDown) {
+        this.onRightMouseDown = onRightMouseDown;
+        initializeInteractivity();
+        return (T)this;
+    }
+
+    public T onLeftMouseDown(Consumer<T> onLeftMouseDown) {
+        this.onLeftMouseDown = onLeftMouseDown;
+        initializeInteractivity();
+        return (T)this;
+    }
+
+    public T onRightMouseUp(Consumer<T> onRightMouseUp) {
+        this.onRightMouseUp = onRightMouseUp;
+        initializeInteractivity();
+        return (T)this;
+    }
+
+    public T onLeftMouseUp(Consumer<T> onLeftMouseUp) {
+        this.onLeftMouseUp = onLeftMouseUp;
+        initializeInteractivity();
+        return (T)this;
+    }
+
     /**
      * Update this widget if it requires any logic updates each frame. Mostly for interactive widgets (as this is the spot to update hitboxes to see if they're moused over or clicked, etc.) which need updates each frame. Container widgets (e.g. {@link easel.ui.layouts.VerticalLayout}) will pass updates to all their children. The top-most widget in the hierarchy can subscribe to BaseMod's post update subscriber (or via some other SpirePatch), but everything else lower down should NOT subscribe and instead just receive their update notifications from their parent widget. The update() function for non-interactive widgets with no children is essentially a NO-OP.
      *
@@ -966,6 +995,24 @@ public abstract class AbstractWidget<T extends AbstractWidget<T>> {
         onRightClick.accept((T)this);
     }
 
+    // --------------------------------------------------------------------------------
+
+    protected void rightMouseDown() {
+        onRightMouseDown.accept((T)this);
+    }
+
+    protected void rightMouseReleased() {
+        onRightMouseUp.accept((T)this);
+    }
+
+    protected void leftMouseDown() {
+        onLeftMouseDown.accept((T)this);
+    }
+
+    protected void leftMouseReleased() {
+        onLeftMouseUp.accept((T)this);
+    }
+
 
     // --------------------------------------------------------------------------------
 
@@ -991,6 +1038,7 @@ public abstract class AbstractWidget<T extends AbstractWidget<T>> {
         // Left click started
         if (isHovered && InputHelper.justClickedLeft) {
             leftClickStarted = true;
+            leftMouseDown();
         }
         else if (hb.hovered && CInputActionSet.select.isJustPressed()) {
             CInputActionSet.select.unpress();
@@ -998,13 +1046,16 @@ public abstract class AbstractWidget<T extends AbstractWidget<T>> {
 //            Easel.logger.info("Clicked (using CInputActionSet)");
 //            Easel.logger.info(this);
 
+            leftMouseReleased();
             leftMouseClick();
         }
 
         // Left click ended
         if (leftClickStarted && InputHelper.justReleasedClickLeft) {
-            if (isHovered)
+            if (isHovered) {
+                leftMouseReleased();
                 leftMouseClick();
+            }
 
             leftClickStarted = false;
         }
@@ -1014,6 +1065,7 @@ public abstract class AbstractWidget<T extends AbstractWidget<T>> {
         // Right click started
         if (isHovered && InputHelper.justClickedRight) {
             rightClickStarted = true;
+            rightMouseDown();
         }
         // Should look into how to use input action set for right clicks - e.g. what is the key used when previewing card upgrades in shops?
 //        else if (hb.hovered && CInputActionSet.???.isJustPressed()) {
@@ -1026,8 +1078,10 @@ public abstract class AbstractWidget<T extends AbstractWidget<T>> {
 
         // Right click ended
         if (rightClickStarted && InputHelper.justReleasedClickRight) {
-            if (isHovered)
+            if (isHovered) {
+                rightMouseReleased();
                 rightMouseClick();
+            }
 
             rightClickStarted = false;
         }

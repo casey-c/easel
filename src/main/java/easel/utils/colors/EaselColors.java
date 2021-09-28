@@ -107,48 +107,48 @@ public class EaselColors {
         return darken(color, 0.1f);
     }
 
-    private static float twoCharHexToFloat(String xy) {
-        int val = Integer.parseInt(xy, 16);
-        return (float) val / 255.0f;
-    }
+//    private static float twoCharHexToFloat(String xy) {
+//        int val = Integer.parseInt(xy, 16);
+//        return (float) val / 255.0f;
+//    }
 
-    /**
-     * <p>
-     * Creates a libgdx Color from a six digit hex "rrggbb" or eight digit hex "rrggbbaa". If no alpha value aa is
-     * provided, the resulting color will not have any transparency. You may include an optional "#" prefix in the form
-     * of "#rrggbb" or "#rrggbbaa" which will be automatically stripped. This function attempts to do minor error
-     * handling by ensuring you give a string of the proper length. If this is not the case, the function returns a pure
-     * black color.
-     * </p>
-     * <p>
-     * Should the given string not be of the proper hexadecimal format (e.g. using characters other than A-F, 0-9), this
-     * function can throw a NumberFormatException.
-     * </p>
-     *
-     * @param hex a case-insensitive hexadecimal string describing the color; may have "#" as a prefix, but otherwise
-     *            should be 6 characters long or eight characters long, depending on whether to include transparency
-     * @return a color corresponding to this hex string
-     */
-    public static Color fromHexString(String hex) {
-        float r = 0.0f;
-        float g = 0.0f;
-        float b = 0.0f;
-
-        float a = 1.0f;
-
-        String work = (hex.startsWith("#")) ? hex.substring(1) : hex;
-
-        if (work.length() == 6 || work.length() == 8) {
-            r = twoCharHexToFloat(work.substring(0, 2));
-            g = twoCharHexToFloat(work.substring(2, 4));
-            b = twoCharHexToFloat(work.substring(4, 6));
-        }
-        if (work.length() == 8) {
-            a = twoCharHexToFloat(work.substring(6, 8));
-        }
-
-        return new Color(r, g, b, a);
-    }
+//    /**
+//     * <p>
+//     * Creates a libgdx Color from a six digit hex "rrggbb" or eight digit hex "rrggbbaa". If no alpha value aa is
+//     * provided, the resulting color will not have any transparency. You may include an optional "#" prefix in the form
+//     * of "#rrggbb" or "#rrggbbaa" which will be automatically stripped. This function attempts to do minor error
+//     * handling by ensuring you give a string of the proper length. If this is not the case, the function returns a pure
+//     * black color.
+//     * </p>
+//     * <p>
+//     * Should the given string not be of the proper hexadecimal format (e.g. using characters other than A-F, 0-9), this
+//     * function can throw a NumberFormatException.
+//     * </p>
+//     *
+//     * @param hex a case-insensitive hexadecimal string describing the color; may have "#" as a prefix, but otherwise
+//     *            should be 6 characters long or eight characters long, depending on whether to include transparency
+//     * @return a color corresponding to this hex string
+//     */
+//    public static Color fromHexString(String hex) {
+//        float r = 0.0f;
+//        float g = 0.0f;
+//        float b = 0.0f;
+//
+//        float a = 1.0f;
+//
+//        String work = (hex.startsWith("#")) ? hex.substring(1) : hex;
+//
+//        if (work.length() == 6 || work.length() == 8) {
+//            r = twoCharHexToFloat(work.substring(0, 2));
+//            g = twoCharHexToFloat(work.substring(2, 4));
+//            b = twoCharHexToFloat(work.substring(4, 6));
+//        }
+//        if (work.length() == 8) {
+//            a = twoCharHexToFloat(work.substring(6, 8));
+//        }
+//
+//        return new Color(r, g, b, a);
+//    }
 
     // --------------------------------------------------------------------------------
     // Common colors
